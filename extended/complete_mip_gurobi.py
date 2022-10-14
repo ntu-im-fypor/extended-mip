@@ -123,11 +123,101 @@ class CompleteMIPModel:
         # constraint4
         for i in self.I:
             for m in self.M[i - 1]:
-                self.z_imR[i, m] >= (
-                    self.parameters.Unfinished_Production_Time[i, m] + 
-                    self.parameters.Maintenance_Length[i, m] +
-                    self.parameters.Very_Large_Positive_Number * (quicksum(self.y_imj_before[i, m, j] for j in self.J) - self.parameters.Number_of_Jobs)
+                self.gp_model.addConstr(
+                    self.z_imR[i, m] >= (
+                        self.parameters.Unfinished_Production_Time[i, m] + 
+                        self.parameters.Maintenance_Length[i, m] +
+                        self.parameters.Very_Large_Positive_Number * (quicksum(self.y_imj_before[i, m, j] for j in self.J) - self.parameters.Number_of_Jobs)
+                    )
                 )
+        # constraint5
+        for i in self.I:
+            M_i = self.M[i - 1]
+            for m in M_i:
+                for j in self.J:
+                    self.gp_model.addConstr(
+                        self.z_ij[i, j] + self.parameters.Maintenance_Length[i, m] - self.z_imR[i, m] <= self.parameters.Very_Large_Positive_Number * (1 - self.y_imj_after[i, m, j])
+                    )
+        # constraint6
+        for i in self.I:
+            M_i = self.M[i - 1]
+            for m in M_i:
+                for j in self.J:
+                    self.gp_model.addConstr(
+                        self.z_imR[i, m] + self.p_imj[i, m, j] - self.z_ij[i, j] <= self.parameters.Very_Large_Positive_Number * (1 - self.y_imj_before[i, m, j])
+                    )
+        # constraint7
+        for i in self.I:
+            M_i = self.M[i - 1]
+            for m in M_i:
+                for j in self.J:
+                    self.gp_model.addConstr(
+                        self.p_imj[i, m, j] >= self.parameters.Initial_Production_Time[i, m, j] * (1 - (1 - self.parameters.Production_Time_Discount[i, m]) * self.y_imj_before[i, m, j])
+                    )
+        # constraint8
+        for i1 in self.I:
+            M_i1 = self.M[i1 - 1]
+            for i2 in self.I:
+                M_i2 = self.M[i2 - 1]
+                for m1 in M_i1:
+                    for m2 in M_i2:
+                        if not (i1 == i2 and m1 == m2):
+                            self.gp_model.addConstr(
+                                self.z_imR[i1, m1] + self.parameters.Maintenance_Length[i2, m2] - self.z_imR[i2, m2] <= self.parameters.Very_Large_Positive_Number * (1 - self.w[i1, m1, i2, m2])
+                            )
+        # constraint9
+        for i in self.I:
+            M_i = self.M[i - 1]
+            for j in self.J:
+                self.gp_model.addConstr(
+                    quicksum(self.r_imj[i, m, j] for m in M_i) == 1
+                )
+        # constraint10
+        for i in self.I:
+            M_i = self.M[i - 1]
+            for m in M_i:
+                for j1 in self.J:
+                    for j2 in self.J:
+                        if j1 != j2:
+                            self.gp_model.addConstr(
+                                self.x[i, m, j1, j2] + self.x[i, m, j2, j1] >= self.r_imj[i, m, j1] + self.r_imj[i, m, j2] - 1
+                            )
+        # constraint11
+        for i in self.I:
+            M_i = self.M[i - 1]
+            for m in M_i:
+                for j in self.J:
+                    self.gp_model.addConstr(
+                        2 * (self.y_imj_before[i, m, j] + self.y_imj_after[i, m, j]) <= self.r_imj[i, m, j] + self.v_im[i, m]
+                    )
+        # constraint12
+        for i in self.I:
+            M_i = self.M[i - 1]
+            for m in M_i:
+                for j in self.J:
+                    self.gp_model.addConstr(
+                        self.y_imj_before[i, m, j] + self.y_imj_after[i, m, j] >= self.r_imj[i, m, j] + self.v_im[i, m] - 1
+                    )
+        # constraint13
+        for i1 in self.I:
+            M_i1 = self.M[i1 - 1]
+            for i2 in self.I:
+                M_i2 = self.M[i2 - 1]
+                for m1 in M_i1:
+                    for m2 in M_i2:
+                        if not (i1 == i2 and m1 == m2):
+                            self.gp_model.addConstr(
+                                self.w[i1, m1, i2, m2] + self.w[i2, m2, i1, m1] >= self.v_im[i1, m1] + self.v_im[i2, m2] - 1
+                            )
+        # constraint14
+        for i in self.I[1:]:
+            M_i = self.M[i - 1]
+            for m in M_i:
+                for j in self.J:
+                    self.gp_model.addConstr(
+                        self.z_ij[i, j] - self.p_imj[i, m, j] - self.z_ij[i - 1, j] - self.parameters.Queue_Time_Limit[i, j] <= self.parameters.Very_Large_Positive_Number * (1 - self.r_imj[i, m, j])
+                    )
+
     def set_objective(self) -> None:
         # define objective function
         self.gp_model.setObjective((quicksum(
