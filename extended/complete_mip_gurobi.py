@@ -3,9 +3,9 @@ import math
 
 class Parameters:
     def __init__(self) -> None:
-        # n_I: Number of stages
+        # n^I: Number of stages
         self.Number_of_Stages = 0
-        # n_J: Number of jobs
+        # n^J: Number of jobs
         self.Number_of_Jobs = 0
         # n_i^M: Number of machines in stage i
         self.Number_of_Machines = []
@@ -35,9 +35,9 @@ class Parameters:
 
         """
         range definition for sets
-        i = 1, 2, ..., n_I
+        i = 1, 2, ..., n^I
         m = 1, 2, ..., n_i^M
-        j = 1, 2, ..., n_J
+        j = 1, 2, ..., n^J
         """
         self.I = list(range(1, self.parameters.Number_of_Stages + 1))
         self.M = []
@@ -59,7 +59,7 @@ class CompleteMIPModel:
 
         # r_imj: 1 if job j is completed on machine m in stage i or 0, otherwise
         self.r_imj = self.gp_model.addVars(I, M, J, vtype=GRB.BINARY, name="r")
-        #v_im: 1 if machine m is maintained in stage i or 0, otherwise
+        # v_im: 1 if machine m is maintained in stage i or 0, otherwise
         self.v_im = self.gp_model.addVars(I, M, vtype=GRB.BINARY, name="v")
         # z_im^R: completion time of maintenance of machine m in stage i
         self.z_imR = self.gp_model.addVars(I, M, vtype=GRB.CONTINUOUS, name="z^R")
@@ -67,7 +67,7 @@ class CompleteMIPModel:
         self.z_ij = self.gp_model.addVars(I, J, vtype=GRB.CONTINUOUS, name="z")
         # p_imj = effective production time of job j on machine m in stage i
         self.p_imj = self.gp_model.addVars(I, M, J, vtype=GRB.CONTINUOUS, name="p")
-        # x_imjk = 1 if job j precedes job k on machine m in stage i or 0, otherwise
+        # x_imj_1j_2 = 1 if job j_1 precedes job j_2 on machine m in stage i or 0, otherwise
         self.x = {}
         for i in self.I:
             M_i = self.M[i - 1]
@@ -112,12 +112,14 @@ class CompleteMIPModel:
                     )
         # constraint3
         for i in self.I:
-            for j1 in self.J:
-                for j2 in self.J:
-                    if j1 != j2:
-                        self.gp_model.addConstr(
-                            self.z_ij[i, j1] + self.p_imj[i, m, j2] - self.z_ij[i, j2] <= self.parameters.Very_Large_Positive_Number * (1 - self.x[i, m, j1, j2])
-                        )
+            M_i = self.M[i - 1]
+            for m in M_i:
+                for j1 in self.J:
+                    for j2 in self.J:
+                        if j1 != j2:
+                            self.gp_model.addConstr(
+                                self.z_ij[i, j1] + self.p_imj[i, m, j2] - self.z_ij[i, j2] <= self.parameters.Very_Large_Positive_Number * (1 - self.x[i, m, j1, j2])
+                            )
         # constraint4
         for i in self.I:
             for m in self.M[i - 1]:
