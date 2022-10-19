@@ -18,7 +18,7 @@ class Parameters:
         # F_im: Maintenance length of machine m in stage i
         self.Maintenance_Length = np.array([])
         # D_j: Due time of job j
-        self.Due_Time = np.array([])
+        self.Due_Time = np.array()
         # W_j: Tardiness penalty of job j
         self.Tardiness_Penalty = np.array([])
         # K: A very large positive number
@@ -57,7 +57,9 @@ class Parameters:
             
             # following n^I - 1 lines are queue time limit for n^J jobs in n^I - 1 stages
             for i in range(1, self.Number_of_Stages):
-                self.Queue_Time_Limit[i] = list(map(int, f.readline().split()))
+                tokens = list(map(int, f.readline().split()))
+                for j in range(self.Number_of_Jobs):
+                    self.Queue_Time_Limit[i][j] = tokens[j]
 
 
         """
