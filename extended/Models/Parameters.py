@@ -18,11 +18,12 @@ class Parameters:
         # F_im: Maintenance length of machine m in stage i
         self.Maintenance_Length = np.array([])
         # D_j: Due time of job j
-        self.Due_Time = np.array()
+        self.Due_Time = np.array([])
         # W_j: Tardiness penalty of job j
         self.Tardiness_Penalty = np.array([])
         # K: A very large positive number
-        self.Very_Large_Positive_Number = float('inf')
+        # TODO: 這邊要討論 K 的值應該設多少比較好
+        self.Very_Large_Positive_Number = 10000000
     
     def read_parameters(self, file_name: str) -> None:
         with open(file_name, 'r') as f:
@@ -45,7 +46,7 @@ class Parameters:
                 # the following n_i^M lines are information of machines
                 for m in range(self.Number_of_Machines[i]):
                     # every row is discount, maintenance length, unfinished production time, initial production time for n^J jobs
-                    tokens = list(map(int, f.readline().split()))
+                    tokens = list(map(float, f.readline().split()))
                     self.Production_Time_Discount[i][m] = tokens[0]
                     self.Maintenance_Length[i][m] = tokens[1]
                     self.Unfinished_Production_Time[i][m] = tokens[2]
@@ -53,14 +54,14 @@ class Parameters:
                         self.Initial_Production_Time[i][m][j] = tokens[3 + j]
             # following n^J lines are (due time, tardiness penalty) for n^J jobs
             for j in range(self.Number_of_Jobs):
-                self.Due_Time[j], self.Tardiness_Penalty[j] = map(int, f.readline().split())
+                self.Due_Time[j], self.Tardiness_Penalty[j] = map(float, f.readline().split())
             
             # following n^I - 1 lines are queue time limit for n^J jobs in n^I - 1 stages
             for i in range(1, self.Number_of_Stages):
                 tokens = list(map(int, f.readline().split()))
                 for j in range(self.Number_of_Jobs):
                     self.Queue_Time_Limit[i][j] = tokens[j]
-
+        print("Parameters read from file successfully.")
 
         """
         range definition for sets
