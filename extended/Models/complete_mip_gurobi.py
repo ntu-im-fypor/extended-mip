@@ -11,6 +11,8 @@ class CompleteMIPModel:
         self.J = self.parameters.J
         self.gp_model.setParam('TimeLimit', run_time_limit)
         self.gp_model.setParam('MIPGap', mip_gap)
+        # restrict binary variables to be 0 or 1
+        self.gp_model.setParam('IntFeasTol', 1e-9)
         self.__add_variables()
         self.__add_constraints()
         self.__set_objective()
@@ -36,7 +38,7 @@ class CompleteMIPModel:
             for m in M_i:
                 self.z_imR[i, m] = self.gp_model.addVar(vtype=GRB.CONTINUOUS, name=f'z_{i}_{m}^R')
         # z_ij: completion time of job j in stage i
-        self.z_ij = self.gp_model.addVars(self.I, self.J, vtype=GRB.CONTINUOUS, name="z")
+        self.z_ij = self.gp_model.addVars(self.I, self.J, vtype=GRB.CONTINUOUS, name="z_{i}_{j}")
         # p_imj = effective production time of job j on machine m in stage i
         self.p_imj = {}
         for i in self.I:
@@ -78,8 +80,10 @@ class CompleteMIPModel:
                         if (i1, m1) != (i2, m2):
                             self.w[i1, m1, i2, m2] = self.gp_model.addVar(vtype=GRB.BINARY, name=f"w_{i1}_{m1}_{i2}_{m2}")
         
-        self.gp_model.update()
-
+        # need to define tardiness for job j because gurobi objective function needs to use it
+        self.tardiness = {}
+        for j in self.J:
+            self.tardiness[j] = self.gp_model.addVar(vtype=GRB.CONTINUOUS, name=f"tardiness_{j}")
     def __add_constraints(self) -> None:
         
         # constraint1
@@ -92,13 +96,14 @@ class CompleteMIPModel:
                     )
         # constraint2
         for i in self.I[:-1]:
-            M_i = self.M[i - 1]
-            for m in M_i:
+            M_i_plus_1 = self.M[i]
+            for m in M_i_plus_1:
                 for j in self.J:
                     self.gp_model.addConstr(
                         self.z_ij[i + 1, j] - (self.z_ij[i, j] + self.p_imj[i + 1, m, j]) >= -1 * self.parameters.Very_Large_Positive_Number * (1 - self.r_imj[i + 1, m, j])
                     )
         # constraint3
+        # TODO: 因為 Gurobi 沒辦法真的讓變數是 binary，所以如果他應該是 0 但不是 0，那這邊的 constraint 就會乘上一個很大的數 (我設 1000000)，這可能要改一下 large number 的值
         for i in self.I:
             M_i = self.M[i - 1]
             for m in M_i:
@@ -205,14 +210,22 @@ class CompleteMIPModel:
                     self.gp_model.addConstr(
                         self.z_ij[i, j] - self.p_imj[i, m, j] - self.z_ij[i - 1, j] - self.parameters.Queue_Time_Limit[i - 1][j - 1] <= self.parameters.Very_Large_Positive_Number * (1 - self.r_imj[i, m, j])
                     )
+        # tardiness for each job
+        for j in self.J:
+            self.gp_model.addConstr(
+                self.tardiness[j] >= quicksum(self.z_ij[self.parameters.Number_of_Stages, j] - self.parameters.Due_Time[j - 1] for j in self.J)
+            )
+            self.gp_model.addConstr(
+                self.tardiness[j] >= 0
+            )
 
     def __set_objective(self) -> None:
         # define objective function
-        #TODO: rewrite the objective function!! 
-        self.gp_model.setObjective((quicksum(
-            max(self.z_ij[] - self.parameters.Due_Time[j - 1], 0) * self.parameters.Tardiness_Penalty[j - 1]
-            for j in list(range(1, self.parameters.Number_of_Jobs + 1))
-        )), GRB.MINIMIZE)
+        #TODO: rewrite the objective function!!
+
+        self.gp_model.setObjective(
+            quicksum(self.tardiness[j] * self.parameters.Tardiness_Penalty[j - 1] for j in self.J)
+        )
 
     def run_and_solve(self) -> None:
         print("Start solving...")
@@ -226,4 +239,7 @@ class CompleteMIPModel:
         print("Best objective value: ", self.gp_model.objVal)
         print("Best MIP gap: ", self.gp_model.MIPGap)
         print("Best bound: ", self.gp_model.ObjBound)
+        # print out all decision variables
+        for v in self.gp_model.getVars():
+            print(v.varName, v.x)
 
