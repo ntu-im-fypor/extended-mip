@@ -12,6 +12,7 @@ def main():
     # build and solve the model
     model = CompleteMIPModel(parameters)
     model.run_and_solve()
+    model.plot_result()
 
 
 if __name__ == '__main__':
