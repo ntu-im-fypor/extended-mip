@@ -23,7 +23,7 @@ class Parameters:
         self.Tardiness_Penalty = np.array([])
         # K: A very large positive number
         # TODO: 這邊要討論 K 的值應該設多少比較好
-        self.Very_Large_Positive_Number = 10000
+        self.Very_Large_Positive_Number = 0
     
     def read_parameters(self, file_name: str) -> None:
         with open(file_name, 'r') as f:
@@ -61,6 +61,7 @@ class Parameters:
                 tokens = list(map(int, f.readline().split()))
                 for j in range(self.Number_of_Jobs):
                     self.Queue_Time_Limit[i][j] = tokens[j]
+
         print("Parameters read from file successfully.")
 
         """
@@ -74,3 +75,13 @@ class Parameters:
         for machine_num in self.Number_of_Machines:
             self.M.append(list(range(1, machine_num + 1)))
         self.J = list(range(1, self.Number_of_Jobs + 1))
+
+        # set very large positive number
+        for i in range(self.Number_of_Stages):
+            for m in range(self.Number_of_Machines[i]):
+                for j in range(self.Number_of_Jobs):
+                    self.Very_Large_Positive_Number += (
+                        self.Initial_Production_Time[i][m][j] +
+                        self.Maintenance_Length[i][m] +
+                        self.Unfinished_Production_Time[i][m]
+                    )
