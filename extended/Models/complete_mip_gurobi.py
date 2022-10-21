@@ -1,4 +1,5 @@
 import gurobipy as gp
+import xlsxwriter
 from gurobipy import *
 from Models import Parameters
 
@@ -12,7 +13,6 @@ class CompleteMIPModel:
         self.gp_model.setParam('TimeLimit', run_time_limit)
         self.gp_model.setParam('MIPGap', mip_gap)
         # restrict binary variables to be 0 or 1
-        self.gp_model.setParam('IntFeasTol', 1e-9)
         self.__add_variables()
         self.__add_constraints()
         self.__set_objective()
@@ -38,7 +38,7 @@ class CompleteMIPModel:
             for m in M_i:
                 self.z_imR[i, m] = self.gp_model.addVar(vtype=GRB.CONTINUOUS, name=f'z_{i}_{m}^R')
         # z_ij: completion time of job j in stage i
-        self.z_ij = self.gp_model.addVars(self.I, self.J, vtype=GRB.CONTINUOUS, name="z_{i}_{j}")
+        self.z_ij = self.gp_model.addVars(self.I, self.J, vtype=GRB.CONTINUOUS, name="z")
         # p_imj = effective production time of job j on machine m in stage i
         self.p_imj = {}
         for i in self.I:
@@ -119,8 +119,8 @@ class CompleteMIPModel:
                 self.gp_model.addConstr(
                     self.z_imR[i, m] >= (
                         self.parameters.Unfinished_Production_Time[i - 1][m - 1] + 
-                        self.parameters.Maintenance_Length[i - 1][m - 1] +
-                        self.parameters.Very_Large_Positive_Number * (quicksum(self.y_imj_Before[i, m, j] for j in self.J) - self.parameters.Number_of_Jobs)
+                        self.parameters.Maintenance_Length[i - 1][m - 1]
+                        # self.parameters.Very_Large_Positive_Number * (quicksum(self.y_imj_Before[i, m, j] for j in self.J) - self.parameters.Number_of_Jobs)
                     )
                 )
         # constraint5
@@ -213,7 +213,7 @@ class CompleteMIPModel:
         # tardiness for each job
         for j in self.J:
             self.gp_model.addConstr(
-                self.tardiness[j] >= quicksum(self.z_ij[self.parameters.Number_of_Stages, j] - self.parameters.Due_Time[j - 1] for j in self.J)
+                self.tardiness[j] >= self.z_ij[self.parameters.Number_of_Stages, j] - self.parameters.Due_Time[j - 1]
             )
             self.gp_model.addConstr(
                 self.tardiness[j] >= 0
@@ -224,7 +224,7 @@ class CompleteMIPModel:
         #TODO: rewrite the objective function!!
 
         self.gp_model.setObjective(
-            quicksum(self.tardiness[j] * self.parameters.Tardiness_Penalty[j - 1] for j in self.J)
+            quicksum(self.tardiness[j] * self.parameters.Tardiness_Penalty[j - 1] for j in self.J), GRB.MINIMIZE
         )
 
     def run_and_solve(self) -> None:
@@ -242,4 +242,5 @@ class CompleteMIPModel:
         # print out all decision variables
         for v in self.gp_model.getVars():
             print(v.varName, v.x)
+    
 

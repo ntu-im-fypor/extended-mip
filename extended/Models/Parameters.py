@@ -23,7 +23,7 @@ class Parameters:
         self.Tardiness_Penalty = np.array([])
         # K: A very large positive number
         # TODO: 這邊要討論 K 的值應該設多少比較好
-        self.Very_Large_Positive_Number = 10000000
+        self.Very_Large_Positive_Number = 10000
     
     def read_parameters(self, file_name: str) -> None:
         with open(file_name, 'r') as f:
