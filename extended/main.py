@@ -1,5 +1,5 @@
 import sys
-from Models import Parameters, CompleteMIPModel
+from Models import Parameters, CompleteMIPModel, OldMIPModel
 
 def main():
     # read parameters from file
@@ -13,6 +13,7 @@ def main():
     model = CompleteMIPModel(parameters)
     model.run_and_solve()
     model.plot_result()
+
 
 
 if __name__ == '__main__':
