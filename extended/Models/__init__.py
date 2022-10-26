@@ -1,2 +1,2 @@
-from Models.parameters import Parameters
-from Models.Gurobi import OldMIPModel, CompleteMIPModel
+from .parameters import Parameters
+from .solution_model import SolutionModel

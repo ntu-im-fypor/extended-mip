@@ -2,7 +2,7 @@ import gurobipy as gp
 from gurobipy import *
 from Models import Parameters
 
-class CompleteMIPModel:
+class OldMIPModel:
     def __init__(self, parameters: Parameters, run_time_limit=300, mip_gap=0.01) -> None:
         self.gp_model = gp.Model("Complete_MIP")
         self.parameters = parameters
