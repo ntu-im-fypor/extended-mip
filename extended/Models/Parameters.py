@@ -58,7 +58,7 @@ class Parameters:
             
             # following n^I - 1 lines are queue time limit for n^J jobs in n^I - 1 stages
             for i in range(1, self.Number_of_Stages):
-                tokens = list(map(int, f.readline().split()))
+                tokens = list(map(float, f.readline().split()))
                 for j in range(self.Number_of_Jobs):
                     self.Queue_Time_Limit[i][j] = tokens[j]
 
