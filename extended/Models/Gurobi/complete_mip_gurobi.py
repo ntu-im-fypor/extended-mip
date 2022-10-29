@@ -230,6 +230,9 @@ class CompleteMIPModel(SolutionModel):
         print("Start solving...")
         # run Gurobi
         self.gp_model.optimize()
+
+    def get_objective_value(self) -> float:
+        return self.gp_model.objVal
     
     def record_result(self) -> None:
         # record the result
