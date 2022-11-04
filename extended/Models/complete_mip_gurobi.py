@@ -251,7 +251,7 @@ class CompleteMIPModel:
 
         What should be noticed is that the index of every parameter starts from 0, while the index of every variable starts from 1
         """
-        print("Plotting...")
-        print(f"z_11: {self.z_ij[1, 1].x}")
-        print(f"due time of job 1: {self.parameters.Due_Time[0]}")
+        # print("Plotting...")
+        # print(f"z_11: {self.z_ij[1, 1].x}")
+        # print(f"due time of job 1: {self.parameters.Due_Time[0]}")
 
