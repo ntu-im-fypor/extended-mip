@@ -1,7 +1,7 @@
 import sys
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, OldMIPModel
-from Models.heuristic import HeuristicModel
+from Models.heuristic import MetaPSOModel
 import pandas as pd
 
 def main():
@@ -18,7 +18,7 @@ def main():
     model.record_result()
     model.plot_result()
 
-    heuristic_model = HeuristicModel(parameters)
+    heuristic_model = MetaPSOModel(parameters)
     heuristic_model.run_and_solve()
     heuristic_model.record_result()
 
