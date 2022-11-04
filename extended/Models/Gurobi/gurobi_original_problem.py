@@ -2,9 +2,10 @@ import gurobipy as gp
 from gurobipy import *
 from Models import Parameters
 
-class OldMIPModel:
+class CompleteMIPModel_original:
     def __init__(self, parameters: Parameters, run_time_limit=1800, mip_gap=0.01) -> None:
         self.gp_model = gp.Model("Complete_MIP")
+        self.gp_model.Params.LogToConsole = 0
         self.parameters = parameters
         self.I = self.parameters.I
         self.M = self.parameters.M
@@ -216,7 +217,7 @@ class OldMIPModel:
                         for j2 in self.J:
                             if j1 != j2:
                                 self.gp_model.addConstr(
-                                    self.x[i1, 0, j1, j2] == self.x[i2, 0, j1, j2]
+                                    self.x[i1, 1, j1, j2] == self.x[i2, 1, j1, j2]
                                 )
         # tardiness for each job
         for j in self.J:
@@ -240,6 +241,8 @@ class OldMIPModel:
         # run Gurobi
         self.gp_model.optimize()
         self.__record_result()
+        return [self.gp_model.Runtime, self.gp_model.objVal, self.gp_model.MIPGap, self.gp_model.ObjBound]
+
     
     def __record_result(self) -> None:
         # record the result
@@ -260,7 +263,7 @@ class OldMIPModel:
 
         What should be noticed is that the index of every parameter starts from 0, while the index of every variable starts from 1
         """
-        print("Plotting...")
-        print(f"z_11: {self.z_ij[1, 1].x}")
-        print(f"due time of job 1: {self.parameters.Due_Time[0]}")
+        # print("Plotting...")
+        # print(f"z_11: {self.z_ij[1, 1].x}")
+        # print(f"due time of job 1: {self.parameters.Due_Time[0]}")
 

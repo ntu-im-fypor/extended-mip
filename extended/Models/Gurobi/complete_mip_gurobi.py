@@ -1,11 +1,12 @@
 import gurobipy as gp
 from gurobipy import *
-from Models import Parameters, SolutionModel
+from Models import Parameters
 
-class CompleteMIPModel(SolutionModel):
-    def __init__(self, parameters: Parameters, run_time_limit=1800, mip_gap=0.01) -> None:
-        super().__init__(parameters)
+class CompleteMIPModel:
+    def __init__(self, parameters: Parameters, run_time_limit=300, mip_gap=0.01) -> None:
         self.gp_model = gp.Model("Complete_MIP")
+        self.gp_model.Params.LogToConsole = 0
+        self.parameters = parameters
         self.I = self.parameters.I
         self.M = self.parameters.M
         self.J = self.parameters.J
@@ -102,7 +103,6 @@ class CompleteMIPModel(SolutionModel):
                         self.z_ij[i + 1, j] - (self.z_ij[i, j] + self.p_imj[i + 1, m, j]) >= -1 * self.parameters.Very_Large_Positive_Number * (1 - self.r_imj[i + 1, m, j])
                     )
         # constraint3
-        # TODO: 因為 Gurobi 沒辦法真的讓變數是 binary，所以如果他應該是 0 但不是 0，那這邊的 constraint 就會乘上一個很大的數 (我設 1000000)，這可能要改一下 large number 的值
         for i in self.I:
             M_i = self.M[i - 1]
             for m in M_i:
@@ -230,22 +230,54 @@ class CompleteMIPModel(SolutionModel):
         print("Start solving...")
         # run Gurobi
         self.gp_model.optimize()
-
-    def get_objective_value(self) -> float:
-        return self.gp_model.objVal
+        return self.__record_result()
     
-    def record_result(self) -> None:
+    def __record_result(self) -> None:
         # record the result
         print("Runtime: ", self.gp_model.Runtime)
         print("Best objective value: ", self.gp_model.objVal)
         print("Best MIP gap: ", self.gp_model.MIPGap)
         print("Best bound: ", self.gp_model.ObjBound)
+        return [self.gp_model.Runtime, self.gp_model.objVal]
         # print out all decision variables
-        for v in self.gp_model.getVars():
-            print(v.varName, v.x)
+        # for v in self.gp_model.getVars():
+        #     print(v.varName, v.x)
+        # with open(result_path, 'w') as f:
+        #     f.write(str(self.gp_model.objVal))
+        #     f.write('\n')
+        #     for i in self.I:
+        #         M_i = self.M[i - 1]
+        #         for m in M_i:
+        #             for j in self.J:
+        #                 f.write(str(self.r_imj[i, m, j].X))
+        #                 f.write(" ")
+        #             f.write('\n')
+            
+        #     for i in self.I:
+        #         for j in self.J:
+        #             f.write(str(self.z_ij[i, j].X))
+        #             f.write(" ")
+        #         f.write('\n')
+
+        #     for i in self.I:
+        #         M_i = self.M[i - 1]
+        #         for m in M_i:
+        #             f.write(str(self.z_imR[i, m].X))
+        #             f.write(" ")
+        #         f.write('\n')
+        #     f.close()
+            
     
     def plot_result(self) -> None:
-        print("Plotting...")
-        print(f"z_11: {self.z_ij[1, 1].x}")
-        print(f"due time of job 1: {self.parameters.Due_Time[0]}")
+        """
+        1. you can access every variable by passing its index
+        e.g. you can access completion time of job 1 in stage 1 using self.z_ij[1, 1].x (Note: z_ij[1, 1] is a gurobi variable, but its value needs to be accessed by .x)
+        2. you can access every parameter by using the property self.parameters
+        e.g. you can access the due time of job 1 using self.parameters.Due_Time[0]
+
+        What should be noticed is that the index of every parameter starts from 0, while the index of every variable starts from 1
+        """
+        # print("Plotting...")
+        # print(f"z_11: {self.z_ij[1, 1].x}")
+        # print(f"due time of job 1: {self.parameters.Due_Time[0]}")
 
