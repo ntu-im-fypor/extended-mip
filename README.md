@@ -2,11 +2,10 @@
 A Joint Production and Preventive Maintenance Scheduling Problem in a Multi-stage Flexible Flow Shop Environment
 
 ## How to Run Gurobi
-1. clone this repo
-2. go to the repo directory and `cd` to extended folder
-3. install required packages by typing `pip install -r requirements.txt`
-4. Make sure you have a valid Gurobi license in your computer. If don't, please refer to the link to apply for an individual academic license: https://www.gurobi.com/academia/academic-program-and-licenses/.
-5. run the Gurobi Model by typing `python main.py -tests/origianl_test.txt`
+1. clone this repo and go to the repo directory
+2. install required packages by typing `pip install -r requirements.txt`
+3. Make sure you have a valid Gurobi license in your computer. If don't, please refer to the link to apply for an individual academic license: https://www.gurobi.com/academia/academic-program-and-licenses/.
+4. `cd` to extended folder and run the Gurobi Model by typing `python main.py tests/original_test.txt`
 
 
 ## About accessing Gurobi variable and Parameters for plotting result
@@ -22,7 +21,8 @@ def plot_result(self) -> None:
         What should be noticed is that the index of every parameter starts from 0, while the index of every variable starts from 1
         """
         print("Plotting...")
-        # use following method, you can get the value of completion time of job 1 in stage 1 and due time of job 1
+        # use following method, you can get the value of 
+        # completion time of job 1 in stage 1 and due time of job 1
         print(f"z_11: {self.z_ij[1, 1].x}")
         print(f"due time of job 1: {self.parameters.Due_Time[0]}")
 ```

@@ -1,5 +1,8 @@
 import sys
-from Models import Parameters, CompleteMIPModel
+from Models import Parameters
+from Models.Gurobi import CompleteMIPModel, OldMIPModel
+from Models.heuristic import HeuristicModel
+import pandas as pd
 
 def main():
     # read parameters from file
@@ -12,8 +15,12 @@ def main():
     # build and solve the model
     model = CompleteMIPModel(parameters)
     model.run_and_solve()
+    model.record_result()
     model.plot_result()
 
+    heuristic_model = HeuristicModel(parameters)
+    heuristic_model.run_and_solve()
+    heuristic_model.record_result()
 
 if __name__ == '__main__':
     main()

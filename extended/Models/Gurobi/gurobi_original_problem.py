@@ -2,7 +2,11 @@ import gurobipy as gp
 from gurobipy import *
 from Models import Parameters
 
+<<<<<<< HEAD:extended/Models/gurobi_original_problem.py
 class CompleteMIPModel_original:
+=======
+class OldMIPModel:
+>>>>>>> b889fb06ac1af34b7eb19b26f5676d367937764a:extended/Models/Gurobi/gurobi_original_problem.py
     def __init__(self, parameters: Parameters, run_time_limit=1800, mip_gap=0.01) -> None:
         self.gp_model = gp.Model("Complete_MIP")
         self.gp_model.Params.LogToConsole = 0
