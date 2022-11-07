@@ -64,8 +64,7 @@ def transform_parameters_to_instance(parameters: Parameters) -> Instance:
     instance.WEIGHT = parameters.Tardiness_Penalty.tolist()
     instance.QUEUE_LIMIT = []
     for i in range(1, parameters.Number_of_Stages):
-        for j in range(parameters.Number_of_Jobs):
-            instance.QUEUE_LIMIT.append(parameters.Queue_Time_Limit[i][j])
+        instance.QUEUE_LIMIT.append(parameters.Queue_Time_Limit[i].tolist())
     return instance
 
 def print_instance(instance):
@@ -218,7 +217,7 @@ def calculate_objective_value(schedule, instance) -> float:
                     # save the job end time of previous stage
                     prev_stage_end_time = current_end_time[job_maintenance_order[j]]
                     # check if violates queue time limit
-                    if (production_start_time - prev_stage_end_time > instance.QUEUE_LIMIT[job_maintenance_order[j]]):
+                    if (production_start_time - prev_stage_end_time > instance.QUEUE_LIMIT[stage-1][job_maintenance_order[j]]):
                         return -1
 
                 current_end_time[job_maintenance_order[j]
