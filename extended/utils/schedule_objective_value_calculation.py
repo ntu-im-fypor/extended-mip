@@ -145,6 +145,8 @@ def calculate_objective_value(schedule, instance) -> float:
         for j in range(len(job_maintenance_order)):  # loop all jobs/maintenance in order
             # if currently maintenance is processed, record start and end time of maintenance
             if (job_maintenance_order[j] == -1):
+                if (j == len(job_maintenance_order)): # maintenance must not be processed last
+                    break
                 has_maintained = True
                 maint_time[i][0] = current_machine_time
                 current_machine_time += instance.MAINT_LEN[i]
