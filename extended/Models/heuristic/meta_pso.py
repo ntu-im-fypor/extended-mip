@@ -8,11 +8,11 @@ class MetaPSOModel(SolutionModel):
     def run_and_solve(self):
         print("Running and solving using PSOModel")
 
-    def record_result(self):
-        print("Recording result using PSOModel")
-        example_schedule = [[1.2, 1.3, 2.5, 0, 2.3], [1.2, 1.5, 1.3, 1.1, 0]]
+    def record_result(self, schedule):
+        # print("Recording result using PSOModel")
+        # example_schedule = [[1.2, 1.3, 2.5, 0, 2.3], [1.2, 1.5, 1.3, 1.1, 0]]
         instance = transform_parameters_to_instance(self.parameters)
-        print("Instance after transformation:")
-        print_instance(instance)
-        schedule_obj = calculate_objective_value(example_schedule, instance)
-        print("Schedule objective value: ", schedule_obj)
+        # print("Instance after transformation:")
+        schedule_obj = calculate_objective_value(schedule, instance)
+        print("Generated Schedule objective value: ", schedule_obj)
+        return schedule_obj

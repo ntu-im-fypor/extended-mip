@@ -84,7 +84,6 @@ instance = Instance()
 
 
 def compute_tardiness(current_end_time, instance):
-    print(current_end_time)
     obj = 0
     for i in range(instance.JOBS_NUM):
         if (current_end_time[i] > instance.DUE_TIME[i]):  # finished after due time
@@ -104,8 +103,7 @@ def get_job_maintenance_order_for_machine(machine, schedule, instance):
     for i in range(len(schedule)):
         if math.floor(schedule[i]) == machine:  # 如果是會在此機台上被處裡的 job 或 maintenance
             # append the job being processed, else append -1 to indicate maintenance
-            l.append((schedule[i], i)) if isJob(
-                i) else l.append((schedule[i], -1))
+            l.append((schedule[i], i)) if isJob(i) else l.append((schedule[i], -1))
     l = sorted(l, key=itemgetter(0))  # sort by first value of tuple
 
     # get first element using zip, then change data type to list
@@ -145,7 +143,7 @@ def calculate_objective_value(schedule, instance) -> float:
         for j in range(len(job_maintenance_order)):  # loop all jobs/maintenance in order
             # if currently maintenance is processed, record start and end time of maintenance
             if (job_maintenance_order[j] == -1):
-                if (j == len(job_maintenance_order)): # maintenance must not be processed last
+                if (j == len(job_maintenance_order)-1): # maintenance must not be processed last
                     break
                 has_maintained = True
                 maint_time[i][0] = current_machine_time
@@ -190,6 +188,7 @@ def calculate_objective_value(schedule, instance) -> float:
     current_end_time = [0] * instance.JOBS_NUM
 
     # Time re-calculation to eliminate maintenance conflict
+    violated = False # whether queue time limit is violated
     for i in range(total_machines_num):  # loop all machines in order
         # get the stage number and machine index for current stage of current machine
         stage, machine_stage_index = get_stage_and_machine_index(i, instance)
@@ -220,11 +219,15 @@ def calculate_objective_value(schedule, instance) -> float:
                     prev_stage_end_time = current_end_time[job_maintenance_order[j]]
                     # check if violates queue time limit
                     if (production_start_time - prev_stage_end_time > instance.QUEUE_LIMIT[stage-1][job_maintenance_order[j]]):
-                        return -1
+                        violated =  True
 
                 current_end_time[job_maintenance_order[j]
                                  ] = production_start_time + production_time
                 current_machine_time = production_start_time + production_time
+        print("end time of stage ", stage + 1, "machine ", machine_stage_index+1)
+        print(current_end_time)
 
+    if violated:
+        return -1
     obj = compute_tardiness(current_end_time, instance)
     return obj

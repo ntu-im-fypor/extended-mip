@@ -62,7 +62,7 @@ class Parameters:
                 for j in range(self.Number_of_Jobs):
                     self.Queue_Time_Limit[i][j] = tokens[j]
 
-        print("Parameters read from file successfully.")
+        # print("Parameters read from file successfully.")
 
         """
         range definition for sets
