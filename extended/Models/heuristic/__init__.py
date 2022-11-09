@@ -1,1 +1,1 @@
-from .heuristic_model_1 import HeuristicModel
+from .meta_pso import MetaPSOModel

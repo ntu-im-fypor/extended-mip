@@ -3,16 +3,11 @@ import xlsxwriter
 from tokenize import String
 from unittest import result
 from Models import Parameters
-from Models.Gurobi import CompleteMIPModel
-from Models.heuristic import HeuristicModel
+from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original
+from Models.heuristic import MetaPSOModel
 import pandas as pd
 
-def main():
-    # read parameters from file
-    # if len(sys.argv) == 0:
-    #     print("No parameters file specified")
-    #     return
-    # file_path = sys.argv[1]
+def test_relaxation_result():
     result = []
     for i in range(1, 51):
         file_path = "/Users/ckocp3/Downloads/base/base_" + str(i) + ".txt"
@@ -38,5 +33,18 @@ def main():
     # heuristic_model.run_and_solve()
     # heuristic_model.record_result()
 
+def test_heuristic_model():
+    # read parameters from file
+    if len(sys.argv) == 0:
+        print("No parameters file specified")
+        return
+    file_path = sys.argv[1]
+    parameters = Parameters()
+    parameters.read_parameters(file_path)
+    heuristic_model = MetaPSOModel(parameters)
+    heuristic_model.run_and_solve()
+    heuristic_model.record_result()
+
 if __name__ == '__main__':
-    main()
+    # test_relaxation_result()
+    test_heuristic_model()
