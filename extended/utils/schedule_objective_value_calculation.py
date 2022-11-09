@@ -184,6 +184,8 @@ def calculate_objective_value(schedule, instance) -> float:
                 instance.MAINT_LEN[min_index]
         maint_end_time = maint_time[min_index][1]
 
+    print("maintenance time of each machine: ", maint_time)
+
     # Reset [Array to store the current end time of each job, will update after looping each machine] for re-calculation
     current_end_time = [0] * instance.JOBS_NUM
 
