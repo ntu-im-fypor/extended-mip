@@ -224,7 +224,7 @@ def calculate_objective_value(schedule, instance) -> float:
                 current_end_time[job_maintenance_order[j]
                                  ] = production_start_time + production_time
                 current_machine_time = production_start_time + production_time
-        print("end time of stage ", stage + 1, "machine ", machine_stage_index+1)
+        print("end time of jobs on stage ", stage + 1, "machine ", machine_stage_index+1)
         print(current_end_time)
 
     if violated:
