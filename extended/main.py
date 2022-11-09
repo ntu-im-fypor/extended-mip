@@ -15,22 +15,24 @@ def main():
     # file_path = sys.argv[1]
     result = []
     for i in range(1, 51):
-        # file_path = "/Users/ckocp3/Downloads/base/base_" + str(i) + ".txt"
-        file_path = "/Users/ckocp3/Downloads/base_1104/base_" + str(i) + ".txt"
+        file_path = "/Users/ckocp3/Downloads/base/base_" + str(i) + ".txt"
+        # file_path = "/Users/ckocp3/Downloads/base_1105/base_" + str(i) + ".txt"
+        result_path = "/Users/ckocp3/Downloads/base_result_1107/base_result_" + str(i) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         # build and solve the model
         model = CompleteMIPModel(parameters)
-        result.append(model.run_and_solve())
+        result.append(model.run_and_solve(result_path))
 
-    workbook = xlsxwriter.Workbook('relaxation_result.xlsx')
-    worksheet = workbook.add_worksheet()
-    for i in range(1, 51):
-        # write operation perform
-        worksheet.write(i, 0, result[i-1][0])
-        worksheet.write(i, 1, result[i-1][1])
+    # workbook = xlsxwriter.Workbook('relaxation_result.xlsx')
+    # worksheet = workbook.add_worksheet()
+    # for i in range(1, 3):
+    #     # write operation perform
+    #     worksheet.write(i, 0, result[i-1][0])
+    #     worksheet.write(i, 1, result[i-1][1])
+    #     worksheet.write(i, 2, result[i-1][2])
      
-    workbook.close()
+    # workbook.close()
 
     # heuristic_model = HeuristicModel(parameters)
     # heuristic_model.run_and_solve()
