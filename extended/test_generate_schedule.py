@@ -77,7 +77,7 @@ def test_objective_function():
     resultParameters = ResultParameters()
     resultParameters.read_result('tests/base/base_'+ str(file_id) +'.txt','tests/base_result_1107/base_result_'+ str(file_id) +'.txt')
     resultParameters.generateOrder()
-    print("Generated Schedule:")
+    print("Generated Ordering:")
     print(resultParameters.schedule)
     heuristic_model.record_result(resultParameters.schedule)
     print("Gurobi objective value: ", resultParameters.objVal)
