@@ -40,12 +40,14 @@ def generate_population(instance, population_num):
 
     return population
 
-instance = temp()
 
-ans = generate_population(instance, 10)
+if __name__ == "__main__":
+    instance = temp()
 
-for i in range(len(ans)):
-    for j in range(len(ans[i])):
-        print(ans[i][j])
-        print('\n')
-    print("=================")
+    ans = generate_population(instance, 10)
+
+    for i in range(len(ans)):
+        for j in range(len(ans[i])):
+            print(ans[i][j])
+            print('\n')
+        print("=================")
