@@ -27,14 +27,14 @@ def generate_population(instance, population_num):
         population.append([])
         for j in range(stage_num):
             population[i].append([])
+
             # job schedule
             for k in range(job_num):
-                # random range: 1 ~ machine_num[j]+1
                 population[i][j].append(round(random.uniform(1, machine_num[j]+1), 2))
+
             # machine schedule
             # for k in range(machine_num[j]):
             for k in range(max_machine):
-                # random range: k+1 ~ K+2
                 population[i][j].append(round(random.uniform(k+1, k+2), 2))
 
 
