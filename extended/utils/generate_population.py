@@ -1,5 +1,6 @@
 
 import random
+import numpy as np
 
 class temp():
     def __init__(self):
@@ -38,11 +39,14 @@ def generate_population(instance, population_num):
                 population[i][j].append(round(random.uniform(k+1, k+2), 2))
 
 
-    return population
+    np_result =  np.array(population)
+    return np_result
 
 instance = temp()
 
 ans = generate_population(instance, 10)
+
+print("type = ", type(ans))
 
 for i in range(len(ans)):
     for j in range(len(ans[i])):
