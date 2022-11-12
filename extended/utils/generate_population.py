@@ -1,5 +1,6 @@
 from Models import Parameters
 import random
+import numpy as np
 
 class temp():
     def __init__(self):
@@ -20,7 +21,6 @@ def generate_population(instance, population_num):
 
     # get max. machine
     max_machine  = max(machine_num)
-    print("max_machine = ", max_machine)
 
     population = []
     for i in range(population_num):
@@ -37,8 +37,9 @@ def generate_population(instance, population_num):
             for k in range(max_machine):
                 population[i][j].append(round(random.uniform(k+1, k+2), 2))
 
+    np_result = np.array(population)
 
-    return population
+    return np_result
 
 
 if __name__ == "__main__":
