@@ -1,43 +1,249 @@
-from Models import Parameters
+'''
+TODO:
+1. 檢查數字有沒有重複（有的話要往後移動）
+
+
+'''
+
+
+
+# from Models import Parameters
 import random
 import numpy as np
+import copy
+
+
+def print_job_order_method(job_order_dic, stage_num, job_num):
+    for i in job_order_dic:
+        print(i)
+        print('==================')
+        print(job_order_dic[i])
+        print('==================')
+        for j in range(stage_num):
+            print("stage = ", j)
+            for k in range(job_num):
+                print("job num = ", k)
+                print("arranged machine = ", job_order_dic[i][j][k])
+                print('------------')
+
+    print('END JOB MACHINE ARRANGEMENT PRINT')
+
 
 class temp():
     def __init__(self):
         self.Number_of_Stages = 5
         self.Number_of_Jobs = 10
         self.Number_of_Machines = [3,5,6,3,5]
+        self.max_machine_num = max(self.Number_of_Machines)
+        self.Initial_Production_Time = np.random.randint(1, 100, size=((self.Number_of_Stages, self.max_machine_num, self.Number_of_Jobs)))
+        self.Due_Time = np.random.randint(1, 100, self.Number_of_Jobs)
+        self.Tardiness_Penalty = np.random.randint(1, 100, self.Number_of_Jobs)
+
 
 
 
 '''
 population_num=n : 對於每個方法的排列組合，都生成 n 個不同數值的解
 
+方法：
+
+1. pick machine
+    a. 找讓 initial production time 最短的機器 A[stage][machine][job]
+    b. 隨機選一個地方放
+
+2. decide job order
+    a. Random
+    b. Weighted Penalty
+    c. Due Time
+    d. Due Time / Weighted Penalty
+    e. Least Slack Time Ratio (先不做)
+
+3. decide maintenance time
+    a. 統一不保養
+    b. 統一放最前面
+    c. random DONE
+
+流程
+1. 先決定順序
+2. 再決定要放在哪裡
+3. 最後放 maintenance
+
 '''
 def generate_population(instance, population_num):
     stage_num = instance.Number_of_Stages
     job_num = instance.Number_of_Jobs
     machine_num = instance.Number_of_Machines
-
-    # get max. machine
     max_machine  = max(machine_num)
+    weighted_penalty = instance.Tardiness_Penalty
+    due_time = instance.Due_Time
+    initial_production_time = instance.Initial_Production_Time
 
     population = []
-    for i in range(population_num):
-        population.append([])
-        for j in range(stage_num):
-            population[i].append([])
+    return_value = []
 
-            # job schedule
-            for k in range(job_num):
-                population[i][j].append(round(random.uniform(1, machine_num[j]+1), 2))
+    # machine_method = ['random', 'min_prod_time']
+    machine_methods = ['random']
+    # job_order_method = ['random', 'weight_penalty', 'due_time', 'due_time_x_weight_penalty']
+    job_order_methods = ['random', 'weight_penalty', 'due_time', 'due_time_x_weight_penalty']
+    # maintenance_methods = ['random', 'no_maintain', 'first_place']
+    maintenance_methods = ['random', 'no_maintain', 'first_place']
 
-            # machine schedule
-            # for k in range(machine_num[j]):
-            for k in range(max_machine):
-                population[i][j].append(round(random.uniform(k+1, k+2), 2))
+    job_order_dic = {} # to be deleted
+    '''
+    {
+        machine_method_name:{
+            [stage][job]: machine_num
+        }
+    }
+    '''
 
-    np_result = np.array(population)
+    '''
+    WARNING:  之後記得machine_num, job_num, stage_num 都要加一
+    '''
+
+
+    # step 1: decide machine arrangement
+    for machine_method in machine_methods:
+        job_order_dic[machine_method] = []
+        if(machine_method == 'random'):
+            for j in range(stage_num):
+                job_order_dic[machine_method].append([])
+                for k in range(job_num):
+                    chosen_machine_num = random.randint(0,machine_num[j]-1)
+                    job_order_dic[machine_method][j].append(chosen_machine_num)
+
+
+        '''
+        if(i == 'min_prod_time'):
+            for j in range(stage_num):
+                job_order_dic[i].append([])
+                for k in range(machine_num[j]):
+                    job_order_dic[i][j].append([])
+                    for p in range(job_num):
+        '''
+
+    print_job_order_method(job_order_dic, stage_num, job_num)
+
+    # step 2: decide job order of each macine in each stage
+
+    for machine_method in machine_methods:
+        for job_order_method in job_order_methods:
+            population.append([])
+            cur_population = len(population)-1
+
+            if(job_order_method == 'random'):
+                for s in range(stage_num):
+                    population[cur_population].append([])
+                    for j in range(job_num):
+                        # decide stage, job 的個位數
+                        assigned_machine = job_order_dic[machine_method][s][j]
+                        population[cur_population][s].append(round(random.uniform(assigned_machine+1, assigned_machine+2-0.01), 2))
+
+            # TODO: 簡化這個部分
+            if(job_order_method == 'weight_penalty'):
+                for s in range(stage_num):
+                    population[cur_population].append([])
+
+                    # === Start the order deciding process ===
+                    job_order_list = [[] for i in range(machine_num[s])]
+                    for j in range(job_num):
+                        assigned_machine = job_order_dic[machine_method][s][j]
+                        # Step a: init 所有值
+                        population[cur_population][s].append(0.0)
+                        # Step b: 抓出所有 job 所屬的 machine
+                        job_order_list[assigned_machine].append(j)
+                    # Step c: 對於每個 machine，根據所有 job 排序 ===>  order = [[job_num1, job_num2]]
+                    for m in range(machine_num[s]):
+                        weighted_penalty_short = [weighted_penalty[j] for j in job_order_list[m]]
+                        job_order_list[m] = [job_order_list[m] for _, job_order_list[m] in sorted(zip(weighted_penalty_short, job_order_list[m]), reverse=True)]
+                        # Step d: 從前到後逐一生成數值
+                        min_val = 0
+                        for j in job_order_list[m]:
+                            population[cur_population][s][j] = round(random.uniform(m+1+min_val+0.01, m+2-0.01), 2)
+                            min_val = population[cur_population][s][j] - m - 1
+
+            if(job_order_method == 'due_time'):
+                for s in range(stage_num):
+                    population[cur_population].append([])
+
+                    # === Start the order deciding process ===
+                    job_order_list = [[] for i in range(machine_num[s])]
+                    for j in range(job_num):
+                        assigned_machine = job_order_dic[machine_method][s][j]
+                        # Step a: init 所有值
+                        population[cur_population][s].append(0.0)
+                        # Step b: 抓出所有 job 所屬的 machine
+                        job_order_list[assigned_machine].append(j)
+                    # Step c: 對於每個 machine，根據所有 job 排序 ===>  order = [[job_num1, job_num2]]
+                    for m in range(machine_num[s]):
+                        print("job_order_list[m] = ", job_order_list[m])
+                        due_time_short = [due_time[j] for j in job_order_list[m]]
+                        print("due_time_short = ", due_time_short)
+                        job_order_list[m] = [job_order_list[m] for _, job_order_list[m] in sorted(zip(due_time_short, job_order_list[m]))]
+                        print("sorted = ", job_order_list[m])
+
+                        # Step d: 從前到後逐一生成數值
+                        min_val = 0
+                        for j in job_order_list[m]:
+                            population[cur_population][s][j] = round(random.uniform(m+1+min_val+0.01, m+2-0.01), 2)
+                            min_val = population[cur_population][s][j] - m - 1
+
+            if(job_order_method == 'due_time_x_weight_penalty'):
+                for s in range(stage_num):
+                    population[cur_population].append([])
+
+                    # === Start the order deciding process ===
+                    job_order_list = [[] for i in range(machine_num[s])]
+                    for j in range(job_num):
+                        assigned_machine = job_order_dic[machine_method][s][j]
+                        # Step a: init 所有值
+                        population[cur_population][s].append(0.0)
+                        # Step b: 抓出所有 job 所屬的 machine
+                        job_order_list[assigned_machine].append(j)
+                    # Step c: 對於每個 machine，根據所有 job 排序 ===>  order = [[job_num1, job_num2]]
+                    for m in range(machine_num[s]):
+                        print("job_order_list[m] = ", job_order_list[m])
+                        max_order = [due_time[j] / weighted_penalty[j] for j in job_order_list[m]]
+                        print("max_order = ", max_order)
+                        job_order_list[m] = [job_order_list[m] for _, job_order_list[m] in sorted(zip(max_order, job_order_list[m]))]
+                        print("sorted = ", job_order_list[m])
+
+                        # Step d: 從前到後逐一生成數值
+                        min_val = 0
+                        for j in job_order_list[m]:
+                            population[cur_population][s][j] = round(random.uniform(m+1+min_val+0.01, m+2-0.01), 2)
+                            min_val = population[cur_population][s][j] - m - 1
+
+
+    # step 3: decide maintenance order
+
+    for maintenance_method in maintenance_methods:
+        for p in population:
+            return_value.append(copy.deepcopy(p))
+            cur_posi = len(return_value)-1
+            if(maintenance_method == 'random'):
+                for s in range(stage_num):
+                    for m in range(0, machine_num[s]):
+                        return_value[cur_posi][s].append(round(random.uniform(m+1, m+2-0.01), 2))
+                    for m in range(machine_num[s], max_machine):
+                        return_value[cur_posi][s].append(m+1+0.99)
+
+            if(maintenance_method == 'no_maintain'):
+                for s in range(stage_num):
+                    for m in range(0, machine_num[s]):
+                        return_value[cur_posi][s].append(0)
+                    for m in range(machine_num[s], max_machine):
+                        return_value[cur_posi][s].append(m+1+0.99)
+
+
+            if(maintenance_method == 'first_place'):
+                for s in range(stage_num):
+                    for m in range(0, machine_num[s]):
+                        return_value[cur_posi][s].append(m+1)
+                    for m in range(machine_num[s], max_machine):
+                        return_value[cur_posi][s].append(m+1+0.99)
+
+    np_result = np.array(return_value)
 
     return np_result
 
@@ -47,6 +253,8 @@ if __name__ == "__main__":
 
     ans = generate_population(instance, 10)
 
+
+    print('FINAL SOLUTION')
     for i in range(len(ans)):
         for j in range(len(ans[i])):
             print(ans[i][j])
