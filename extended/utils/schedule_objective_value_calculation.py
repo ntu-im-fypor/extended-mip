@@ -31,11 +31,13 @@ class Instance:
     DUE_TIME = [30, 40, 30]
     WEIGHT = [100, 200, 200]
     QUEUE_LIMIT = [10, 10, 0]
+    MAX_MACHINE_NUM = max(MACHINES_NUM)
 
 
 def transform_parameters_to_instance(parameters: Parameters) -> Instance:
     instance = Instance()
     instance.JOBS_NUM = parameters.Number_of_Jobs
+    instance.MAX_MACHINE_NUM = parameters.Max_Number_of_Machines
     instance.STAGES_NUMBER = parameters.Number_of_Stages
     instance.MACHINES_NUM = parameters.Number_of_Machines
     instance.DISCOUNT = []
@@ -52,7 +54,7 @@ def transform_parameters_to_instance(parameters: Parameters) -> Instance:
     for i in range(parameters.Number_of_Stages):
         for m in range(parameters.Number_of_Machines[i]):
             instance.REMAIN.append(parameters.Unfinished_Production_Time[i][m])
-        
+
     instance.INIT_PROD_TIME = []
     for i in range(parameters.Number_of_Stages):
         for m in range(parameters.Number_of_Machines[i]):
@@ -71,6 +73,7 @@ def print_instance(instance):
     print("JOBS_NUM: ", instance.JOBS_NUM)
     print("STAGES_NUMBER: ", instance.STAGES_NUMBER)
     print("MACHINES_NUM: ", instance.MACHINES_NUM)
+    print("MAX_MACHINES_NUM: ", instance.MAX_MACHINES_NUM)
     print("DISCOUNT: ", instance.DISCOUNT)
     print("MAINT_LEN: ", instance.MAINT_LEN)
     print("REMAIN: ", instance.REMAIN)
