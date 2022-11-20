@@ -3,7 +3,7 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original
-from Models.heuristic import MetaPSOModel
+from Models.heuristic import MetaPSOModel, MetaGAModel
 import pandas as pd
 import numpy as np
 
@@ -19,13 +19,14 @@ class ResultParameters:
         self.JOBS_NUM = parameters.Number_of_Jobs
         self.STAGES_NUM = parameters.Number_of_Stages
         self.MACHINES_NUM = parameters.Number_of_Machines
+        self.MAX_MACHINE_NUM = parameters.Max_Number_of_Machines
 
         self.rmj = np.zeros((self.MACHINES_NUM_FLATTEN, self.JOBS_NUM)) # whether job j completed on machine m
         self.zij = np.zeros((self.STAGES_NUM, self.JOBS_NUM)) # whether job j's completion time in stage i
         self.vim = np.zeros((self.STAGES_NUM, max(self.MACHINES_NUM))) # whether maintenance is completed on machine m in stage i
         self.bim = np.zeros((self.STAGES_NUM, max(self.MACHINES_NUM))) # maintenance completion time of machine m in stage i
         self.schedule = np.zeros((self.STAGES_NUM, self.JOBS_NUM + max(self.MACHINES_NUM))) # solution schedule
-    
+
         with open(result_file_path, 'r') as f:
             [self.objVal] = map(float, f.readline().split())
             for m in range(self.MACHINES_NUM_FLATTEN):
@@ -44,7 +45,7 @@ class ResultParameters:
                 row = list(map(float, f.readline().split()))
                 for m in range(self.MACHINES_NUM[i]):
                     self.bim[i][m] = row[m]
-  
+
     def generateOrder(self) -> None:
         machine = 0
         for i in range(self.STAGES_NUM):

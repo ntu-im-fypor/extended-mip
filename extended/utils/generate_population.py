@@ -1,6 +1,6 @@
 '''
 TODO:
-1. 檢查數字有沒有重複（有的話要往後移動）
+1. 檢查數字有沒有重複（有的話要往後移動） > solve!
 
 
 '''
@@ -32,7 +32,7 @@ def print_job_order_method(job_order_dic, stage_num, job_num):
 class temp():
     def __init__(self):
         self.Number_of_Stages = 5
-        self.Number_of_Jobs = 10
+        self.Number_of_Jobs = 4
         self.Number_of_Machines = [3,5,6,3,5]
         self.max_machine_num = max(self.Number_of_Machines)
         self.Initial_Production_Time = np.random.randint(1, 100, size=((self.Number_of_Stages, self.max_machine_num, self.Number_of_Jobs)))
@@ -51,7 +51,7 @@ population_num=n : 對於每個方法的排列組合，都生成 n 個不同數�
     c. 平均分配 (TODO)
     d. 讓每個機器的初始完成時間最平均(TODO)
 
-2. decide job order
+2. decide job order (deleted)
     a. Random
     b. Weighted Penalty
     c. Due Time
@@ -61,7 +61,7 @@ population_num=n : 對於每個方法的排列組合，都生成 n 個不同數�
 3. decide maintenance time
     a. 統一不保養
     b. 統一放最前面
-    c. random DONE
+    c. random
 
 流程
 1. 先決定順序
@@ -69,7 +69,11 @@ population_num=n : 對於每個方法的排列組合，都生成 n 個不同數�
 3. 最後放 maintenance
 
 '''
-def generate_population(instance, population_num):
+
+# TODO: add input: n * job_num
+
+
+def generate_population(instance, population_num, share_job_order_list):
     stage_num = instance.Number_of_Stages
     job_num = instance.Number_of_Jobs
     machine_num = instance.Number_of_Machines
@@ -84,7 +88,7 @@ def generate_population(instance, population_num):
     # machine_method = ['random', 'min_prod_time']
     machine_methods = ['random', 'min_prod_time']
     # job_order_method = ['random', 'weight_penalty', 'due_time', 'due_time_x_weight_penalty']
-    job_order_methods = ['random', 'weight_penalty', 'due_time', 'due_time_x_weight_penalty']
+    # job_order_methods = ['random', 'weight_penalty', 'due_time', 'due_time_x_weight_penalty']
     # maintenance_methods = ['random', 'no_maintain', 'first_place']
     maintenance_methods = ['random', 'no_maintain', 'first_place']
 
@@ -132,49 +136,29 @@ def generate_population(instance, population_num):
                         else:
                             print('abnormal')
 
-        # step 2: decide job order of each macine in each stage
+        # step 2: decide job order of each macine in each stage -> TODO: 直接用 share job order 去做
 
+        print("share_job_order_list = ", share_job_order_list)
         for machine_method in machine_methods:
-            for job_order_method in job_order_methods:
+            for share_job_order in share_job_order_list:
+                print(share_job_order)
                 population.append([])
                 cur_population = len(population)-1
-                if(job_order_method == 'random'):
-                    for s in range(stage_num):
-                        population[cur_population].append([])
-                        for j in range(job_num):
-                            # decide stage, job 的個位數
-                            assigned_machine = job_order_dic[machine_method][s][j]
-                            population[cur_population][s].append(round(random.uniform(assigned_machine+1, assigned_machine+2-0.01), 2))
-
-                if(job_order_method == 'weight_penalty' or job_order_method == 'due_time' or job_order_method == 'due_time_x_weight_penalty'):
-                    for s in range(stage_num):
-                        population[cur_population].append([])
-
-                        # === Start the order deciding process ===
-                        job_order_list = [[] for i in range(machine_num[s])]
-                        for j in range(job_num):
-                            assigned_machine = job_order_dic[machine_method][s][j]
-                            # Step a: init 所有值
-                            population[cur_population][s].append(0.0)
-                            # Step b: 抓出所有 job 所屬的 machine
-                            job_order_list[assigned_machine].append(j)
-                        # Step c: 對於每個 machine，根據所有 job 排序 ===>  order = [[job_num1, job_num2]]
-                        for m in range(machine_num[s]):
-                            decision_order_list = []
-                            need_reverse = False
-                            if(job_order_method == 'weight_penalty'):
-                                decision_order_list = [weighted_penalty[j] for j in job_order_list[m]]
-                                need_reverse = True
-                            if(job_order_method == 'due_time'):
-                                decision_order_list = [due_time[j] for j in job_order_list[m]]
-                            if(job_order_method == 'due_time_x_weight_penalty'):
-                                decision_order_list = [due_time[j] / weighted_penalty[j] for j in job_order_list[m]]
-                            job_order_list[m] = [job_order_list[m] for _, job_order_list[m] in sorted(zip(decision_order_list, job_order_list[m]), reverse=need_reverse)]
-                            # Step d: 從前到後逐一生成數值
-                            min_val = 0
-                            for j in job_order_list[m]:
-                                population[cur_population][s][j] = round(random.uniform(m+1+min_val+0.01, m+2-0.01), 2)
-                                min_val = population[cur_population][s][j] - m - 1
+                for s in range(stage_num):
+                    population[cur_population].append([])
+                    print("share_job_order = ", share_job_order)
+                    '''
+                    for j in range(job_num):
+                        1. 找該個 job 是在第幾個
+                        2. 找該個 job 對應的機器
+                        3. 算好數字
+                        4. append 進去
+                    '''
+                    for j in range(job_num):
+                        assigned_machine = job_order_dic[machine_method][s][j] + 1
+                        assigned_order = share_job_order.index(j+1)
+                        assigned_order_value = 1 / job_num * (assigned_order+1) + assigned_machine
+                        population[cur_population][s].append(assigned_order_value)
 
         # step 3: decide maintenance order
 
@@ -185,7 +169,7 @@ def generate_population(instance, population_num):
                 if(maintenance_method == 'random'):
                     for s in range(stage_num):
                         for m in range(0, machine_num[s]):
-                            return_value[cur_posi][s].append(round(random.uniform(m+1, m+2-0.01), 2))
+                            return_value[cur_posi][s].append(round(random.uniform(m+1, m+2-0.01), 2) + 1/(job_num+1) * 0.001)
                         for m in range(machine_num[s], max_machine):
                             return_value[cur_posi][s].append(m+1+0.99)
 
@@ -205,6 +189,9 @@ def generate_population(instance, population_num):
                             return_value[cur_posi][s].append(m+1+0.99)
 
     np_result = np.array(return_value)
+    for i in range(len(np_result)):
+        for s in range(stage_num):
+            print(np_result[i][s])
 
     return np_result
 
@@ -212,7 +199,19 @@ def generate_population(instance, population_num):
 if __name__ == "__main__":
     instance = temp()
 
-    ans = generate_population(instance, 2)
+    # create several share job order
+    job_num = instance.Number_of_Jobs
+    job_list = [ i+1 for i in range(job_num)]
+    # print("job_list = ", job_list)
+    temp_share_job_order_list = []
+    for i in range(5):
+        random.shuffle(job_list)
+        temp_shuffle_list = job_list
+        print("temp_shuffle_list = ", temp_shuffle_list)
+        temp_share_job_order_list.append(copy.deepcopy(temp_shuffle_list))
+
+    print("temp_share_job_order_list = ", temp_share_job_order_list)
+    ans = generate_population(instance, 2, temp_share_job_order_list)
 
 
     print('FINAL SOLUTION')

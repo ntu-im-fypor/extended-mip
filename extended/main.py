@@ -4,7 +4,7 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original
-from Models.heuristic import MetaPSOModel
+from Models.heuristic import MetaPSOModel, MetaGAModel
 import pandas as pd
 
 def test_relaxation_result():
@@ -26,7 +26,7 @@ def test_relaxation_result():
     #     worksheet.write(i, 0, result[i-1][0])
     #     worksheet.write(i, 1, result[i-1][1])
     #     worksheet.write(i, 2, result[i-1][2])
-     
+
     # workbook.close()
 
     # heuristic_model = HeuristicModel(parameters)
@@ -35,13 +35,14 @@ def test_relaxation_result():
 
 def test_heuristic_model():
     # read parameters from file
-    if len(sys.argv) == 0:
+    if len(sys.argv) <= 1:
         print("No parameters file specified")
         return
+    print(sys.argv)
     file_path = sys.argv[1]
     parameters = Parameters()
     parameters.read_parameters(file_path)
-    heuristic_model = MetaPSOModel(parameters)
+    heuristic_model = MetaGAModel(parameters)
     heuristic_model.run_and_solve()
     heuristic_model.record_result()
 
