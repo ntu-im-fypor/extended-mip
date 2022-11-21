@@ -19,7 +19,7 @@ class ResultParameters:
         self.JOBS_NUM = parameters.Number_of_Jobs
         self.STAGES_NUM = parameters.Number_of_Stages
         self.MACHINES_NUM = parameters.Number_of_Machines
-        self.MAX_MACHINE_NUM = parameters.Max_Number_of_Machines
+        self.MAX_MACHINES_NUM = parameters.Max_Number_of_Machines
 
         self.rmj = np.zeros((self.MACHINES_NUM_FLATTEN, self.JOBS_NUM)) # whether job j completed on machine m
         self.zij = np.zeros((self.STAGES_NUM, self.JOBS_NUM)) # whether job j's completion time in stage i
