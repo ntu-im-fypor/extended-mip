@@ -26,7 +26,7 @@ class GreedyModel(SolutionModel):
         self.real_production_time_matrix = get_real_production_time_matrix(self.parameters, self.maintenace_choice)
         self.WEDD_list = get_WEDD_list(self.parameters)
         self.average_machine_time_for_each_stage = get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix)
-    def _run_initial_job_listing(self):
+    def _run_initial_job_olisting(self):
         """
         Run the initial job listing part
         it will return the initial job listing schedule indicating the job order
@@ -40,6 +40,17 @@ class GreedyModel(SolutionModel):
             for _ in range(self.parameters.Number_of_Machines[i]):
                 job_order_list[i].append([])
 
+        current_job_priority = {}
+        current_jobs_info = []
+        for k in range(self.parameters.Number_of_Jobs):
+            current_jobs_info.append((i, self.WEDD_list[k]))
+        # sort the current jobs info by the WEDD
+        current_jobs_info.sort(key=lambda x: x[1]) # first shared job order is sorted by WEDD, the lower the WEDD, the higher the priority
+        # keep this information in a dictionary
+        priority_index = 0
+        for job_index, _ in current_jobs_info:
+            current_job_priority[job_index] = priority_index
+            priority_index += 1
         
         # current machine time for every machine is default to unfinished production time
         current_machine_time = self.parameters.Unfinished_Production_Time
@@ -53,7 +64,7 @@ class GreedyModel(SolutionModel):
                 production_difference_list.append((k, max(self.real_production_time_matrix[i, :machine_num, k]) - min(self.real_production_time_matrix[i, :machine_num, k])))
             production_difference_list.sort(key=lambda x: x[1], reverse=True) # sort the list by production time difference, descending order
             # start to schedule the job onto the machine
-            for job_index, wedd in production_difference_list:
+            for job_index, _ in production_difference_list:
                 # first find the machine with smallest production time for this job
                 best_machine_idx = np.argmin(self.real_production_time_matrix[i, :machine_num, job_index])
                 # if schedule the job onto this machine will make current machine time exceed average machine time on this stage, then we need to schedule the job onto another machine
@@ -71,9 +82,12 @@ class GreedyModel(SolutionModel):
                     if smallest_current_machine_time <= self.average_machine_time_for_each_stage[i]:
                         best_machine_idx = secondary_machine_idx
                 # schedule the job onto the machine
-                job_order_list[i][best_machine_idx].append((job_index, wedd))
+                job_order_list[i][best_machine_idx].append((job_index, current_job_priority[job_index]))
                 # update the current machine time
                 current_machine_time[i, best_machine_idx] += self.real_production_time_matrix[i, best_machine_idx, job_index]
+
+        # sort the job order for each machine in each stage, the order should follow the current job priority
+        job_order_list.sort(key=lambda x: x[1]) # x[1] is the current job priority index for this job, and we want lower index to be scheduled first, so we sort in ascending order
         # now we have the initial job listing, we need to flatten the list
         job_order_list_flatten = []
         for i in range(self.parameters.Number_of_Stages):
