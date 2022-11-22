@@ -59,7 +59,8 @@ def get_WEDD_list(parameters: Parameters):
     """
     Get the WEDD list for each job
     WEDD = due time of the job / tardiness penalty of the job
-    return a 1d array of shape (Number_of_Jobs)
+
+    return a 1d array of shape `Number_of_Jobs`
     every element is the WEDD for that job
     """
     WEDD_list = np.zeros(parameters.Number_of_Jobs)
