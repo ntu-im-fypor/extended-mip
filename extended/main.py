@@ -38,7 +38,7 @@ def test_heuristic_model():
     if len(sys.argv) <= 1:
         print("No parameters file specified")
         return
-    print(sys.argv)
+    # print(sys.argv)
     file_path = sys.argv[1]
     parameters = Parameters()
     parameters.read_parameters(file_path)

@@ -1,6 +1,19 @@
 def ga_crossover(schedule_list, job_num, machine_num, job_point, machine_point) -> list:
-  for schedule in schedule_list:
-    print("schedule:", schedule)
+
+  # print all the values to make sure the input is correct
+  # print("==============================")
+  # print("schedule_list = ")
+  # print(schedule_list)
+  # print("job_num = ", job_num)
+  # print("machine_num = ", machine_num)
+  # print("job_point = ", job_point)
+  # print("machine_point", machine_point)
+  # print("==============================")
+
+
+
+  # for schedule in schedule_list:
+  #   print("schedule:", schedule)
 
   stage_num = len(schedule_list[0])
 
@@ -31,6 +44,9 @@ def ga_crossover(schedule_list, job_num, machine_num, job_point, machine_point) 
   for i in range(stage_num):
     job_1_point_before[i] += job_2_point_after[i]
     job_2_point_before[i] += job_1_point_after[i]
+    # job_1_point_before[i] = job_1_point_before[i] + job_2_point_after[i]
+    # job_2_point_before[i] = job_2_point_before[i] + job_1_point_after[i]
+
 
   # test
   """
@@ -47,7 +63,7 @@ def ga_crossover(schedule_list, job_num, machine_num, job_point, machine_point) 
     print(i)
   print('------------------')
   """
-  
+
   # machine
   machine_1_point_before = []
   machine_1_point_after = []
@@ -61,8 +77,8 @@ def ga_crossover(schedule_list, job_num, machine_num, job_point, machine_point) 
     machine_2_point_after.append(stage[-(machine_num - machine_point):])
 
   for i in range(stage_num):
-    machine_1_point_before[i] += machine_2_point_after[i]
-    machine_2_point_before[i] += machine_1_point_after[i]
+    machine_1_point_before[i] = machine_1_point_before[i] + machine_2_point_after[i]
+    machine_2_point_before[i] = machine_2_point_before[i] + machine_1_point_after[i]
 
   # test
   """
@@ -100,7 +116,7 @@ def ga_crossover(schedule_list, job_num, machine_num, job_point, machine_point) 
     print(i)
   print('------------------')
   """
-    
+
   result = []
   result.append(job_1_point_before)
   result.append(job_2_point_before)

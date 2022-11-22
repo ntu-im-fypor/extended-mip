@@ -31,13 +31,13 @@ class Instance:
     DUE_TIME = [30, 40, 30]
     WEIGHT = [100, 200, 200]
     QUEUE_LIMIT = [10, 10, 0]
-    MAX_MACHINE_NUM = max(MACHINES_NUM)
+    MAX_MACHINES_NUM = max(MACHINES_NUM)
 
 
 def transform_parameters_to_instance(parameters: Parameters) -> Instance:
     instance = Instance()
     instance.JOBS_NUM = parameters.Number_of_Jobs
-    instance.MAX_MACHINE_NUM = parameters.Max_Number_of_Machines
+    instance.MAX_MACHINES_NUM = parameters.Max_Number_of_Machines
     instance.STAGES_NUMBER = parameters.Number_of_Stages
     instance.MACHINES_NUM = parameters.Number_of_Machines
     instance.DISCOUNT = []

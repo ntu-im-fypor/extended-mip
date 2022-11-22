@@ -72,14 +72,24 @@ population_num=n : 對於每個方法的排列組合，都生成 n 個不同數�
 
 # TODO: add input: n * job_num
 
+# 將 job 順序轉換成小數點 array
+def calculate_job__order_value(order_array):
+    interval = 1/ (len(order_array)+1)
+    result = []
+    for i in range(len(order_array)):
+        cur_index = order_array.index(i+1)
+        result.append(interval * (cur_index+1))
+    return result
+
+
 
 def generate_population(instance, population_num, share_job_order_list):
     stage_num = instance.Number_of_Stages
     job_num = instance.Number_of_Jobs
     machine_num = instance.Number_of_Machines
     max_machine  = max(machine_num)
-    weighted_penalty = instance.Tardiness_Penalty
-    due_time = instance.Due_Time
+    # weighted_penalty = instance.Tardiness_Penalty
+    # due_time = instance.Due_Time
     initial_production_time = instance.Initial_Production_Time
 
     population = []
@@ -87,27 +97,22 @@ def generate_population(instance, population_num, share_job_order_list):
 
     # machine_method = ['random', 'min_prod_time']
     machine_methods = ['random', 'min_prod_time']
-    # job_order_method = ['random', 'weight_penalty', 'due_time', 'due_time_x_weight_penalty']
-    # job_order_methods = ['random', 'weight_penalty', 'due_time', 'due_time_x_weight_penalty']
     # maintenance_methods = ['random', 'no_maintain', 'first_place']
     maintenance_methods = ['random', 'no_maintain', 'first_place']
 
     job_order_dic = {} # to be deleted
-    '''
-    {
-        machine_method_name:{
-            [stage][job]: machine_num
-        }
-    }
-    '''
 
-    '''
-    WARNING:  之後記得machine_num, job_num, stage_num 都要加一
-    '''
+    interval = 1/(job_num+1)
+    offset = interval * 0.01
 
-    for num in range(population_num):
-        print(num)
+    # print("interval = ", interval)
+    # print("offset = ", offset )
+
+
+    for _ in range(population_num):
+        # print(num)
         population = []
+
         # step 1: decide machine arrangement
         for machine_method in machine_methods:
             job_order_dic[machine_method] = []
@@ -138,26 +143,20 @@ def generate_population(instance, population_num, share_job_order_list):
 
         # step 2: decide job order of each macine in each stage -> TODO: 直接用 share job order 去做
 
-        print("share_job_order_list = ", share_job_order_list)
+        # print("share_job_order_list = ", share_job_order_list)
         for machine_method in machine_methods:
             for share_job_order in share_job_order_list:
-                print(share_job_order)
+                # print(share_job_order)
                 population.append([])
                 cur_population = len(population)-1
                 for s in range(stage_num):
                     population[cur_population].append([])
-                    print("share_job_order = ", share_job_order)
-                    '''
-                    for j in range(job_num):
-                        1. 找該個 job 是在第幾個
-                        2. 找該個 job 對應的機器
-                        3. 算好數字
-                        4. append 進去
-                    '''
+                    # print("share_job_order = ", share_job_order)
                     for j in range(job_num):
                         assigned_machine = job_order_dic[machine_method][s][j] + 1
                         assigned_order = share_job_order.index(j+1)
-                        assigned_order_value = 1 / job_num * (assigned_order+1) + assigned_machine
+                        assigned_order_value = interval * (assigned_order+1) + assigned_machine
+                        # print("assigned_order_value = ", assigned_order_value)
                         population[cur_population][s].append(assigned_order_value)
 
         # step 3: decide maintenance order
@@ -169,24 +168,28 @@ def generate_population(instance, population_num, share_job_order_list):
                 if(maintenance_method == 'random'):
                     for s in range(stage_num):
                         for m in range(0, machine_num[s]):
-                            return_value[cur_posi][s].append(round(random.uniform(m+1, m+2-0.01), 2) + 1/(job_num+1) * 0.001)
+                            cur_machine_value = round(random.uniform(m+1, m+2), 2) - offset
+                            return_value[cur_posi][s].append(cur_machine_value)
+                        # machine which doesn't appear in that stage
                         for m in range(machine_num[s], max_machine):
-                            return_value[cur_posi][s].append(m+1+0.99)
+                            return_value[cur_posi][s].append(m+2-offset)
 
                 if(maintenance_method == 'no_maintain'):
                     for s in range(stage_num):
                         for m in range(0, machine_num[s]):
-                            return_value[cur_posi][s].append(0)
+                            return_value[cur_posi][s].append(m+2-offset)
+                        # machine which doesn't appear in that stage
                         for m in range(machine_num[s], max_machine):
-                            return_value[cur_posi][s].append(m+1+0.99)
+                            return_value[cur_posi][s].append(m+2-offset)
 
 
                 if(maintenance_method == 'first_place'):
                     for s in range(stage_num):
                         for m in range(0, machine_num[s]):
                             return_value[cur_posi][s].append(m+1)
+                        # machine which doesn't appear in that stage
                         for m in range(machine_num[s], max_machine):
-                            return_value[cur_posi][s].append(m+1+0.99)
+                            return_value[cur_posi][s].append(m+2-offset)
 
     np_result = np.array(return_value)
     for i in range(len(np_result)):
@@ -197,6 +200,11 @@ def generate_population(instance, population_num, share_job_order_list):
 
 
 if __name__ == "__main__":
+
+
+    temp_order = [1,3,2,4]
+    # print("order list")
+    # print(calculate_job__order_value(temp_order))
     instance = temp()
 
     # create several share job order
@@ -207,15 +215,15 @@ if __name__ == "__main__":
     for i in range(5):
         random.shuffle(job_list)
         temp_shuffle_list = job_list
-        print("temp_shuffle_list = ", temp_shuffle_list)
+        # print("temp_shuffle_list = ", temp_shuffle_list)
         temp_share_job_order_list.append(copy.deepcopy(temp_shuffle_list))
 
-    print("temp_share_job_order_list = ", temp_share_job_order_list)
+    # print("temp_share_job_order_list = ", temp_share_job_order_list)
     ans = generate_population(instance, 2, temp_share_job_order_list)
 
 
-    print('FINAL SOLUTION')
-    print("length =", len(ans) )
+    # print('FINAL SOLUTION')
+    # print("length =", len(ans) )
     # for i in range(len(ans)):
     #     for j in range(len(ans[i])):
     #         print(ans[i][j])

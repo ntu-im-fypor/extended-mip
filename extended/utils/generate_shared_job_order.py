@@ -12,7 +12,7 @@ def generate_shared_job_order(instance) -> list:
   job_order = []
   for i in sorted_WEDD:
     job_order.append(WEDD.index(i)+1)
-  
+
   result = [job_order]
   for i in range(len(job_order) - 1):
     job_order[i], job_order[i+1] = job_order[i+1], job_order[i]
@@ -33,6 +33,6 @@ def generate_shared_job_order(instance) -> list:
 #     DUE_TIME = [30, 40, 30]
 #     WEIGHT = [100, 200, 200]
 #     QUEUE_LIMIT = [10, 10, 0]
-#     MAX_MACHINE_NUM = max(MACHINES_NUM)
+#     MAX_MACHINES_NUM = max(MACHINES_NUM)
 # instance = Instance()
 # generate_shared_job_order(instance)
