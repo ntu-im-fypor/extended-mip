@@ -78,7 +78,9 @@ class GreedyModel(SolutionModel):
                 current_machine_time[i, best_machine_idx] += self.real_production_time_matrix[i, best_machine_idx, job_index]
 
         # sort the job order for each machine in each stage, the order should follow the current job priority
-        job_order_list.sort(key=lambda x: x[1]) # x[1] is the current job priority index for this job, and we want lower index to be scheduled first, so we sort in ascending order
+        for i in range(self.parameters.Number_of_Stages):
+            for j in range(self.parameters.Number_of_Machines[i]):
+                job_order_list[i][j].sort(key=lambda x: x[1])
         # now we have the initial job listing, we need to flatten the list
         job_order_list_flatten = []
         for i in range(self.parameters.Number_of_Stages):
