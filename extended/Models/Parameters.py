@@ -29,7 +29,6 @@ class Parameters:
 
     def read_parameters(self, file_name: str) -> None:
         with open(file_name, 'r') as f:
-            print(f)
             # first line: n^I, n^J
             self.Number_of_Stages, self.Number_of_Jobs = map(int, f.readline().split())
             # second line: n_i^M
