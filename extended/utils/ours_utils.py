@@ -73,13 +73,7 @@ def get_WEDD_list(parameters: Parameters):
 
 def get_average_machine_time_for_each_stage(parameters: Parameters, production_time_matrix: np.ndarray) -> np.ndarray:
     """
-    production_time_matrix: a 3d array of shape `(Number_of_Stages, max_machine_num, Number_of_Jobs)`
-    each element is the real production time for that job on that machine.
-    You can get this matrix by calling `get_real_production_time_matrix(parameters, maintenance_choice)`
-    #### 這裡的 production_time_matrix 就是 1121_會議簡報 p.18 的 production time table, 會考慮 maintenance 後的時間
-    Get the average machine time for each stage
-    return a 1d array of shape (Number_of_Stages)
-    every element is the average machine time for that stage
+    Get the average machine time for each stage\n
     """
     average_machine_time = np.zeros(parameters.Number_of_Stages)
     for i in range(parameters.Number_of_Stages):
