@@ -1,5 +1,5 @@
 from Models import Parameters, SolutionModel
-from utils.schedule_objective_value_calculation import calculate_objective_value, transform_parameters_to_instance, print_instance
+from utils.common import cast_parameters_to_instance
 from utils.generate_population import generate_population
 from utils.ga_crossover import ga_crossover
 from utils.ga_mutation import ga_mutation
@@ -17,7 +17,7 @@ class MetaGAModel(SolutionModel):
     def run_and_solve(self, population_num: int = 2, iteration_num: int = 60):
         print("Running and solving using GAModel")
 
-        instance = transform_parameters_to_instance(self.parameters)
+        instance = cast_parameters_to_instance(self.parameters)
         print("Running and solving using GAModel")
 
         shared_job_order_list = generate_shared_job_order(instance)
@@ -96,7 +96,7 @@ class MetaGAModel(SolutionModel):
         print("self.best_schedule = ", self.best_schedule)
         print("Recording result using GAModel")
         example_schedule = [[1.2, 1.3, 2.5, 0, 2.3], [1.2, 1.5, 1.3, 1.1, 0]]
-        instance = transform_parameters_to_instance(self.parameters)
+        instance = cast_parameters_to_instance(self.parameters)
         print("Instance after transformation:")
         # print_instance(instance)
         schedule_obj = calculate_objective_value(self.best_schedule, instance)
