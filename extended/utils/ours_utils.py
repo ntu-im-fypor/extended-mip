@@ -44,7 +44,8 @@ def get_real_production_time_matrix(parameters: Parameters, maintenance_choice: 
     return a 3d array of shape (Number_of_Stages, max_machine_num, Number_of_Jobs)
     each element is the real production time for that job on that machine
     """
-    production_time_matrix = np.zeros((parameters.Number_of_Stages, parameters.max_machine_num, parameters.Number_of_Jobs))
+    max_machine_num = np.max(parameters.Number_of_Machines)
+    production_time_matrix = np.zeros((parameters.Number_of_Stages, max_machine_num, parameters.Number_of_Jobs))
     for i in range(parameters.Number_of_Stages):
         for j in range(parameters.Number_of_Machines[i]):
             # if the machine is not chosen to do maintenance, set the production time to the initial production time

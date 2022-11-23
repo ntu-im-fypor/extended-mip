@@ -26,7 +26,7 @@ class GreedyModel(SolutionModel):
         self.real_production_time_matrix = get_real_production_time_matrix(self.parameters, self.maintenance_choice)
         self.WEDD_list = get_WEDD_list(self.parameters)
         self.average_machine_time_for_each_stage = get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix)
-    def _run_initial_job_olisting(self):
+    def _run_initial_job_listing(self):
         """
         Run the initial job listing part
         it will return the initial job listing schedule indicating the job order
@@ -90,14 +90,13 @@ class GreedyModel(SolutionModel):
 
     def _generate_shared_job_order(self) -> dict:
         """
-        Generate the shared job order.
-
+        Generate the shared job order. It will return a dictionary\n
         `Key`: job index, `Value`: job priority index (the smaller the index, the higher the priority)
         """
         current_job_priority = {}
         current_jobs_info = []
         for k in range(self.parameters.Number_of_Jobs):
-            current_jobs_info.append((i, self.WEDD_list[k]))
+            current_jobs_info.append((k, self.WEDD_list[k]))
         # sort the current jobs info by the WEDD
         current_jobs_info.sort(key=lambda x: x[1]) # first shared job order is sorted by WEDD, the lower the WEDD, the higher the priority
         # keep this information in a dictionary
