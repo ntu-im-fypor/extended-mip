@@ -84,3 +84,14 @@ def get_average_machine_time_for_each_stage(parameters: Parameters, production_t
                 average_machine_time[i] += production_time_matrix[i][j][k]
         average_machine_time[i] /= parameters.Number_of_Machines[i] * parameters.Number_of_Machines[i] # divide by the square of the number of machines
     return average_machine_time
+
+def get_shared_job_order_from_WEDD_list(WEDD_list):
+    """
+    Get the shared job order from the WEDD list\n
+    Return a 1d array of shape `Number_of_Jobs`, every element is the job index
+    """
+    job_order = np.zeros(len(WEDD_list))
+    for i in range(len(WEDD_list)):
+        job_order[i] = i
+    job_order.sort(key=lambda x: WEDD_list[x])
+    return job_order

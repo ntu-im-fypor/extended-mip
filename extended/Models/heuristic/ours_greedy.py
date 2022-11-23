@@ -15,8 +15,8 @@ class GreedyModel(SolutionModel):
         
         # setup
         self._setup()
-        # run initial job listing
-        self._run_initial_job_listing()
+        # run initial job listing with maintenance
+        initial_job_listing = self._generate_initial_job_listing()
         
     def _setup(self):
         """
@@ -26,11 +26,11 @@ class GreedyModel(SolutionModel):
         self.real_production_time_matrix = utils.get_real_production_time_matrix(self.parameters, self.maintenance_choice)
         self.WEDD_list = utils.get_WEDD_list(self.parameters)
         self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix)
-    def _run_initial_job_listing(self):
+    def _generate_initial_job_listing(self):
         """
-        Run the initial job listing part
-        it will return the initial job listing schedule indicating the job order
-        the shape of the initial job listing is (number of stages, max number of machines, number of jobs)
+        Run the initial job listing part\n
+        it will return the initial job listing schedule indicating the job order\n
+        the shape follows the input format of generate_schedule function written by Hsiao-Li Yeh
         """
 
         # first create a 3d list to store the job order for every machine in every stage the 3-th dimension is default to an empty list
@@ -85,10 +85,15 @@ class GreedyModel(SolutionModel):
         job_order_list_flatten = []
         for i in range(self.parameters.Number_of_Stages):
             for j in range(self.parameters.Number_of_Machines[i]):
-                job_order_list_flatten.append(job_order_list[i][j])
-
-        # TODO: till now we have the initial job listing after flattening so that we can put the listing into the generate_schedule function. But the correctness has not been verified yet.
-
+                # if machine j has maintenance, we need to add a 'M' to the head of the job order list for this machine
+                job_order_for_this_machine = []
+                if self.maintenance_choice[i, j] == 1:
+                    job_order_for_this_machine.append('M')
+                for job_index, _ in job_order_list[i][j]:
+                    job_order_for_this_machine.append(job_index)
+                job_order_list_flatten.append(job_order_for_this_machine)
+        # complete the initial job listing
+        return job_order_list_flatten
 
     def _generate_shared_job_order(self) -> dict:
         """
@@ -107,5 +112,6 @@ class GreedyModel(SolutionModel):
             current_job_priority[job_index] = priority_index
             priority_index += 1
         return current_job_priority
+
     def record_result(self):
         return super().record_result()
