@@ -1,14 +1,15 @@
 import numpy as np
 from Models import Parameters
 
-def get_maintenance_choice(parameters: Parameters):
+def get_maintenance_choice(parameters: Parameters) -> np.ndarray:
     """
     Get the maintenance benefit for each machine
     maintenance benefit = average discounted time - maintenance length
     return a 2d array of shape (Number_of_Stages, max_machine_num)
     every element is the maintenance benefit for that machine
     """
-    maintenance_benefit = np.zeros((parameters.Number_of_Stages, parameters.max_machine_num))
+    max_machine_num = np.max(parameters.Number_of_Machines)
+    maintenance_benefit = np.zeros((parameters.Number_of_Stages, max_machine_num))
     for i in range(parameters.Number_of_Stages):
         # calculate average discounted time base value
         base_value = 0
@@ -32,9 +33,10 @@ def get_maintenance_choice(parameters: Parameters):
     # create a 2d array of shape (Number_of_Stages, max_machine_num)
     # every element indicates whether that machine is chosen to do maintenance
     # 1 means chosen, 0 means not chosen
-    maintenance_choice = np.zeros((parameters.Number_of_Stages, parameters.max_machine_num))
+    maintenance_choice = np.zeros((parameters.Number_of_Stages, max_machine_num))
     for i in range(len(benefit_list) // 2):
         maintenance_choice[benefit_list[i][1][0]][benefit_list[i][1][1]] = 1
+    return maintenance_choice
 
 def get_real_production_time_matrix(parameters: Parameters, maintenance_choice: np.ndarray):
     """

@@ -1,6 +1,5 @@
 import sys
 import pandas as pd
-import xlsxwriter
 from tokenize import String
 from unittest import result
 from Models import Parameters
@@ -34,12 +33,13 @@ def test_relaxation_result():
     # heuristic_model.record_result()
 
 def test_heuristic_model():
-    # read parameters from file
-    if len(sys.argv) <= 1:
-        print("No parameters file specified")
-        return
-    # print(sys.argv)
-    file_path = sys.argv[1]
+    # # read parameters from file
+    # if len(sys.argv) <= 1:
+    #     print("No parameters file specified")
+    #     return
+    # # print(sys.argv)
+    # file_path = sys.argv[1]
+    file_path = "tests/base/base_1.txt"
     parameters = Parameters()
     parameters.read_parameters(file_path)
     # use input to choose which model to use

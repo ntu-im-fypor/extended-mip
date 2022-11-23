@@ -22,8 +22,8 @@ class GreedyModel(SolutionModel):
         """
         Setup the data for the model
         """
-        self.maintenace_choice = get_maintenance_choice(self.parameters)
-        self.real_production_time_matrix = get_real_production_time_matrix(self.parameters, self.maintenace_choice)
+        self.maintenance_choice = get_maintenance_choice(self.parameters)
+        self.real_production_time_matrix = get_real_production_time_matrix(self.parameters, self.maintenance_choice)
         self.WEDD_list = get_WEDD_list(self.parameters)
         self.average_machine_time_for_each_stage = get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix)
     def _run_initial_job_olisting(self):
@@ -40,17 +40,8 @@ class GreedyModel(SolutionModel):
             for _ in range(self.parameters.Number_of_Machines[i]):
                 job_order_list[i].append([])
 
-        current_job_priority = {}
-        current_jobs_info = []
-        for k in range(self.parameters.Number_of_Jobs):
-            current_jobs_info.append((i, self.WEDD_list[k]))
-        # sort the current jobs info by the WEDD
-        current_jobs_info.sort(key=lambda x: x[1]) # first shared job order is sorted by WEDD, the lower the WEDD, the higher the priority
-        # keep this information in a dictionary
-        priority_index = 0
-        for job_index, _ in current_jobs_info:
-            current_job_priority[job_index] = priority_index
-            priority_index += 1
+        # generate the shared job order
+        current_job_priority = self._generate_shared_job_order()
         
         # current machine time for every machine is default to unfinished production time
         current_machine_time = self.parameters.Unfinished_Production_Time
@@ -96,5 +87,24 @@ class GreedyModel(SolutionModel):
 
         # TODO: till now we have the initial job listing after flattening so that we can put the listing into the generate_schedule function. But the correctness has not been verified yet.
 
+
+    def _generate_shared_job_order(self) -> dict:
+        """
+        Generate the shared job order.
+
+        `Key`: job index, `Value`: job priority index (the smaller the index, the higher the priority)
+        """
+        current_job_priority = {}
+        current_jobs_info = []
+        for k in range(self.parameters.Number_of_Jobs):
+            current_jobs_info.append((i, self.WEDD_list[k]))
+        # sort the current jobs info by the WEDD
+        current_jobs_info.sort(key=lambda x: x[1]) # first shared job order is sorted by WEDD, the lower the WEDD, the higher the priority
+        # keep this information in a dictionary
+        priority_index = 0
+        for job_index, _ in current_jobs_info:
+            current_job_priority[job_index] = priority_index
+            priority_index += 1
+        return current_job_priority
     def record_result(self):
         return super().record_result()
