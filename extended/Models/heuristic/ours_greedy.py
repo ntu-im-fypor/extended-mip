@@ -1,5 +1,5 @@
 from Models import Parameters, SolutionModel
-from utils.ours_utils import get_maintenance_choice, get_real_production_time_matrix, get_WEDD_list, get_average_machine_time_for_each_stage
+import utils.ours_utils as utils
 import numpy as np
 
 class GreedyModel(SolutionModel):
@@ -22,10 +22,10 @@ class GreedyModel(SolutionModel):
         """
         Setup the data for the model
         """
-        self.maintenance_choice = get_maintenance_choice(self.parameters)
-        self.real_production_time_matrix = get_real_production_time_matrix(self.parameters, self.maintenance_choice)
-        self.WEDD_list = get_WEDD_list(self.parameters)
-        self.average_machine_time_for_each_stage = get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix)
+        self.maintenance_choice = utils.get_maintenance_choice(self.parameters)
+        self.real_production_time_matrix = utils.get_real_production_time_matrix(self.parameters, self.maintenance_choice)
+        self.WEDD_list = utils.get_WEDD_list(self.parameters)
+        self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix)
     def _run_initial_job_listing(self):
         """
         Run the initial job listing part
