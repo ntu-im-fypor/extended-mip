@@ -1,6 +1,9 @@
 from Models import Parameters, SolutionModel
+from utils.common import cast_parameters_to_instance
+from utils.generate_schedule import generate_schedule
 import utils.ours_utils as utils
 import numpy as np
+import copy
 
 class GreedyModel(SolutionModel):
     def __init__(self, parameters: Parameters):
@@ -17,6 +20,9 @@ class GreedyModel(SolutionModel):
         self._setup()
         # run initial job listing with maintenance
         initial_job_listing = self._generate_initial_job_listing()
+        # get the shared job order for the initial job listing
+        initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
+        # start to consider the best maintenance position for each machine
         
     def _setup(self):
         """
@@ -112,6 +118,52 @@ class GreedyModel(SolutionModel):
             current_job_priority[job_index] = priority_index
             priority_index += 1
         return current_job_priority
+
+    def _decide_best_maintenance_position(self, job_order_on_machines: list[list], shared_job_order: list[int]) -> list[list]:
+        """
+        Decide the best maintenance position for each machine on each stage\n
+        For every machine with maintenance, we will try to find the best position for the maintenance\n
+        Return a list of list, each list indicates the job order for each machine on each stage
+        #### Parameters\n
+        `job_order_on_machines`: the job order on machines for each stage, it should be a list of list\n
+        `shared_job_order`: the shared job order, it should be a list, every element is a job index
+        """
+
+        # do a deep copy of the job order on machines
+        job_order_on_machines_copy = copy.deepcopy(job_order_on_machines)
+        best_objective_value = np.inf
+        # calculate the number of machines with maintenance
+        machines_with_maintenance_num = 0
+        for job_order in job_order_on_machines_copy:
+            if job_order[0] == 'M':
+                machines_with_maintenance_num += 1
+        while True: # stopping crietria: no improvement for the number of machines with maintenance
+            accumulated_no_improvement_count = 0
+            for machine_index, job_order in enumerate(job_order_on_machines_copy):
+                # if the job order contains 'M', it means this machine has maintenance, so we need to find the best position for the maintenance
+                if 'M' in job_order:
+                    has_improved_on_this_machine = False
+                    # do a deep copy of the job order
+                    job_order_copy = copy.deepcopy(job_order)
+                    # first we get the job order list without 'M', and insert 'M' into every possible position to find the best position
+                    for i in range(len(job_order_copy) + 1):
+                        job_order_copy.remove('M')
+                        job_order_copy.insert(i, 'M')
+                        # replace the job order on this machine with the new job order
+                        job_order_on_machines_copy[machine_index] = job_order_copy
+                        # calculate the objective value for this job order under the situation that other machines maintain the same job order
+                        cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, cast_parameters_to_instance(self.parameters))
+                        if cur_objective_value < best_objective_value:
+                            best_objective_value = cur_objective_value
+                            has_improved_on_this_machine = True
+                        else:
+                            # replace the job order on this machine with the original job order
+                            job_order_on_machines_copy[machine_index] = job_order
+                    if not has_improved_on_this_machine:
+                        accumulated_no_improvement_count += 1
+            if accumulated_no_improvement_count == machines_with_maintenance_num:
+                break
+        return job_order_on_machines_copy
 
     def record_result(self):
         return super().record_result()
