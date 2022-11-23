@@ -109,6 +109,9 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
     current_machine_index = [0] * total_machines_num
     machine_has_maintained = [False] * total_machines_num
 
+    for i in range(total_machines_num): # initialize current machine time
+        current_machine_time[i] = instance.REMAIN[i]
+
     for i in range(len(shared_job_order)):  # loop all jobs in shared job order
         maint_order = [] # store the maintenance order
         for j in range(total_machines_num): # mark all machines that need maintenance
