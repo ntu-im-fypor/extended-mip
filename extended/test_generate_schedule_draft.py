@@ -3,7 +3,6 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original
-from utils.schedule_objective_value_calculation import calculate_objective_value, transform_parameters_to_instance, print_instance
 from Models.heuristic import MetaPSOModel, MetaGAModel
 import pandas as pd
 import numpy as np
@@ -72,21 +71,19 @@ def test_objective_function():
     file_id = sys.argv[1]
     parameters = Parameters()
     parameters.read_parameters('tests/base/base_'+ str(file_id) +'.txt')
-    instance = transform_parameters_to_instance(parameters)
+    heuristic_model = MetaPSOModel(parameters)
+    # heuristic_model.run_and_solve()
 
-    print(instance.REMAIN)
-
-    
-    # # generate a schedule from the base results
-    # resultParameters = ResultParameters()
-    # resultParameters.read_result('tests/base/base_'+ str(file_id) +'.txt','tests/base_result_1107/base_result_'+ str(file_id) +'.txt')
-    # resultParameters.generateOrder()
-    # print("Generated Ordering:")
-    # print(resultParameters.schedule)
-    # heuristic_model.record_result(resultParameters.schedule)
-    # print("Gurobi objective value: ", resultParameters.objVal)
-    # ### for listing and comparing all objective values
-    # # return resultParameters.objVal, heuristic_model.record_result(resultParameters.schedule) # gurobi value, fn value
+    # generate a schedule from the base results
+    resultParameters = ResultParameters()
+    resultParameters.read_result('tests/base/base_'+ str(file_id) +'.txt','tests/base_result_1107/base_result_'+ str(file_id) +'.txt')
+    resultParameters.generateOrder()
+    print("Generated Ordering:")
+    print(resultParameters.schedule)
+    heuristic_model.record_result(resultParameters.schedule)
+    print("Gurobi objective value: ", resultParameters.objVal)
+    ### for listing and comparing all objective values
+    # return resultParameters.objVal, heuristic_model.record_result(resultParameters.schedule) # gurobi value, fn value
 
 
 
