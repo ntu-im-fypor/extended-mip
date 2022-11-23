@@ -10,6 +10,7 @@ import os
 from collections import defaultdict
  
 ### copied from https://www.geeksforgeeks.org/detect-cycle-in-a-graph/
+### topological sort from https://www.geeksforgeeks.org/topological-sorting/
 class Graph():
     def __init__(self,vertices):
         self.graph = defaultdict(list)
@@ -50,6 +51,37 @@ class Graph():
                     return True
         return False
 
+    # A recursive function used by topologicalSort
+    def topologicalSortUtil(self, v, visited, stack):
+ 
+        # Mark the current node as visited.
+        visited[v] = True
+ 
+        # Recur for all the vertices adjacent to this vertex
+        for i in self.graph[v]:
+            if visited[i] == False:
+                self.topologicalSortUtil(i, visited, stack)
+ 
+        # Push current vertex to stack which stores result
+        stack.append(v)
+ 
+    # The function to do Topological Sort. It uses recursive
+    # topologicalSortUtil()
+    def topologicalSort(self):
+        # Mark all the vertices as not visited
+        visited = [False]*self.V
+        stack = []
+ 
+        # Call the recursive helper function to store Topological
+        # Sort starting from all vertices one by one
+        for i in range(self.V):
+            if visited[i] == False:
+                self.topologicalSortUtil(i, visited, stack)
+ 
+        # Print contents of the stack
+        # print(stack[::-1])  # return list in reverse order
+        return stack[::-1]
+    
 class ResultParameters:
     def __init__(self) -> None:
         self.objVal = 0 # objective value
@@ -119,10 +151,12 @@ class ResultParameters:
                     g.addEdge(i, j)
         if g.isCyclic() == 1:
             # print("Graph contains cycle")
-            return True
+            return True, None
         else:
             # print("Graph doesn't contain cycle")
-            return False
+            job_order = g.topologicalSort()
+            job_order = [i+1 for i in job_order] # the job index start from 1
+            return False, job_order
         
 
 
@@ -139,11 +173,11 @@ def look_for_topological_order(file_id):
     resultParameters.read_result('tests/base/base_'+ str(file_id) +'.txt','tests/base_result_1107/base_result_'+ str(file_id) +'.txt')
     resultParameters.generateOrder()
     resultParameters.create_adj_matrix()
-    has_cycle = resultParameters.hasCycle()
+    has_cycle, job_order = resultParameters.hasCycle()
     if has_cycle: # total order exists if there is no cycle in directed graph
-        return 0
+        return 0, job_order
     else:
-        return 1
+        return 1, job_order
 
     
 
@@ -152,9 +186,9 @@ def look_for_topological_order(file_id):
 if __name__ == '__main__':
     # look_for_topological_order()
     
-    data = [['Contains Cycle']]
+    data = [['Job Order Exists', 'Shared Job order']]
     for i in range(1, 51):
-        res = look_for_topological_order(i)
-        data.append([res])
+        total_order_exists, order = look_for_topological_order(i)
+        data.append([total_order_exists, order])
     df = pd.DataFrame(data)
-    df.to_csv('./tests/1108_exists_total_order.csv')
+    df.to_csv('./tests/1123_exists_total_order.csv')
