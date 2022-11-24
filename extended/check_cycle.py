@@ -85,7 +85,7 @@ class Graph():
 class ResultParameters:
     def __init__(self) -> None:
         self.objVal = 0 # objective value
-        self.shared_job_order = [] # shared job order
+        self.shared_job_order = None # shared job order
         self.job_maintenance_order = [] # job and maintenance order on each machine
 
     def read_result(self, instance_file_path, result_file_path) -> None:

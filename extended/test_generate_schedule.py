@@ -4,6 +4,7 @@ from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original
 from utils.schedule_objective_value_calculation import calculate_objective_value, transform_parameters_to_instance, print_instance
+from utils.generate_schedule import generate_schedule
 from Models.heuristic import MetaPSOModel, MetaGAModel
 import pandas as pd
 import numpy as np
@@ -26,8 +27,14 @@ def test_objective_function():
 
     print(resultParameters.job_maintenance_order)
     print(resultParameters.shared_job_order)
+    gurobi_obj = resultParameters.objVal
+    print(gurobi_obj)
 
-
+    heuristic_obj = None
+    if resultParameters.shared_job_order != None:
+        heuristic_obj = generate_schedule(resultParameters.shared_job_order, resultParameters.job_maintenance_order, instance)
+    print(heuristic_obj)
+    return gurobi_obj, heuristic_obj
 
     
     # # generate a schedule from the base results
@@ -47,10 +54,10 @@ if __name__ == '__main__':
     test_objective_function()
 
     ### function to list and compare all objective values
-    # data = [['Gurobi obj', 'Constrained obj']]
+    # data = [['Gurobi obj', 'Generate Schedule obj']]
     # for i in range(1, 51):
-    #     real_obj, unconstrained_obj = test_objective_function(i)
-    #     print(real_obj, unconstrained_obj)
-    #     data.append([real_obj, unconstrained_obj])
+    #     gurobi_obj, heuristic_obj = test_objective_function(i)
+    #     # print(real_obj, unconstrained_obj)
+    #     data.append([gurobi_obj, heuristic_obj])
     # df = pd.DataFrame(data)
-    # df.to_csv('./tests/1108_objective_values_constrained.csv')
+    # df.to_csv('./tests/1124_test_generate_schedule.csv')
