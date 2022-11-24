@@ -28,6 +28,9 @@ class GreedyModel(SolutionModel):
         initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
         # start to consider the best maintenance position for each machine
         initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order)
+
+        # try swapping shared job order and adjusting maintenance position to see if we can get a better solution
+
         
     def _setup(self):
         """
@@ -43,7 +46,7 @@ class GreedyModel(SolutionModel):
         it will return the initial job listing schedule indicating the job order\n
         the shape follows the input format of generate_schedule function written by Hsiao-Li Yeh
         #### Parameters
-        - `shared_job_order`: the shared job order, if not provided, it will use WEDD list to generate the shared job order
+        - `shared_job_order`: the shared job order where job index starts from 1, if not provided, it will use WEDD list to generate the shared job order
         """
 
         # setup
@@ -62,7 +65,7 @@ class GreedyModel(SolutionModel):
             current_job_priority = self._generate_shared_job_order_from_WEDD()
         else:
             for i in range(len(shared_job_order)):
-                current_job_priority[shared_job_order[i]] = i
+                current_job_priority[shared_job_order[i] - 1] = i
         
         # current machine time for every machine is default to unfinished production time
         current_machine_time = self.parameters.Unfinished_Production_Time
@@ -76,7 +79,7 @@ class GreedyModel(SolutionModel):
                 production_difference_list.append((k, max(self.real_production_time_matrix[i, :machine_num, k]) - min(self.real_production_time_matrix[i, :machine_num, k])))
             production_difference_list.sort(key=lambda x: x[1], reverse=True) # sort the list by production time difference, descending order
             # start to schedule the job onto the machine
-            for job_index, _ in production_difference_list:
+            for job_index, _ in production_difference_list: # here the job index starts from 0, after computing we need to add 1 to the final job listing
                 # first find the machine with smallest production time for this job
                 best_machine_idx = np.argmin(self.real_production_time_matrix[i, :machine_num, job_index])
                 # if schedule the job onto this machine will make current machine time exceed average machine time on this stage, then we need to schedule the job onto another machine
@@ -111,7 +114,7 @@ class GreedyModel(SolutionModel):
                 if self.maintenance_choice[i, j] == 1:
                     job_order_for_this_machine.append('M')
                 for job_index, _ in job_order_list[i][j]:
-                    job_order_for_this_machine.append(job_index)
+                    job_order_for_this_machine.append(job_index + 1)
                 job_order_list_flatten.append(job_order_for_this_machine)
         # complete the initial job listing
         return job_order_list_flatten
@@ -188,5 +191,38 @@ class GreedyModel(SolutionModel):
                 break
         return job_order_on_machines_copy, best_objective_value
 
+    def _try_swapping_shared_job_order(self, job_order_on_machines: list[list], shared_job_order: list[int], initial_best_obj: float) -> tuple[list[int], float]:
+        """
+        Try swapping shared job order to find the best job order\n
+        Return a list of int that indciates the best shared job order after swapping and the best objective value for this job order
+        #### Parameters\n
+        `job_order_on_machines`: the job order on machines for each stage, it should be a list of list\n
+        `shared_job_order`: the shared job order, it should be a list, every element is a job index
+        `initial_best_obj`: the initial best objective value, used to see whether there is any swap that can improve the objective value
+        """
+        # do a deep copy of the job order on machines
+        instances = cast_parameters_to_instance(self.parameters)
+        job_order_on_machines_copy = copy.deepcopy(job_order_on_machines)
+        best_objective_value = initial_best_obj
+        accumulated_no_improvement_count = 0
+        while True:
+            shared_job_order_copy = copy.deepcopy(shared_job_order)
+            # try swapping every two jobs in the shared job order
+            for i in range(len(shared_job_order_copy)):
+                for j in range(i + 1, len(shared_job_order_copy)):
+                    shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
+                    # sort job order on machines according to the new shared job order
+                    for machine_job_order in job_order_on_machines_copy:
+                        machine_job_order.sort(key=lambda x: shared_job_order_copy.index(x))
+                    # calculate the objective value for this job order under the situation that other machines maintain the same job order
+                    cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances)
+                    if cur_objective_value < best_objective_value:
+                        best_objective_value = cur_objective_value
+                        shared_job_order = shared_job_order_copy
+                        accumulated_no_improvement_count = 1
+                    else:
+                        shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i]
+                        accumulated_no_improvement_count += 1
+    
     def record_result(self):
         return super().record_result()
