@@ -27,7 +27,7 @@ class GreedyModel(SolutionModel):
         # get the shared job order for the initial job listing
         initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
         # start to consider the best maintenance position for each machine
-        initial_job_schedule = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order)
+        initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order)
         
     def _setup(self):
         """
@@ -134,11 +134,11 @@ class GreedyModel(SolutionModel):
             priority_index += 1
         return current_job_priority
 
-    def _decide_best_maintenance_position(self, job_order_on_machines: list[list], shared_job_order: list[int]) -> list[list]:
+    def _decide_best_maintenance_position(self, job_order_on_machines: list[list], shared_job_order: list[int]) -> tuple[list[list], float]:
         """
         Decide the best maintenance position for each machine on each stage\n
         For every machine with maintenance, we will try to find the best position for the maintenance\n
-        Return a list of list, each list indicates the job order for each machine on each stage
+        Return a list of list, each list indicates the job order for each machine on each stage and the best objective value for this job order
         #### Parameters\n
         `job_order_on_machines`: the job order on machines for each stage, it should be a list of list\n
         `shared_job_order`: the shared job order, it should be a list, every element is a job index
@@ -153,8 +153,10 @@ class GreedyModel(SolutionModel):
         for job_order in job_order_on_machines_copy:
             if job_order[0] == 'M':
                 machines_with_maintenance_num += 1
+
+        accumulated_no_improvement_count = 0
         while True: # stopping crietria: no improvement for the number of machines with maintenance
-            accumulated_no_improvement_count = 0
+            is_best_schedule_found = False
             for machine_index, job_order in enumerate(job_order_on_machines_copy):
                 # if the job order contains 'M', it means this machine has maintenance, so we need to find the best position for the maintenance
                 if 'M' in job_order:
@@ -177,9 +179,14 @@ class GreedyModel(SolutionModel):
                             job_order_on_machines_copy[machine_index] = job_order
                     if not has_improved_on_this_machine:
                         accumulated_no_improvement_count += 1
-            if accumulated_no_improvement_count == machines_with_maintenance_num:
+                    else:
+                        accumulated_no_improvement_count = 1
+                if accumulated_no_improvement_count >= machines_with_maintenance_num:
+                    is_best_schedule_found = True
+                    break
+            if is_best_schedule_found:
                 break
-        return job_order_on_machines_copy
+        return job_order_on_machines_copy, best_objective_value
 
     def record_result(self):
         return super().record_result()
