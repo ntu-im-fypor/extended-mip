@@ -15,14 +15,12 @@ class GreedyModel(SolutionModel):
         Then calculate the objective value of the schedule using record_result()
         """
         print("Running and solving using GreedyModel")
-        
-        # setup
-        self._setup()
         # run initial job listing with maintenance
-        initial_job_listing = self._generate_initial_job_listing()
+        initial_job_listing = self.generate_initial_job_listing()
         # get the shared job order for the initial job listing
         initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
         # start to consider the best maintenance position for each machine
+        initial_job_schedule = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order)
         
     def _setup(self):
         """
@@ -32,12 +30,17 @@ class GreedyModel(SolutionModel):
         self.real_production_time_matrix = utils.get_real_production_time_matrix(self.parameters, self.maintenance_choice)
         self.WEDD_list = utils.get_WEDD_list(self.parameters)
         self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix)
-    def _generate_initial_job_listing(self):
+    def generate_initial_job_listing(self, shared_job_order: list[int] = None) -> list[list]:
         """
         Run the initial job listing part\n
         it will return the initial job listing schedule indicating the job order\n
         the shape follows the input format of generate_schedule function written by Hsiao-Li Yeh
+        #### Parameters
+        - `shared_job_order`: the shared job order, if not provided, it will use WEDD list to generate the shared job order
         """
+
+        # setup
+        self._setup()
 
         # first create a 3d list to store the job order for every machine in every stage the 3-th dimension is default to an empty list
         job_order_list = []
@@ -47,7 +50,12 @@ class GreedyModel(SolutionModel):
                 job_order_list[i].append([])
 
         # generate the shared job order
-        current_job_priority = self._generate_shared_job_order()
+        current_job_priority = {}
+        if shared_job_order is None:
+            current_job_priority = self._generate_shared_job_order_from_WEDD()
+        else:
+            for i in range(len(shared_job_order)):
+                current_job_priority[shared_job_order[i]] = i
         
         # current machine time for every machine is default to unfinished production time
         current_machine_time = self.parameters.Unfinished_Production_Time
@@ -101,9 +109,9 @@ class GreedyModel(SolutionModel):
         # complete the initial job listing
         return job_order_list_flatten
 
-    def _generate_shared_job_order(self) -> dict:
+    def _generate_shared_job_order_from_WEDD(self) -> dict:
         """
-        Generate the shared job order. It will return a dictionary\n
+        Generate the shared job order from WEDD list. It will return a dictionary\n
         `Key`: job index, `Value`: job priority index (the smaller the index, the higher the priority)
         """
         current_job_priority = {}
@@ -130,6 +138,7 @@ class GreedyModel(SolutionModel):
         """
 
         # do a deep copy of the job order on machines
+        instances = cast_parameters_to_instance(self.parameters)
         job_order_on_machines_copy = copy.deepcopy(job_order_on_machines)
         best_objective_value = np.inf
         # calculate the number of machines with maintenance
@@ -152,7 +161,7 @@ class GreedyModel(SolutionModel):
                         # replace the job order on this machine with the new job order
                         job_order_on_machines_copy[machine_index] = job_order_copy
                         # calculate the objective value for this job order under the situation that other machines maintain the same job order
-                        cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, cast_parameters_to_instance(self.parameters))
+                        cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances)
                         if cur_objective_value < best_objective_value:
                             best_objective_value = cur_objective_value
                             has_improved_on_this_machine = True
