@@ -91,8 +91,8 @@ def get_shared_job_order_from_WEDD_list(WEDD_list):
     Get the shared job order from the WEDD list\n
     Return a 1d array of shape `Number_of_Jobs`, every element is the job index
     """
-    job_order = np.zeros(len(WEDD_list))
-    for i in range(len(WEDD_list)):
-        job_order[i] = i
-    job_order.sort(key=lambda x: WEDD_list[x])
+    job_order = []
+    for job_index in range(1, len(WEDD_list) + 1):
+        job_order.append(job_index)
+    job_order.sort(key=lambda x: WEDD_list[x - 1]) 
     return job_order
