@@ -93,9 +93,7 @@ class GreedyModel(SolutionModel):
                         if current_machine_time_for_this_machine < smallest_current_machine_time:
                             secondary_machine_idx = j
                             smallest_current_machine_time = current_machine_time_for_this_machine
-                    # if the current machine time for the machine with smallest current machine time is still larger than average machine time on this stage, then we need to schedule the job onto the machine with smallest production time
-                    if smallest_current_machine_time <= self.average_machine_time_for_each_stage[i]:
-                        best_machine_idx = secondary_machine_idx
+                    best_machine_idx = secondary_machine_idx
                 # schedule the job onto the machine
                 job_order_list[i][best_machine_idx].append((job_index, current_job_priority[job_index]))
                 # update the current machine time
