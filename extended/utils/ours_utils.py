@@ -1,7 +1,7 @@
 import numpy as np
 from Models import Parameters
 
-def get_maintenance_choice(parameters: Parameters) -> np.ndarray:
+def get_maintenance_choice(parameters: Parameters, percent: float) -> np.ndarray:
     """
     Get the maintenance benefit for each machine
     maintenance benefit = average discounted time - maintenance length
@@ -34,7 +34,8 @@ def get_maintenance_choice(parameters: Parameters) -> np.ndarray:
     # every element indicates whether that machine is chosen to do maintenance
     # 1 means chosen, 0 means not chosen
     maintenance_choice = np.zeros((parameters.Number_of_Stages, max_machine_num))
-    for i in range(len(benefit_list) // 2):
+    # choose the top `percent` percent of machines to do maintenance
+    for i in range(int(len(benefit_list) * percent)):
         maintenance_choice[benefit_list[i][1][0]][benefit_list[i][1][1]] = 1
     return maintenance_choice
 

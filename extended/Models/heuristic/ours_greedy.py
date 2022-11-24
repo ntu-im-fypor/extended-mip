@@ -6,8 +6,15 @@ import numpy as np
 import copy
 
 class GreedyModel(SolutionModel):
-    def __init__(self, parameters: Parameters):
+    def __init__(self, parameters: Parameters, maintenance_choice_percentage: float = 0.5):
+        """
+        Initialize the model with the parameters and the maintenance choice percentage
+        #### Parameters
+        - `parameters`: the parameters of the problem
+        - `maintenance_choice_percentage`: the percentage of the maintenance choice, that is, after calculating maintenance benefit, we choose first `maintenance_choice_percentage` of the machines to do maintenance
+        """
         super().__init__(parameters)
+        self.maintenance_choice_percentage = maintenance_choice_percentage
 
     def run_and_solve(self):
         """
@@ -26,7 +33,7 @@ class GreedyModel(SolutionModel):
         """
         Setup the data for the model
         """
-        self.maintenance_choice = utils.get_maintenance_choice(self.parameters)
+        self.maintenance_choice = utils.get_maintenance_choice(self.parameters, self.maintenance_choice_percentage)
         self.real_production_time_matrix = utils.get_real_production_time_matrix(self.parameters, self.maintenance_choice)
         self.WEDD_list = utils.get_WEDD_list(self.parameters)
         self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix)
