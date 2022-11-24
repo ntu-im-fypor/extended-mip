@@ -83,7 +83,7 @@ def get_average_machine_time_for_each_stage(parameters: Parameters, production_t
             average_machine_time[i] += parameters.Unfinished_Production_Time[i][j]
             for k in range(parameters.Number_of_Jobs):
                 average_machine_time[i] += production_time_matrix[i][j][k]
-        average_machine_time[i] /= parameters.Number_of_Machines[i] * parameters.Number_of_Machines[i] # divide by the square of the number of machines
+        average_machine_time[i] /= parameters.Number_of_Machines[i] # divide by the square of the number of machines
     return average_machine_time
 
 def get_shared_job_order_from_WEDD_list(WEDD_list):
