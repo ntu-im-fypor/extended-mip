@@ -1,7 +1,7 @@
 import numpy as np
 from Models import Parameters
 
-def get_maintenance_choice(parameters: Parameters) -> np.ndarray:
+def get_maintenance_choice(parameters: Parameters, percent: float) -> np.ndarray:
     """
     Get the maintenance benefit for each machine
     maintenance benefit = average discounted time - maintenance length
@@ -34,7 +34,8 @@ def get_maintenance_choice(parameters: Parameters) -> np.ndarray:
     # every element indicates whether that machine is chosen to do maintenance
     # 1 means chosen, 0 means not chosen
     maintenance_choice = np.zeros((parameters.Number_of_Stages, max_machine_num))
-    for i in range(len(benefit_list) // 2):
+    # choose the top `percent` percent of machines to do maintenance
+    for i in range(int(len(benefit_list) * percent)):
         maintenance_choice[benefit_list[i][1][0]][benefit_list[i][1][1]] = 1
     return maintenance_choice
 
@@ -73,13 +74,7 @@ def get_WEDD_list(parameters: Parameters):
 
 def get_average_machine_time_for_each_stage(parameters: Parameters, production_time_matrix: np.ndarray) -> np.ndarray:
     """
-    production_time_matrix: a 3d array of shape `(Number_of_Stages, max_machine_num, Number_of_Jobs)`
-    each element is the real production time for that job on that machine.
-    You can get this matrix by calling `get_real_production_time_matrix(parameters, maintenance_choice)`
-    #### 這裡的 production_time_matrix 就是 1121_會議簡報 p.18 的 production time table, 會考慮 maintenance 後的時間
-    Get the average machine time for each stage
-    return a 1d array of shape (Number_of_Stages)
-    every element is the average machine time for that stage
+    Get the average machine time for each stage\n
     """
     average_machine_time = np.zeros(parameters.Number_of_Stages)
     for i in range(parameters.Number_of_Stages):
@@ -90,3 +85,14 @@ def get_average_machine_time_for_each_stage(parameters: Parameters, production_t
                 average_machine_time[i] += production_time_matrix[i][j][k]
         average_machine_time[i] /= parameters.Number_of_Machines[i] * parameters.Number_of_Machines[i] # divide by the square of the number of machines
     return average_machine_time
+
+def get_shared_job_order_from_WEDD_list(WEDD_list):
+    """
+    Get the shared job order from the WEDD list\n
+    Return a 1d array of shape `Number_of_Jobs`, every element is the job index
+    """
+    job_order = np.zeros(len(WEDD_list))
+    for i in range(len(WEDD_list)):
+        job_order[i] = i
+    job_order.sort(key=lambda x: WEDD_list[x])
+    return job_order

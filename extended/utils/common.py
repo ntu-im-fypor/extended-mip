@@ -34,7 +34,7 @@ class Instance:
     MAX_MACHINES_NUM = max(MACHINES_NUM)
 
 
-def transform_parameters_to_instance(parameters: Parameters) -> Instance:
+def cast_parameters_to_instance(parameters: Parameters) -> Instance:
     instance = Instance()
     instance.JOBS_NUM = parameters.Number_of_Jobs
     instance.MAX_MACHINES_NUM = parameters.Max_Number_of_Machines
