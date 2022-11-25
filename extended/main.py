@@ -43,14 +43,16 @@ def test_heuristic_model():
     parameters = Parameters()
     parameters.read_parameters(file_path)
     # use input to choose which model to use
-    model_type = input("Please choose which model to use: 1. MetaPSOModel, 2. MetaGAModel, 3. GreedyModel")
+    model_type = input("Please choose which model to use: 1. MetaPSOModel, 2. MetaGAModel, 3. GreedyModel, 4. CompleteMIPModel")
     heuristic_model = None
     if model_type == "1":
         heuristic_model = MetaPSOModel(parameters)
     elif model_type == "2":
         heuristic_model = MetaGAModel(parameters)
     elif model_type == "3":
-        heuristic_model = GreedyModel(parameters)
+        heuristic_model = GreedyModel(parameters, file_path="greedy-results/test.json")
+    elif model_type == "4":
+        heuristic_model = CompleteMIPModel(parameters)
     else:
         print("Invalid model type")
         return

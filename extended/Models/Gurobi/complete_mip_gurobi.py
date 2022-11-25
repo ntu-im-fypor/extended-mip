@@ -230,9 +230,9 @@ class CompleteMIPModel:
         print("Start solving...")
         # run Gurobi
         self.gp_model.optimize()
-        return self.__record_result()
+        return self.record_result()
     
-    def __record_result(self) -> None:
+    def record_result(self) -> None:
         # record the result
         print("Runtime: ", self.gp_model.Runtime)
         print("Best objective value: ", self.gp_model.objVal)
@@ -266,18 +266,4 @@ class CompleteMIPModel:
         #             f.write(" ")
         #         f.write('\n')
         #     f.close()
-            
-    
-    def plot_result(self) -> None:
-        """
-        1. you can access every variable by passing its index
-        e.g. you can access completion time of job 1 in stage 1 using self.z_ij[1, 1].x (Note: z_ij[1, 1] is a gurobi variable, but its value needs to be accessed by .x)
-        2. you can access every parameter by using the property self.parameters
-        e.g. you can access the due time of job 1 using self.parameters.Due_Time[0]
-
-        What should be noticed is that the index of every parameter starts from 0, while the index of every variable starts from 1
-        """
-        # print("Plotting...")
-        # print(f"z_11: {self.z_ij[1, 1].x}")
-        # print(f"due time of job 1: {self.parameters.Due_Time[0]}")
 

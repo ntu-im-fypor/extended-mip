@@ -1,4 +1,5 @@
 from itertools import combinations
+import json
 from Models import Parameters, SolutionModel
 from utils.common import cast_parameters_to_instance
 from utils.generate_schedule import generate_schedule
@@ -7,7 +8,7 @@ import numpy as np
 import copy
 
 class GreedyModel(SolutionModel):
-    def __init__(self, parameters: Parameters, maintenance_choice_percentage: float = 0.5):
+    def __init__(self, parameters: Parameters, maintenance_choice_percentage: float = 0.5, file_path: str = None):
         """
         Initialize the model with the parameters and the maintenance choice percentage
         #### Parameters
@@ -15,6 +16,10 @@ class GreedyModel(SolutionModel):
         - `maintenance_choice_percentage`: the percentage of the maintenance choice, that is, after calculating maintenance benefit, we choose first `maintenance_choice_percentage` of the machines to do maintenance
         """
         super().__init__(parameters)
+        if file_path is None:
+            print("No file path specified!")
+            return
+        self.file_path = file_path
         self.maintenance_choice_percentage = maintenance_choice_percentage
 
     def run_and_solve(self):
@@ -51,7 +56,13 @@ class GreedyModel(SolutionModel):
             if not has_improved:
                 break
 
-        
+        # store the best schedule
+        self.final_result = {
+            "schedule": best_job_schedule,
+            "objective_value": best_objective_value,
+            "shared_job_order": best_shared_job_order
+        }
+        self.record_result()
     def _setup(self):
         """
         Setup the data for the model
@@ -185,8 +196,9 @@ class GreedyModel(SolutionModel):
                     has_improved_on_this_machine = False
                     # do a deep copy of the job order
                     job_order_copy = copy.deepcopy(job_order)
+                    best_job_order_on_this_machine = copy.deepcopy(job_order)
                     # first we get the job order list without 'M', and insert 'M' into every possible position to find the best position
-                    for i in range(len(job_order_copy) + 1):
+                    for i in range(len(job_order_copy)):
                         job_order_copy.remove('M')
                         job_order_copy.insert(i, 'M')
                         # replace the job order on this machine with the new job order
@@ -194,18 +206,18 @@ class GreedyModel(SolutionModel):
                         # calculate the objective value for this job order under the situation that other machines maintain the same job order
                         cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances)
                         if cur_objective_value < best_objective_value:
+                            best_job_order_on_this_machine = copy.deepcopy(job_order_copy)
                             best_objective_value = cur_objective_value
                             has_improved_on_this_machine = True
-                        else:
-                            # replace the job order on this machine with the original job order
-                            job_order_on_machines_copy[machine_index] = job_order
                     if not has_improved_on_this_machine:
                         accumulated_no_improvement_count += 1
                     else:
                         accumulated_no_improvement_count = 1
-                if accumulated_no_improvement_count >= machines_with_maintenance_num:
-                    is_best_schedule_found = True
-                    break
+                    # replace the job order on this machine with the best job order
+                    job_order_on_machines_copy[machine_index] = best_job_order_on_this_machine
+                    if accumulated_no_improvement_count >= machines_with_maintenance_num:
+                        is_best_schedule_found = True
+                        break
             if is_best_schedule_found:
                 break
         return job_order_on_machines_copy, best_objective_value
@@ -235,7 +247,7 @@ class GreedyModel(SolutionModel):
                 cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances)
                 if cur_objective_value < best_objective_value:
                     best_objective_value = cur_objective_value
-                    shared_job_order = shared_job_order_copy
+                    shared_job_order = copy.deepcopy(shared_job_order_copy)
                     accumulated_no_improvement_count = 1
                 else:
                     shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i] # swap back because this swap doesn't improve
@@ -274,4 +286,12 @@ class GreedyModel(SolutionModel):
                 machine_job_order.sort(key=lambda x: job_priority[x])
         return schedule_copy
     def record_result(self):
-        return super().record_result()
+        """
+        Record the result of the algorithm
+        """
+        # shared job order is a list of int, so store it to json file
+        print(f"Final Objective Value: {self.final_result['objective_value']}")
+        print(f"Final Shared Job Order: {self.final_result['shared_job_order']}")
+        print(f"Final Schedule: {self.final_result['schedule']}")
+        with open(self.file_path, 'w+') as f:
+            json.dump(self.final_result, f)
