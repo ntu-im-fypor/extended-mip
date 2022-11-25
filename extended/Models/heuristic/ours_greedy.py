@@ -57,6 +57,8 @@ class GreedyModel(SolutionModel):
             if not has_improved:
                 break
 
+        self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
+
         # store the best schedule
         self.final_result = {
             "schedule": best_job_schedule,
@@ -277,7 +279,7 @@ class GreedyModel(SolutionModel):
         all_stages_machines_job_order = []
         for i in range(self.parameters.Number_of_Stages):
             all_stages_machines_job_order.append([])
-            for j in range(self.parameters.Number_of_Machines[i]):
+            for _ in range(self.parameters.Number_of_Machines[i]):
                 all_stages_machines_job_order[i].append(job_order_on_machines_copy[machine_index])
                 machine_index += 1
         # then we try swapping two jobs between two machines on the same stage
