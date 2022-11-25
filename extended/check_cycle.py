@@ -85,6 +85,8 @@ class Graph():
 class ResultParameters:
     def __init__(self) -> None:
         self.objVal = 0 # objective value
+        self.shared_job_order = None # shared job order
+        self.job_maintenance_order = [] # job and maintenance order on each machine
 
     def read_result(self, instance_file_path, result_file_path) -> None:
         parameters = Parameters() # read parameters
@@ -121,6 +123,7 @@ class ResultParameters:
                 for m in range(self.MACHINES_NUM[i]):
                     self.bim[i][m] = row[m]
   
+    # generate order on machines of jobs only
     def generateOrder(self) -> None:
         machine = 0
         for i in range(self.STAGES_NUM):
@@ -138,12 +141,35 @@ class ResultParameters:
                 self.order.append(maint_job_list)
                 machine+=1
     
+    # generate order on machines of jobs and maintenance
+    def generateJobMaintenanceOrder(self) -> None:
+        machine = 0
+        for i in range(self.STAGES_NUM):
+            for m in range(self.MACHINES_NUM[i]):
+                maint_job_list = []
+                indexes = np.where(self.rmj[machine] == 1) # filter jobs completed on this machine in this stage
+                completion_time = self.zij[i][indexes] # retrieve their completion times
+                index_completion_time_list = list(zip(np.array(indexes).flatten(), completion_time))
+                if(self.vim[i][m] == 1): # if maintenance is completed on stage i of machine m
+                    index_completion_time_list.append((-1, self.bim[i][m])) # zip to (index, completion time) list and append maintenance time
+                sorted_index_completion_time_list = sorted(index_completion_time_list, key=lambda x: x[1]) # sort according to completion time
+                for k in range(len(sorted_index_completion_time_list)):
+                    if sorted_index_completion_time_list[k][0] != -1: # is a job
+                        maint_job_list.append(sorted_index_completion_time_list[k][0] + 1)
+                    else: # is maintenance
+                         maint_job_list.append('M')
+                self.job_maintenance_order.append(maint_job_list)
+                machine+=1
+    
     def create_adj_matrix(self) -> None:
         for i in range(len(self.order)):
             for j in range(len(self.order[i])-1):
                 self.adj_matrix[self.order[i][j]-1][self.order[i][j+1]-1] = 1
         
-    def hasCycle(self) -> bool:
+    # generate shared job order, return 
+    def generateSharedJobOrder(self) -> bool:
+        self.generateOrder()
+        self.create_adj_matrix()
         g = Graph(self.JOBS_NUM)
         for i in range(len(self.adj_matrix)):
             for j in range(len(self.adj_matrix[i])):
@@ -151,12 +177,13 @@ class ResultParameters:
                     g.addEdge(i, j)
         if g.isCyclic() == 1:
             # print("Graph contains cycle")
-            return True, None
+            return False, None
         else:
             # print("Graph doesn't contain cycle")
             job_order = g.topologicalSort()
             job_order = [i+1 for i in job_order] # the job index start from 1
-            return False, job_order
+            self.shared_job_order = job_order
+            return True, job_order
         
 
 
@@ -171,13 +198,8 @@ def look_for_topological_order(file_id):
     # generate a schedule from the base results
     resultParameters = ResultParameters()
     resultParameters.read_result('tests/base/base_'+ str(file_id) +'.txt','tests/base_result_1107/base_result_'+ str(file_id) +'.txt')
-    resultParameters.generateOrder()
-    resultParameters.create_adj_matrix()
-    has_cycle, job_order = resultParameters.hasCycle()
-    if has_cycle: # total order exists if there is no cycle in directed graph
-        return 0, job_order
-    else:
-        return 1, job_order
+    has_shared_job_order, job_order = resultParameters.generateSharedJobOrder()
+    return has_shared_job_order, job_order
 
     
 

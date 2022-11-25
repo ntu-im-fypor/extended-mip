@@ -96,13 +96,26 @@ def compute_tardiness(current_end_time, instance):
     return obj
 
 
-# TODO: sort maintenance order according to stage and machine length
-def sort_maintenance(maint_order):
-    return maint_order
+
 
 
 # function for generating schedule and computing objective value
 def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
+
+    def sort_maintenance(maint_order): # TODO: sort maintenance order according to stage and machine length
+        # print('maint_order', maint_order)
+        job_priority = [[0, 0] for i in range(len(maint_order))]
+        for i in range(len(maint_order)):
+            job_priority[i][0] = maint_order[i]
+            job_after_maintenance = order_on_machines[maint_order[i]][current_machine_index[maint_order[i]]+1]
+            job_priority[i][1] = shared_job_order.index(job_after_maintenance) # sorting criteria: next job in shared job order
+        job_priority = sorted(job_priority, key=itemgetter(1))  # sort by first value of tuple
+        
+        if job_priority != []: # get first element using zip, then change data type to list
+            maint_order = list(list(zip(*job_priority))[0])
+        
+        return maint_order
+    
     current_end_time = [0] * instance.JOBS_NUM
     total_machines_num = sum(instance.MACHINES_NUM)
     current_machine_time = [0] * total_machines_num
@@ -112,21 +125,22 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
     for i in range(total_machines_num): # initialize current machine time
         current_machine_time[i] = instance.REMAIN[i]
 
+    current_maint_time = 0
     for i in range(len(shared_job_order)):  # loop all jobs in shared job order
         maint_order = [] # store the maintenance order
         for j in range(total_machines_num): # mark all machines that need maintenance
             if (current_machine_index[j] != len(order_on_machines[j])):
-                if (order_on_machines[j][current_machine_index[j]] == 'M'):
+                if (order_on_machines[j][current_machine_index[j]] == 'M' and current_machine_index[j] != len(order_on_machines[j])-1):
                     maint_order.append(j) # append the machine that needs maintenance
         sorted_maintenance_order = sort_maintenance(maint_order) # sort the maintenance order
         # print(sorted_maintenance_order)
-        current_maint_time = 0
         for j in range(len(sorted_maintenance_order)): # append maintenance to schedule
-            maint_start_time = max(current_machine_time[j], current_maint_time)
-            current_machine_time[sorted_maintenance_order[j]] = maint_start_time + instance.MAINT_LEN[j]
-            current_maint_time = maint_start_time + instance.MAINT_LEN[j]
+            maint_start_time = max(current_machine_time[sorted_maintenance_order[j]], current_maint_time)
+            current_machine_time[sorted_maintenance_order[j]] = maint_start_time + instance.MAINT_LEN[sorted_maintenance_order[j]]
+            current_maint_time = maint_start_time + instance.MAINT_LEN[sorted_maintenance_order[j]]
             current_machine_index[sorted_maintenance_order[j]] += 1
             machine_has_maintained[sorted_maintenance_order[j]] = True
+            # print("current maint time", current_maint_time)
         # print(machine_has_maintained)
         current_job_time = [[0, 0] for i in range(instance.STAGES_NUMBER)] # initialize current job time
         
@@ -171,10 +185,10 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
         for j in range(instance.STAGES_NUMBER): # update current machine time
             current_machine_time[current_job_machines[j]] = current_job_time[j][1]
         current_end_time[shared_job_order[i]-1] = current_job_time[instance.STAGES_NUMBER-1][1]
-    print(current_end_time)
+    # print(current_end_time)
     obj = compute_tardiness(current_end_time, instance)
     return obj
 
 
-print(generate_schedule(shared_job_order, order_on_machines, instance))
+# print(generate_schedule(shared_job_order, order_on_machines, instance))
     
