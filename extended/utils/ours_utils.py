@@ -89,7 +89,7 @@ def get_average_machine_time_for_each_stage(parameters: Parameters, production_t
 def get_shared_job_order_from_WEDD_list(WEDD_list):
     """
     Get the shared job order from the WEDD list\n
-    Return a 1d array of shape `Number_of_Jobs`, every element is the job index
+    Return a 1d array of shape `Number_of_Jobs`, every element is the job index, the job index starts from 1
     """
     job_order = []
     for job_index in range(1, len(WEDD_list) + 1):
