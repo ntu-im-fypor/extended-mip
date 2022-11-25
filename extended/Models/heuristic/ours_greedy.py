@@ -1,3 +1,4 @@
+from itertools import combinations
 from Models import Parameters, SolutionModel
 from utils.common import cast_parameters_to_instance
 from utils.generate_schedule import generate_schedule
@@ -27,9 +28,28 @@ class GreedyModel(SolutionModel):
         # get the shared job order for the initial job listing
         initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
         # start to consider the best maintenance position for each machine
-        initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order)
-
+        initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order, np.inf)
         # try swapping shared job order and adjusting maintenance position to see if we can get a better solution
+        best_objective_value = initial_best_objective_value
+        best_job_schedule = initial_job_schedule
+        best_shared_job_order = initial_shared_job_order
+        has_improved = False
+        while True:
+            # try swapping shared job order to see if we can get a better solution
+            cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
+            if cur_best_obj < best_objective_value:
+                # use best swapped order to generate a new schedule
+                best_shared_job_order = cur_best_shared_job_order
+                best_job_schedule = self._sort_schedule_with_shared_job_order(best_shared_job_order, best_job_schedule)
+                best_objective_value = cur_best_obj
+            # try adjusting maintenance position to see if we can get a better solution
+            cur_best_schedule, cur_best_obj = self._decide_best_maintenance_position(best_job_schedule, best_shared_job_order, best_objective_value)
+            if cur_best_obj < best_objective_value:
+                best_job_schedule = cur_best_schedule
+                best_objective_value = cur_best_obj
+                has_improved = True
+            if not has_improved:
+                break
 
         
     def _setup(self):
@@ -62,7 +82,7 @@ class GreedyModel(SolutionModel):
         # generate the shared job order
         current_job_priority = {}
         if shared_job_order is None:
-            current_job_priority = self._generate_shared_job_order_from_WEDD()
+            current_job_priority = self._generate_shared_job_order_dict_from_WEDD()
         else:
             for i in range(len(shared_job_order)):
                 current_job_priority[shared_job_order[i] - 1] = i
@@ -117,7 +137,7 @@ class GreedyModel(SolutionModel):
         # complete the initial job listing
         return job_order_list_flatten
 
-    def _generate_shared_job_order_from_WEDD(self) -> dict:
+    def _generate_shared_job_order_dict_from_WEDD(self) -> dict:
         """
         Generate the shared job order from WEDD list. It will return a dictionary\n
         `Key`: job index, `Value`: job priority index (the smaller the index, the higher the priority)
@@ -135,7 +155,7 @@ class GreedyModel(SolutionModel):
             priority_index += 1
         return current_job_priority
 
-    def _decide_best_maintenance_position(self, job_order_on_machines: list[list], shared_job_order: list[int]) -> tuple[list[list], float]:
+    def _decide_best_maintenance_position(self, job_order_on_machines: list[list], shared_job_order: list[int], initial_best_obj: float) -> tuple[list[list], float]:
         """
         Decide the best maintenance position for each machine on each stage\n
         For every machine with maintenance, we will try to find the best position for the maintenance\n
@@ -143,12 +163,13 @@ class GreedyModel(SolutionModel):
         #### Parameters\n
         `job_order_on_machines`: the job order on machines for each stage, it should be a list of list\n
         `shared_job_order`: the shared job order, it should be a list, every element is a job index
+        `initial_best_obj`: the initial best objective value
         """
 
         # do a deep copy of the job order on machines
         instances = cast_parameters_to_instance(self.parameters)
         job_order_on_machines_copy = copy.deepcopy(job_order_on_machines)
-        best_objective_value = np.inf
+        best_objective_value = initial_best_obj
         # calculate the number of machines with maintenance
         machines_with_maintenance_num = 0
         for job_order in job_order_on_machines_copy:
@@ -201,26 +222,56 @@ class GreedyModel(SolutionModel):
         # do a deep copy of the job order on machines
         instances = cast_parameters_to_instance(self.parameters)
         job_order_on_machines_copy = copy.deepcopy(job_order_on_machines)
+        shared_job_order_copy = copy.deepcopy(shared_job_order)
         best_objective_value = initial_best_obj
         accumulated_no_improvement_count = 0
         while True:
-            shared_job_order_copy = copy.deepcopy(shared_job_order)
-            # try swapping every two jobs in the shared job order
-            for i in range(len(shared_job_order_copy)):
-                for j in range(i + 1, len(shared_job_order_copy)):
-                    shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
-                    # sort job order on machines according to the new shared job order
-                    for machine_job_order in job_order_on_machines_copy:
-                        machine_job_order.sort(key=lambda x: shared_job_order_copy.index(x))
-                    # calculate the objective value for this job order under the situation that other machines maintain the same job order
-                    cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances)
-                    if cur_objective_value < best_objective_value:
-                        best_objective_value = cur_objective_value
-                        shared_job_order = shared_job_order_copy
-                        accumulated_no_improvement_count = 1
-                    else:
-                        shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i]
-                        accumulated_no_improvement_count += 1
-    
+            # use combinations to generate all possible pairs of jobs to swap
+            for i, j in combinations(range(len(shared_job_order_copy)), 2):
+                shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
+                # sort job order on machines according to the new shared job order
+                job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
+                # calculate the objective value for this job order under the situation that other machines maintain the same job order
+                cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances)
+                if cur_objective_value < best_objective_value:
+                    best_objective_value = cur_objective_value
+                    shared_job_order = shared_job_order_copy
+                    accumulated_no_improvement_count = 1
+                else:
+                    shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i] # swap back because this swap doesn't improve
+                    accumulated_no_improvement_count += 1
+            if accumulated_no_improvement_count >= len(shared_job_order_copy) * (len(shared_job_order_copy) - 1) / 2: # stopping criteria: no improvement for the number of possible swaps
+                break
+        return shared_job_order, best_objective_value
+
+    def _sort_schedule_with_shared_job_order(self, shared_job_order: list[int], schedule: list[list]) -> list[list]:
+        """
+        Generate the schedule with the shared job order\n
+        Return a list of list, each list indicates the job order for each machine on each stage
+        #### Parameters\n
+        `shared_job_order`: the shared job order, it should be a list, every element is a job index
+        `schedule`: the schedule, it should be a list of list, each list indicates the job order for each machine on each stage, notice that the job index starts from 1
+        """
+        # sort job order on machines according to the shared job order
+        job_priority = {}
+        for priority, job_index in enumerate(shared_job_order):
+            job_priority[job_index] = priority
+
+        # do a deep copy of the schedule
+        schedule_copy = copy.deepcopy(schedule)
+        for machine_job_order in schedule_copy:
+            # if the job order contains 'M', we cannot directly sort it, so we need to store the index of 'M' and remove it first
+            if 'M' in machine_job_order:
+                # find the index of 'M'
+                m_index = machine_job_order.index('M')
+                # remove 'M'
+                machine_job_order.remove('M')
+                # sort the job order
+                machine_job_order.sort(key=lambda x: job_priority[x])
+                # insert 'M' back to the original position
+                machine_job_order.insert(m_index, 'M')
+            else:
+                machine_job_order.sort(key=lambda x: job_priority[x])
+        return schedule_copy
     def record_result(self):
         return super().record_result()
