@@ -14,6 +14,7 @@ class GreedyModel(SolutionModel):
         #### Parameters
         - `parameters`: the parameters of the problem
         - `maintenance_choice_percentage`: the percentage of the maintenance choice, that is, after calculating maintenance benefit, we choose first `maintenance_choice_percentage` of the machines to do maintenance
+        - `file_path`: the file path to store the result
         """
         super().__init__(parameters)
         if file_path is None:
