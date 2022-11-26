@@ -151,41 +151,29 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
                     current_machine_index[j] += 1
                     current_job_machines.append(j)
         # print(current_job_machines)
-        for j in range(instance.STAGES_NUMBER): # append job j's schedule together without interval
-            if (j != 0):
-                current_job_time[j][0] = current_job_time[j-1][1]
-            machine = current_job_machines[j]
+        for j in range(instance.STAGES_NUMBER): 
+            machine = current_job_machines[j] # get machine no, production time of current job current stage
             production_time = instance.INIT_PROD_TIME[machine][shared_job_order[i]-1]
             if machine_has_maintained[machine]:
                 production_time = instance.DISCOUNT[machine] * production_time
+            if j == 0: # append job j's as close to previous job as possible
+                current_job_time[j][0] = current_machine_time[machine] 
+            else:
+                current_job_time[j][0] = max(current_machine_time[machine], current_job_time[j-1][1])
             current_job_time[j][1] = current_job_time[j][0] + production_time
-        # print(current_job_time)
-        overlap = current_machine_time[current_job_machines[0]]
-        for j in range(instance.STAGES_NUMBER): # append (*) to stage 1 machine m 
-            current_job_time[j][0] += overlap
-            current_job_time[j][1] += overlap
-        # print(current_job_time)
-        for j in range(1, instance.STAGES_NUMBER):
-            overlap = current_machine_time[current_job_machines[j]] - current_job_time[j][0]
-            pushback = -1
-            # print("overlap = ", overlap)
-            if overlap > 0:
-                pushback = min(overlap, instance.QUEUE_LIMIT[j-1][shared_job_order[i]-1])
-                for k in range(j, instance.STAGES_NUMBER): # push back after stage j
-                    current_job_time[k][0] += pushback
-                    current_job_time[k][1] += pushback
-            # print("pushback = ", pushback)
-            # print(current_job_time)
-            if pushback != -1 and pushback < overlap:
-                pushback = overlap - pushback
-                for k in range(instance.STAGES_NUMBER): # push back from stage 0
-                    current_job_time[k][0] += pushback
-                    current_job_time[k][1] += pushback
+            for k in range(j, 0, -1): # check previous stages violate queue time limit
+                queue_limit = instance.QUEUE_LIMIT[k-1][shared_job_order[i]-1]
+                shift = (current_job_time[k][0] - current_job_time[k-1][1]) - queue_limit
+                if shift > 0:
+                    current_job_time[k-1][0] += shift
+                    current_job_time[k-1][1] += shift
+                else:
+                    break
         # print(current_job_time)
         for j in range(instance.STAGES_NUMBER): # update current machine time
             current_machine_time[current_job_machines[j]] = current_job_time[j][1]
         current_end_time[shared_job_order[i]-1] = current_job_time[instance.STAGES_NUMBER-1][1]
-    # print(current_end_time)
+    print(current_end_time)
     obj = compute_tardiness(current_end_time, instance)
     return obj
 
