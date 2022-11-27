@@ -190,10 +190,7 @@ class GreedyModel(SolutionModel):
         job_order_on_machines_copy = copy.deepcopy(job_order_on_machines)
         best_objective_value = initial_best_obj
         # calculate the number of machines with maintenance
-        machines_with_maintenance_num = 0
-        for job_order in job_order_on_machines_copy:
-            if job_order[0] == 'M':
-                machines_with_maintenance_num += 1
+        machines_with_maintenance_num = len(job_order_on_machines)
 
         accumulated_no_improvement_count = 0
         while True: # stopping crietria: no improvement for the number of machines with maintenance
@@ -288,9 +285,11 @@ class GreedyModel(SolutionModel):
                 all_stages_machines_job_order[i].append(job_order_on_machines_copy[machine_index])
                 machine_index += 1
         # then we try swapping two jobs between two machines on the same stage
+        completed_machines_count = 0
         for cur_stage_index, machines_on_this_stage in enumerate(all_stages_machines_job_order):
             # if there is only one machine on this stage, we don't need to swap
             if len(machines_on_this_stage) == 1:
+                completed_machines_count += 1
                 continue
             # use combinations to generate all possible pairs of machines to swap
             for machine1_index, machine2_index in combinations(range(len(machines_on_this_stage)), 2):
@@ -306,8 +305,8 @@ class GreedyModel(SolutionModel):
                     # swap the two jobs
                     machine1_job_order_copy[swap[0]], machine2_job_order_copy[swap[1]] = machine2_job_order_copy[swap[1]], machine1_job_order_copy[swap[0]]
                     # update the job order on job schedule
-                    job_order_on_machines_copy[cur_stage_index + machine1_index] = machine1_job_order_copy
-                    job_order_on_machines_copy[cur_stage_index + machine2_index] = machine2_job_order_copy
+                    job_order_on_machines_copy[completed_machines_count + machine1_index] = machine1_job_order_copy
+                    job_order_on_machines_copy[completed_machines_count + machine2_index] = machine2_job_order_copy
                     # sort job order after swapping two jobs
                     job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order, job_order_on_machines_copy)
                     # calculate the objective value for this job order under the situation that other machines maintain the same job order
@@ -316,6 +315,7 @@ class GreedyModel(SolutionModel):
                         best_objective_value = cur_objective_value
                     else:
                         job_order_on_machines_copy = job_order_on_machines_before_swap
+            completed_machines_count += len(machines_on_this_stage)
         return job_order_on_machines_copy, best_objective_value
                         
 
