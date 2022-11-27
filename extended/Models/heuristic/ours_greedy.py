@@ -41,6 +41,7 @@ class GreedyModel(SolutionModel):
         best_shared_job_order = initial_shared_job_order
         has_improved = False
         while True:
+            print("Current best objective value:", best_objective_value)
             # try swapping shared job order to see if we can get a better solution
             cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
             if cur_best_obj < best_objective_value:
@@ -54,6 +55,8 @@ class GreedyModel(SolutionModel):
                 best_job_schedule = cur_best_schedule
                 best_objective_value = cur_best_obj
                 has_improved = True
+            else:
+                has_improved = False
             if not has_improved:
                 break
 
@@ -147,6 +150,8 @@ class GreedyModel(SolutionModel):
                     job_order_for_this_machine.append('M')
                 for job_index, _ in job_order_list[i][j]:
                     job_order_for_this_machine.append(job_index + 1)
+                if self.maintenance_choice[i, j] == 0:
+                    job_order_for_this_machine.append('M')
                 job_order_list_flatten.append(job_order_for_this_machine)
         # complete the initial job listing
         return job_order_list_flatten
