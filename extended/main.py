@@ -39,7 +39,7 @@ def test_heuristic_model():
     #     return
     # # print(sys.argv)
     # file_path = sys.argv[1]
-    file_path = "tests/base/base_1.txt"
+    file_path = "tests/base/base_3.txt"
     parameters = Parameters()
     parameters.read_parameters(file_path)
     # use input to choose which model to use
