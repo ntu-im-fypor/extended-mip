@@ -96,13 +96,26 @@ def compute_tardiness(current_end_time, instance):
     return obj
 
 
-# TODO: sort maintenance order according to stage and machine length
-def sort_maintenance(maint_order):
-    return maint_order
+
 
 
 # function for generating schedule and computing objective value
 def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
+
+    def sort_maintenance(maint_order): # TODO: sort maintenance order according to stage and machine length
+        # print('maint_order', maint_order)
+        job_priority = [[0, 0] for i in range(len(maint_order))]
+        for i in range(len(maint_order)):
+            job_priority[i][0] = maint_order[i]
+            job_after_maintenance = order_on_machines[maint_order[i]][current_machine_index[maint_order[i]]+1]
+            job_priority[i][1] = shared_job_order.index(job_after_maintenance) # sorting criteria: next job in shared job order
+        job_priority = sorted(job_priority, key=itemgetter(1))  # sort by first value of tuple
+        
+        if job_priority != []: # get first element using zip, then change data type to list
+            maint_order = list(list(zip(*job_priority))[0])
+        
+        return maint_order
+    
     current_end_time = [0] * instance.JOBS_NUM
     total_machines_num = sum(instance.MACHINES_NUM)
     current_machine_time = [0] * total_machines_num
@@ -112,21 +125,22 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
     for i in range(total_machines_num): # initialize current machine time
         current_machine_time[i] = instance.REMAIN[i]
 
+    current_maint_time = 0
     for i in range(len(shared_job_order)):  # loop all jobs in shared job order
         maint_order = [] # store the maintenance order
         for j in range(total_machines_num): # mark all machines that need maintenance
             if (current_machine_index[j] != len(order_on_machines[j])):
-                if (order_on_machines[j][current_machine_index[j]] == 'M'):
+                if (order_on_machines[j][current_machine_index[j]] == 'M' and current_machine_index[j] != len(order_on_machines[j])-1):
                     maint_order.append(j) # append the machine that needs maintenance
         sorted_maintenance_order = sort_maintenance(maint_order) # sort the maintenance order
         # print(sorted_maintenance_order)
-        current_maint_time = 0
         for j in range(len(sorted_maintenance_order)): # append maintenance to schedule
-            maint_start_time = max(current_machine_time[j], current_maint_time)
-            current_machine_time[sorted_maintenance_order[j]] = maint_start_time + instance.MAINT_LEN[j]
-            current_maint_time = maint_start_time + instance.MAINT_LEN[j]
+            maint_start_time = max(current_machine_time[sorted_maintenance_order[j]], current_maint_time)
+            current_machine_time[sorted_maintenance_order[j]] = maint_start_time + instance.MAINT_LEN[sorted_maintenance_order[j]]
+            current_maint_time = maint_start_time + instance.MAINT_LEN[sorted_maintenance_order[j]]
             current_machine_index[sorted_maintenance_order[j]] += 1
             machine_has_maintained[sorted_maintenance_order[j]] = True
+            # print("current maint time", current_maint_time)
         # print(machine_has_maintained)
         current_job_time = [[0, 0] for i in range(instance.STAGES_NUMBER)] # initialize current job time
         
@@ -137,36 +151,24 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
                     current_machine_index[j] += 1
                     current_job_machines.append(j)
         # print(current_job_machines)
-        for j in range(instance.STAGES_NUMBER): # append job j's schedule together without interval
-            if (j != 0):
-                current_job_time[j][0] = current_job_time[j-1][1]
-            machine = current_job_machines[j]
+        for j in range(instance.STAGES_NUMBER): 
+            machine = current_job_machines[j] # get machine no, production time of current job current stage
             production_time = instance.INIT_PROD_TIME[machine][shared_job_order[i]-1]
             if machine_has_maintained[machine]:
                 production_time = instance.DISCOUNT[machine] * production_time
+            if j == 0: # append job j's as close to previous job as possible
+                current_job_time[j][0] = current_machine_time[machine] 
+            else:
+                current_job_time[j][0] = max(current_machine_time[machine], current_job_time[j-1][1])
             current_job_time[j][1] = current_job_time[j][0] + production_time
-        # print(current_job_time)
-        overlap = current_machine_time[current_job_machines[0]]
-        for j in range(instance.STAGES_NUMBER): # append (*) to stage 1 machine m 
-            current_job_time[j][0] += overlap
-            current_job_time[j][1] += overlap
-        # print(current_job_time)
-        for j in range(1, instance.STAGES_NUMBER):
-            overlap = current_machine_time[current_job_machines[j]] - current_job_time[j][0]
-            pushback = -1
-            # print("overlap = ", overlap)
-            if overlap > 0:
-                pushback = min(overlap, instance.QUEUE_LIMIT[j-1][shared_job_order[i]-1])
-                for k in range(j, instance.STAGES_NUMBER): # push back after stage j
-                    current_job_time[k][0] += pushback
-                    current_job_time[k][1] += pushback
-            # print("pushback = ", pushback)
-            # print(current_job_time)
-            if pushback != -1 and pushback < overlap:
-                pushback = overlap - pushback
-                for k in range(instance.STAGES_NUMBER): # push back from stage 0
-                    current_job_time[k][0] += pushback
-                    current_job_time[k][1] += pushback
+            for k in range(j, 0, -1): # check previous stages violate queue time limit
+                queue_limit = instance.QUEUE_LIMIT[k-1][shared_job_order[i]-1]
+                shift = (current_job_time[k][0] - current_job_time[k-1][1]) - queue_limit
+                if shift > 0:
+                    current_job_time[k-1][0] += shift
+                    current_job_time[k-1][1] += shift
+                else:
+                    break
         # print(current_job_time)
         for j in range(instance.STAGES_NUMBER): # update current machine time
             current_machine_time[current_job_machines[j]] = current_job_time[j][1]
@@ -176,5 +178,5 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
     return obj
 
 
-print(generate_schedule(shared_job_order, order_on_machines, instance))
+# print(generate_schedule(shared_job_order, order_on_machines, instance))
     

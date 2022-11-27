@@ -1,6 +1,6 @@
 import random
 # from schedule_objective_value_calculation import calculate_objective_value
-from utils.schedule_objective_value_calculation import calculate_objective_value
+from utils.common import calculate_objective_value
 
 # schedule_list: array of schedule
 # chosen method: binary or ranking

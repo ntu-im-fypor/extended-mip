@@ -1,5 +1,5 @@
 from Models import Parameters, SolutionModel
-from utils.schedule_objective_value_calculation import calculate_objective_value, transform_parameters_to_instance, print_instance
+from utils.common import cast_parameters_to_instance
 from utils.generate_population import generate_population
 import numpy as np
 
@@ -12,7 +12,7 @@ class MetaPSOModel(SolutionModel):
         Run and solve the problem using PSO, and then store the output schedule into self.schedule.
         Then calculate the objective value of the schedule using record_result()
         """
-        instance = transform_parameters_to_instance(self.parameters)
+        instance = cast_parameters_to_instance(self.parameters)
         print("Running and solving using PSOModel")
         # TODO: implement PSO algorithm here
 
