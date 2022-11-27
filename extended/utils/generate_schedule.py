@@ -171,7 +171,7 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
         for j in range(instance.STAGES_NUMBER): # update current machine time
             current_machine_time[current_job_machines[j]] = current_job_time[j][1]
         current_end_time[shared_job_order[i]-1] = current_job_time[instance.STAGES_NUMBER-1][1]
-    print(current_end_time)
+    # print(current_end_time)
     obj = compute_tardiness(current_end_time, instance)
     return obj
 
