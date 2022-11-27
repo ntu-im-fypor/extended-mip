@@ -41,7 +41,6 @@ class GreedyModel(SolutionModel):
         best_shared_job_order = initial_shared_job_order
         has_improved = False
         while True:
-            print("Current best objective value:", best_objective_value)
             # try swapping shared job order to see if we can get a better solution
             cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
             if cur_best_obj < best_objective_value:
@@ -68,7 +67,6 @@ class GreedyModel(SolutionModel):
             "objective_value": best_objective_value,
             "shared_job_order": best_shared_job_order
         }
-        self.record_result()
     def _setup(self):
         """
         Setup the data for the model
