@@ -35,6 +35,10 @@ class GreedyModel(SolutionModel):
         initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
         # start to consider the best maintenance position for each machine
         initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order, np.inf)
+        print(f"Initial Objective Value: {initial_best_objective_value}")
+        print(f"Initial Shared Job Order: {initial_shared_job_order}")
+        print(f"Initial Schedule: {initial_job_schedule}")
+        print("=====")
         # try swapping shared job order and adjusting maintenance position to see if we can get a better solution
         best_objective_value = initial_best_objective_value
         best_job_schedule = initial_job_schedule
@@ -58,7 +62,10 @@ class GreedyModel(SolutionModel):
                 has_improved = False
             if not has_improved:
                 break
-
+        print(f"Objective Value: {best_objective_value}")
+        print(f"Shared Job Order: {best_shared_job_order}")
+        print(f"Schedule: {best_job_schedule}")
+        print("=====")
         self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
 
         # store the best schedule
@@ -356,5 +363,6 @@ class GreedyModel(SolutionModel):
         print(f"Final Objective Value: {self.final_result['objective_value']}")
         print(f"Final Shared Job Order: {self.final_result['shared_job_order']}")
         print(f"Final Schedule: {self.final_result['schedule']}")
+        print("=====")
         with open(self.file_path, 'w+') as f:
             json.dump(self.final_result, f)
