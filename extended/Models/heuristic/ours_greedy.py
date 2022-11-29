@@ -5,6 +5,7 @@ from utils.common import cast_parameters_to_instance
 from utils.generate_schedule import generate_schedule
 import utils.ours_utils as utils
 import numpy as np
+import pandas as pd
 import copy
 
 class GreedyModel(SolutionModel):
@@ -35,6 +36,18 @@ class GreedyModel(SolutionModel):
         initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
         # start to consider the best maintenance position for each machine
         initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order, np.inf)
+        print(f"Initial Objective Value: {initial_best_objective_value}")
+        print(f"Initial Shared Job Order: {initial_shared_job_order}")
+        print(f"Initial Schedule: {initial_job_schedule}")
+        print("=====")
+
+        # store the initial results for final reference (after swapping shared job order)
+        self.initial_result = {
+            "schedule": initial_job_schedule,
+            "objective_value": initial_best_objective_value,
+            "shared_job_order": initial_shared_job_order
+        }
+
         # try swapping shared job order and adjusting maintenance position to see if we can get a better solution
         best_objective_value = initial_best_objective_value
         best_job_schedule = initial_job_schedule
@@ -58,8 +71,18 @@ class GreedyModel(SolutionModel):
                 has_improved = False
             if not has_improved:
                 break
-
+        print(f"Objective Value: {best_objective_value}")
+        print(f"Shared Job Order: {best_shared_job_order}")
+        print(f"Schedule: {best_job_schedule}")
+        print("=====")
         self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
+
+        # store the current results for final reference (after swapping shared job order)
+        self.process_result = {
+            "schedule": best_job_schedule,
+            "objective_value": best_objective_value,
+            "shared_job_order": best_shared_job_order
+        }
 
         # store the best schedule
         self.final_result = {
@@ -311,6 +334,8 @@ class GreedyModel(SolutionModel):
                     cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances)
                     if cur_objective_value < best_objective_value:
                         best_objective_value = cur_objective_value
+                        machines_on_this_stage[machine1_index] = machine1_job_order_copy
+                        machines_on_this_stage[machine2_index] = machine2_job_order_copy
                     else:
                         job_order_on_machines_copy = job_order_on_machines_before_swap
             completed_machines_count += len(machines_on_this_stage)
@@ -348,7 +373,7 @@ class GreedyModel(SolutionModel):
         return schedule_copy
     
     
-    def record_result(self):
+    def record_result(self, df: pd.DataFrame, num: int):
         """
         Record the result of the algorithm
         """
@@ -356,5 +381,18 @@ class GreedyModel(SolutionModel):
         print(f"Final Objective Value: {self.final_result['objective_value']}")
         print(f"Final Shared Job Order: {self.final_result['shared_job_order']}")
         print(f"Final Schedule: {self.final_result['schedule']}")
-        with open(self.file_path, 'w+') as f:
-            json.dump(self.final_result, f)
+        print("=====")
+
+        df.iloc[num]["initial objective value"] = self.initial_result['objective_value']
+        df.iloc[num]["initial shared job order"] = self.initial_result['shared_job_order']
+        df.iloc[num]["initial schedule"] = self.initial_result['schedule']
+        df.iloc[num]["process objective value"] = self.process_result['objective_value']
+        df.iloc[num]["process shared job order"] = self.process_result['shared_job_order']
+        df.iloc[num]["process schedule"] = self.process_result['schedule']
+        df.iloc[num]["final objective value"] = self.final_result['objective_value']
+        df.iloc[num]["final shared job order"] = self.final_result['shared_job_order']
+        df.iloc[num]["final schedule"] = self.final_result['schedule']
+
+        return df
+        # with open(self.file_path, 'w+') as f:
+        #     json.dump(self.final_result, f)

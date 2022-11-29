@@ -1,4 +1,5 @@
 import sys
+import time
 import pandas as pd
 from tokenize import String
 from unittest import result
@@ -33,32 +34,54 @@ def test_relaxation_result():
     # heuristic_model.record_result()
 
 def test_heuristic_model():
-    # # read parameters from file
+    # # read parameters from fileˇ
     # if len(sys.argv) <= 1:
     #     print("No parameters file specified")
     #     return
     # # print(sys.argv)
     # file_path = sys.argv[1]
-    file_path = "tests/base_1125/base_2.txt"
-    parameters = Parameters()
-    parameters.read_parameters(file_path)
+    # file_path = "tests/base_1125/base_2.txt"
+    # parameters = Parameters()
+    # parameters.read_parameters(file_path)
     # use input to choose which model to use
     model_type = input("Please choose which model to use: 1. MetaPSOModel, 2. MetaGAModel, 3. GreedyModel, 4. CompleteMIPModel")
-    heuristic_model = None
-    if model_type == "1":
-        heuristic_model = MetaPSOModel(parameters)
-    elif model_type == "2":
-        heuristic_model = MetaGAModel(parameters)
-    elif model_type == "3":
-        heuristic_model = GreedyModel(parameters, file_path="greedy-results/test.json")
-    elif model_type == "4":
-        heuristic_model = CompleteMIPModel(parameters)
-    else:
-        print("Invalid model type")
-        return
+    df = pd.DataFrame(index=range(1, 31), columns=[ # base_1125: 51, 學姊's benchmark: 31
+        "initial objective value", "initial shared job order", "initial schedule",
+        "process objective value", "process shared job order", "process schedule",
+        "final objective value", "final shared job order", "final schedule",
+        "time"])
+    for i in range(30): # base_1125: 50, 學姊's benchmark: 30 
+        print("base_" + str(i+1))
+        # test with base_1125
+        # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
+        # test with 學姊's benchmark
+        file_path = "tests/benchmark/benchmark_" + str(i+1) + ".txt"
+        parameters = Parameters()
+        parameters.read_parameters(file_path)  
+        start_time = time.time()
+        heuristic_model = None
+        if model_type == "1":
+            heuristic_model = MetaPSOModel(parameters)
+        elif model_type == "2":
+            heuristic_model = MetaGAModel(parameters)
+        elif model_type == "3":
+            heuristic_model = GreedyModel(parameters, file_path="greedy-results/test.json")
+        elif model_type == "4":
+            heuristic_model = CompleteMIPModel(parameters)
+        else:
+            print("Invalid model type")
+            return
 
-    heuristic_model.run_and_solve()
-    heuristic_model.record_result()
+        heuristic_model.run_and_solve()
+        df = heuristic_model.record_result(df, i)
+        run_time = time.time() - start_time
+        df.iloc[i]["time"] = run_time
+        print("Run time: ", run_time)
+        print("=====")
+    # test with base_1125
+    # df.to_csv('greedy-results/base_1125.csv')
+    # test with 學姊's benchmark
+    df.to_csv('greedy-results/benchmark.csv')
 
 if __name__ == '__main__':
     # test_relaxation_result()
