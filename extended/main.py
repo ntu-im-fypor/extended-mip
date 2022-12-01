@@ -45,17 +45,19 @@ def test_heuristic_model():
     # parameters.read_parameters(file_path)
     # use input to choose which model to use
     model_type = input("Please choose which model to use: 1. MetaPSOModel, 2. MetaGAModel, 3. GreedyModel, 4. CompleteMIPModel")
-    df = pd.DataFrame(index=range(1, 31), columns=[ # base_1125: 51, 學姊's benchmark: 31
+    df = pd.DataFrame(index=range(1, 51), columns=[ # base_1125/base_1130: 51, 學姊's benchmark: 31
         "initial objective value", "initial shared job order", "initial schedule",
         "process objective value", "process shared job order", "process schedule",
         "final objective value", "final shared job order", "final schedule",
         "time"])
-    for i in range(1): # base_1125: 50, 學姊's benchmark: 30 
+    for i in range(50): # base_1125/base_1130: 50, 學姊's benchmark: 30 
         print("base_" + str(i+1))
         # test with base_1125
-        # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
+        file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
+        # test with base_1130
+        # file_path = "tests/base_1130/base_" + str(i+1) + ".txt"
         # test with 學姊's benchmark
-        file_path = "tests/benchmark/benchmark_" + str(i+1) + ".txt"
+        # file_path = "tests/benchmark/benchmark_" + str(i+1) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)  
         start_time = time.time()
@@ -79,9 +81,11 @@ def test_heuristic_model():
         print("Run time: ", run_time)
         print("=====")
     # test with base_1125
-    # df.to_csv('greedy-results/base_1125.csv')
+    df.to_csv('greedy-results/base_1125.csv')
+    # test with base_1130
+    # df.to_csv('greedy-results/base_1130.csv')
     # test with 學姊's benchmark
-    df.to_csv('greedy-results/benchmark.csv')
+    # df.to_csv('greedy-results/benchmark.csv')
 
 if __name__ == '__main__':
     # test_relaxation_result()
