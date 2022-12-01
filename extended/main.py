@@ -50,7 +50,7 @@ def test_heuristic_model():
         "process objective value", "process shared job order", "process schedule",
         "final objective value", "final shared job order", "final schedule",
         "time"])
-    for i in range(30): # base_1125: 50, 學姊's benchmark: 30 
+    for i in range(1): # base_1125: 50, 學姊's benchmark: 30 
         print("base_" + str(i+1))
         # test with base_1125
         # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
