@@ -110,7 +110,7 @@ class GreedyModel(SolutionModel):
                 current_job_priority[shared_job_order[i] - 1] = i
         
         # current machine time for every machine is default to unfinished production time
-        current_machine_time = self.parameters.Unfinished_Production_Time
+        current_machine_time = copy.deepcopy(self.parameters.Unfinished_Production_Time)
 
         # for each stage, we calculate the largest production time difference for each job on different machines
         # larger production time difference means we should schedule the job first
