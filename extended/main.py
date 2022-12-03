@@ -5,8 +5,7 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original
-# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
-from Models.heuristic import MetaGAModel
+from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 import time
 
 
@@ -113,6 +112,22 @@ def test_heuristic_model():
                 output.to_csv(output_filename, index=True)
                 print('====== finish ', output_filename, ' =========')
 
+def run_initial_job_listing_for_GA_team():
+    for i in range(1, 51):
+        file_path = f"tests/base_1130/base_{i}.txt"
+        parameters = Parameters()
+        parameters.read_parameters(file_path)
+        heuristic_model = GreedyModel(parameters, file_path=f"tests/base_1130/base_{i}.json")
+        heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/base_1130/base_{i}.csv")
+    for i in range(1, 31):
+        file_path = f"tests/benchmark_1203/benchmark_{i}.txt"
+        parameters = Parameters()
+        parameters.read_parameters(file_path)
+        heuristic_model = GreedyModel(parameters, file_path=f"tests/benchmark_1203/benchmark_{i}.json")
+        heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/benchmark_1203/benchmark_{i}.csv")
+
+
 if __name__ == '__main__':
     # test_relaxation_result()
-    test_heuristic_model()
+    # test_heuristic_model()
+    run_initial_job_listing_for_GA_team()
