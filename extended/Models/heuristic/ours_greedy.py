@@ -396,3 +396,11 @@ class GreedyModel(SolutionModel):
         return df
         # with open(self.file_path, 'w+') as f:
         #     json.dump(self.final_result, f)
+
+    def run_initial_and_save_result(self, file_path) -> None:
+        """
+        Run the initial job listing function and save the result, which is list of list, each list indicates the job order for each machine on each stage
+        """
+        initial_job_listing = self.generate_initial_job_listing()
+        df = pd.DataFrame({'output': initial_job_listing})
+        df.to_csv(file_path, index=False)
