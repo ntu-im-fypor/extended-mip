@@ -26,6 +26,8 @@ class Parameters:
         # K: A very large positive number
         # TODO: 這邊要討論 K 的值應該設多少比較好
         self.Very_Large_Positive_Number = 0
+        # for GA: first objective value
+        self.init_obj = 0
 
     def read_parameters(self, file_name: str) -> None:
         with open(file_name, 'r') as f:

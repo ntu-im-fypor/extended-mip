@@ -3,6 +3,11 @@ import random
 import numpy as np
 import copy
 
+from utils.order_to_schedule import greedy_initial
+# from Models.heuristic import GreedyModel
+# from '../Models/heuristic/ours_greedy.py' import GreedyModel
+# from Models.Gurobi import CompleteMIPModel
+
 
 def print_job_order_method(job_order_dic, stage_num, job_num):
     for i in job_order_dic:
@@ -31,24 +36,6 @@ class temp():
         self.WEIGHT = np.random.randint(1, 100, self.Number_of_Jobs)
 
 
-'''
-population_num=n : 對於每個方法的排列組合，都生成 n 個不同數值的解
-
-方法：
-2: determined method
-- 找讓 initial production time 最短的機器 A[stage][machine][job]
-- WEDD
-- 兩種 maintenance 方法
-    統一部保養
-    統一放最前面
-1: greedy method (tbd)
-27: random
-
-
-'''
-
-# TODO: add input: n * job_num
-
 # 將 job 順序轉換成小數點 array
 def calculate_job__order_value(order_array):
     interval = 1/ (len(order_array)+1)
@@ -60,11 +47,12 @@ def calculate_job__order_value(order_array):
 
 
 
-def generate_population(instance, population_num = 30):
+def generate_population(instance, population_num = 30, instance_num = 1):
 
     # population number has to be greater than or euqal to 3
     if(population_num < 3):
         return 0
+
 
     # =================== Get parameters from instance ===================
     stage_num = instance.Number_of_Stages
@@ -72,11 +60,12 @@ def generate_population(instance, population_num = 30):
     machine_num = instance.Number_of_Machines
     max_machine  = max(machine_num)
     initial_production_time = instance.Initial_Production_Time
-    weight = instance.WEIGHT
+    weight = instance.Tardiness_Penalty
     due_time = instance.Due_Time
 
     interval = 1/(job_num+1)
-    offset = interval * 0.000001
+    # offset = interval * 0.001
+    offset = 0.00000001
 
     return_value = []
 
@@ -139,7 +128,7 @@ def generate_population(instance, population_num = 30):
 
 
     # =================== append greedy solution into population: TODO ===================
-
+    greedy_initial(instance_num, job_order, [stage_num, max_machine])
     # =================== generate random population ===================
 
     for _ in range(population_num-2):
@@ -164,7 +153,7 @@ def generate_population(instance, population_num = 30):
         # decide the maintenance schedile randomly
         for s in range(stage_num):
             for m in range(0, machine_num[s]):
-                cur_machine_value = random.uniform(m+1, m+2)
+                cur_machine_value = random.uniform(m+1, m+2) - offset * 2
                 job_schedule[s].append(cur_machine_value)
             # machine which doesn't appear in that stage
             for m in range(machine_num[s], max_machine):

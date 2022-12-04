@@ -104,6 +104,8 @@ def get_job_maintenance_order_for_machine(machine, schedule, instance):
 
     l = []
     for i in range(len(schedule)):
+        print("schedule[i] = ", schedule[i])
+        print("machine = ", machine)
         if math.floor(schedule[i]) == machine:  # 如果是會在此機台上被處裡的 job 或 maintenance
             # append the job being processed, else append -1 to indicate maintenance
             l.append((schedule[i], i)) if isJob(i) else l.append((schedule[i], -1))

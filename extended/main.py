@@ -5,7 +5,8 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original
-from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+from Models.heuristic import MetaGAModel
 import time
 
 
@@ -51,9 +52,17 @@ def test_heuristic_model():
     heuristic_model = None
 
     # iterate all instance
-    population_number = [30, 50]
-    machine_mutation_rate =  [0.05, 0.1]
-    job_mutation_rate = [0.05, 0.1]
+    # population_number = [30, 50]
+    # machine_mutation_rate =  [0.05, 0.1]
+    # job_mutation_rate = [0.05, 0.1]
+    # population_number = [100, 200]
+    # machine_mutation_rate =  [0.05]
+    # job_mutation_rate = [0.05]
+    population_number = [50]
+    machine_mutation_rate =  [0.05]
+    job_mutation_rate = [0.05]
+
+
 
     for p_num in population_number:
         for m_rate in machine_mutation_rate:
@@ -66,8 +75,10 @@ def test_heuristic_model():
                 "time": []
                 }
 
+                # benchmark
                 for i in range(50):
-                    file_path = "tests/base_1130/base_" + str(i+1) + ".txt"
+                    # file_path = "tests/base_1130/base_" + str(i+1) + ".txt"
+                    file_path = "tests/benchmark_1203/benchmark_" + str(i+1) + ".txt"
                     parameters = Parameters()
                     parameters.read_parameters(file_path)
 
@@ -97,7 +108,10 @@ def test_heuristic_model():
                     heuristic_model.run_and_solve(
                         job_mutation_rate = j_rate,
                         machine_mutation_rate = m_rate,
-                        population_num = p_num)
+                        population_num = p_num,
+                        iteration_num=1,
+                        instance_num = i+1
+                    )
                     obj, share_job_order, schedule, init_obj = heuristic_model.record_result()
                     finish_time = time.time()
                     result['final objective value'].append(obj)
@@ -107,27 +121,14 @@ def test_heuristic_model():
                     result['first objective value'].append(init_obj)
                     print("duration = ", finish_time-init_time)
 
+
                 output = pd.DataFrame(result)
-                output_filename = 'GA-results/GA_base_1202_' + 'p_num_' + str(p_num) + '_m_rate_' + str(m_rate) + '_j_rate_' + str(j_rate) + '.csv'
+                # calculate optimality gap
+
+                output_filename = 'GA-results/1205/GA_base_' + 'p_num_' + str(p_num) + '_m_rate_' + str(m_rate) + '_j_rate_' + str(j_rate) + '.csv'
                 output.to_csv(output_filename, index=True)
                 print('====== finish ', output_filename, ' =========')
 
-def run_initial_job_listing_for_GA_team():
-    for i in range(1, 51):
-        file_path = f"tests/base_1130/base_{i}.txt"
-        parameters = Parameters()
-        parameters.read_parameters(file_path)
-        heuristic_model = GreedyModel(parameters, file_path=f"tests/base_1130/base_{i}.json")
-        heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/base_1130/base_{i}.csv")
-    for i in range(1, 31):
-        file_path = f"tests/benchmark_1203/benchmark_{i}.txt"
-        parameters = Parameters()
-        parameters.read_parameters(file_path)
-        heuristic_model = GreedyModel(parameters, file_path=f"tests/benchmark_1203/benchmark_{i}.json")
-        heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/benchmark_1203/benchmark_{i}.csv")
-
-
 if __name__ == '__main__':
     # test_relaxation_result()
-    # test_heuristic_model()
-    run_initial_job_listing_for_GA_team()
+    test_heuristic_model()
