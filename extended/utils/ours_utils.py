@@ -99,7 +99,7 @@ def get_average_machine_time_for_each_stage(parameters: Parameters, production_t
                     average_machine_time[i] += production_time_matrix[i][j][k]
     else:
         for i in range(parameters.Number_of_Stages):
-            average_machine_time[i] == -1 
+            average_machine_time[i] = -1 
     return average_machine_time
 
 def get_shared_job_order_from_WEDD_list(WEDD_list):
