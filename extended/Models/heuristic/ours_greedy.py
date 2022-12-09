@@ -97,7 +97,7 @@ class GreedyModel(SolutionModel):
         self.maintenance_choice = utils.get_maintenance_choice(self.parameters, self.maintenance_choice_percentage)
         self.real_production_time_matrix = utils.get_real_production_time_matrix(self.parameters, self.maintenance_choice)
         self.WEDD_list = utils.get_WEDD_list(self.parameters)
-        self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix)
+        self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix, 0)
     def generate_initial_job_listing(self, shared_job_order: list[int] = None) -> list[list]:
         """
         Run the initial job listing part\n

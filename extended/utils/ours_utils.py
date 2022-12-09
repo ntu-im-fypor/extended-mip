@@ -72,18 +72,34 @@ def get_WEDD_list(parameters: Parameters):
         WEDD_list[k] = parameters.Due_Time[k] / parameters.Tardiness_Penalty[k]
     return WEDD_list
 
-def get_average_machine_time_for_each_stage(parameters: Parameters, production_time_matrix: np.ndarray) -> np.ndarray:
+def get_average_machine_time_for_each_stage(parameters: Parameters, production_time_matrix: np.ndarray, method_choice: int) -> np.ndarray:
     """
     Get the average machine time for each stage\n
+    method_choice:
+    0: origin method, choose by time difference for each job on different machines,
+       if schedule the job onto this machine will make current machine time exceed average machine time on this stage,
+       we try to find another machine that have smallest current machine time
+    1: very large average_machine_time, for each job, just choose the smallest production time on different machines
+    2: very small average_machine_time, for each job, choose the machine that can make the smallest current machine time
     """
     average_machine_time = np.zeros(parameters.Number_of_Stages)
-    for i in range(parameters.Number_of_Stages):
-        for j in range(parameters.Number_of_Machines[i]):
-            # need to add unfinished production time for that machine
-            average_machine_time[i] += parameters.Unfinished_Production_Time[i][j]
-            for k in range(parameters.Number_of_Jobs):
-                average_machine_time[i] += production_time_matrix[i][j][k]
-        average_machine_time[i] /= parameters.Number_of_Machines[i] # divide by the square of the number of machines
+    if method_choice == 0:
+        for i in range(parameters.Number_of_Stages):
+            for j in range(parameters.Number_of_Machines[i]):
+                # need to add unfinished production time for that machine
+                average_machine_time[i] += parameters.Unfinished_Production_Time[i][j]
+                for k in range(parameters.Number_of_Jobs):
+                    average_machine_time[i] += production_time_matrix[i][j][k]
+            average_machine_time[i] /= parameters.Number_of_Machines[i] # divide by the square of the number of machines
+    elif method_choice == 1:
+        for i in range(parameters.Number_of_Stages):
+            for j in range(parameters.Number_of_Machines[i]):
+                average_machine_time[i] += parameters.Unfinished_Production_Time[i][j]
+                for k in range(parameters.Number_of_Jobs):
+                    average_machine_time[i] += production_time_matrix[i][j][k]
+    else:
+        for i in range(parameters.Number_of_Stages):
+            average_machine_time[i] == -1 
     return average_machine_time
 
 def get_shared_job_order_from_WEDD_list(WEDD_list):
