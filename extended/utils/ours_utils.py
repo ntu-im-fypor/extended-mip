@@ -72,7 +72,7 @@ def get_WEDD_list(parameters: Parameters):
         WEDD_list[k] = parameters.Due_Time[k] / parameters.Tardiness_Penalty[k]
     return WEDD_list
 
-def get_average_machine_time_for_each_stage(parameters: Parameters, production_time_matrix: np.ndarray, method_choice: int) -> np.ndarray:
+def get_average_machine_time_for_each_stage(parameters: Parameters, production_time_matrix: np.ndarray, method_choice: int, sensitive_denominator: float) -> np.ndarray:
     """
     Get the average machine time for each stage\n
     method_choice:
@@ -108,7 +108,7 @@ def get_average_machine_time_for_each_stage(parameters: Parameters, production_t
                 average_machine_time[i] += parameters.Unfinished_Production_Time[i][j]
                 for k in range(parameters.Number_of_Jobs):
                     average_machine_time[i] += production_time_matrix[i][j][k]
-            average_machine_time[i] /= (parameters.Number_of_Machines[i]*2) # divide by the square of the number of machines
+            average_machine_time[i] /= (parameters.Number_of_Machines[i]*sensitive_denominator) # divide by the square of the number of machines
 
     return average_machine_time
 
