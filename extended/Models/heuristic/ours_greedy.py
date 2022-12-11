@@ -124,7 +124,7 @@ class GreedyModel(SolutionModel):
         else:
             for i in range(len(shared_job_order)):
                 current_job_priority[shared_job_order[i] - 1] = i
-        
+
         # current machine time for every machine is default to unfinished production time
         current_machine_time = copy.deepcopy(self.parameters.Unfinished_Production_Time)
 
@@ -296,7 +296,7 @@ class GreedyModel(SolutionModel):
         # do a deep copy of the job order on machines
         job_order_on_machines_copy = copy.deepcopy(job_order_on_machines)
         # for each stage, we try swapping two jobs between machines on that stage to find the best job order
-        
+
         # first we need to figure out the number of stages and which machines are on the same stage
         machine_index = 0
         all_stages_machines_job_order = []
@@ -340,7 +340,7 @@ class GreedyModel(SolutionModel):
                         job_order_on_machines_copy = job_order_on_machines_before_swap
             completed_machines_count += len(machines_on_this_stage)
         return job_order_on_machines_copy, best_objective_value
-                        
+
 
     def _sort_schedule_with_shared_job_order(self, shared_job_order: list[int], schedule: list[list]) -> list[list]:
         """
@@ -371,8 +371,8 @@ class GreedyModel(SolutionModel):
             else:
                 machine_job_order.sort(key=lambda x: job_priority[x])
         return schedule_copy
-    
-    
+
+
     def record_result(self, df: pd.DataFrame, num: int):
         """
         Record the result of the algorithm
