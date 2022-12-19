@@ -82,6 +82,7 @@ def get_average_machine_time_for_each_stage(parameters: Parameters, production_t
     1: very large average_machine_time, for each job, just choose the smallest production time on different machines
     2: very small average_machine_time, for each job, choose the machine that can make the smallest current machine time
     3: half of average_machine_time
+    4: average = all values' Q2 value * number of jobs
     """
     average_machine_time = np.zeros(parameters.Number_of_Stages)
     if method_choice == 0:
@@ -101,7 +102,7 @@ def get_average_machine_time_for_each_stage(parameters: Parameters, production_t
     elif method_choice == 2:
         for i in range(parameters.Number_of_Stages):
             average_machine_time[i] = -1 
-    else:
+    elif method_choice == 3:
         for i in range(parameters.Number_of_Stages):
             for j in range(parameters.Number_of_Machines[i]):
                 # need to add unfinished production time for that machine
@@ -109,6 +110,19 @@ def get_average_machine_time_for_each_stage(parameters: Parameters, production_t
                 for k in range(parameters.Number_of_Jobs):
                     average_machine_time[i] += production_time_matrix[i][j][k]
             average_machine_time[i] /= (parameters.Number_of_Machines[i]*sensitive_denominator) # divide by the square of the number of machines
+    else:
+        for i in range(parameters.Number_of_Stages):
+            values = []
+            for j in range(parameters.Number_of_Machines[i]):
+                for k in range(parameters.Number_of_Jobs):
+                    values.append(production_time_matrix[i][j][k])
+            q2_value = np.quantile(values, .50)
+
+            for j in range(parameters.Number_of_Machines[i]):
+                average_machine_time[i] += parameters.Unfinished_Production_Time[i][j]
+                for k in range(parameters.Number_of_Jobs):
+                    average_machine_time[i] += q2_value
+            average_machine_time[i] /= parameters.Number_of_Machines[i] # divide by the square of the number of machines
 
     return average_machine_time
 
