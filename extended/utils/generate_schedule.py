@@ -124,9 +124,10 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
             maint_time_list = [[current_machine_time, current_machine_time + maintenance_length]] + maint_time_list 
             return current_machine_time, maint_time_list
         for i in range(len(maint_time_list)-1): # insert to middle of maint_time
-            if maint_time_list[i][1] <= current_machine_time and (maint_time_list[i+1][0] - maint_time_list[i][1]) >= maintenance_length:
-                maint_time_list = maint_time_list[:i+1] + [[maint_time_list[i][1], maint_time_list[i][1] + maintenance_length]] + maint_time_list[i+1:]
-                return maint_time_list[i][1], maint_time_list
+            if maint_time_list[i+1][0] - max(current_machine_time, maint_time_list[i][1]) >= maintenance_length:
+                start_time = max(current_machine_time, maint_time_list[i][1])
+                maint_time_list = maint_time_list[:i+1] + [[start_time, start_time + maintenance_length]] + maint_time_list[i+1:]
+                return start_time, maint_time_list
         start_time = max(current_machine_time, maint_time_list[len(maint_time_list)-1][1]) # insert to tail of maint_time
         maint_time_list.append([start_time, start_time + maintenance_length])
         return start_time, maint_time_list
