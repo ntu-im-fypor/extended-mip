@@ -14,18 +14,18 @@ class MetaGAModel(SolutionModel):
         super().__init__(parameters)
 
     # interation number 待確定
-    def run_and_solve(self, population_num: int = 2, iteration_num: int = 60):
-        print("Running and solving using GAModel")
+    def run_and_solve(self, job_mutation_rate : int = 0.05, machine_mutation_rate: int = 0.05,  population_num: int = 2, iteration_num: int = 60):
+        # print("Running and solving using GAModel")
 
         instance = cast_parameters_to_instance(self.parameters)
-        print("Running and solving using GAModel")
+        # print("Running and solving using GAModel")
 
         shared_job_order_list = generate_shared_job_order(instance)
         # print("shared_job_order_list")
         # print(shared_job_order_list)
 
         # Generate Population
-        init_population = generate_population(self.parameters, population_num, shared_job_order_list)
+        init_population = generate_population(self.parameters, population_num)
 
         # print("finish init. population generation")
         chosen_list = []

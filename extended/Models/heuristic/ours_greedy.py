@@ -97,7 +97,7 @@ class GreedyModel(SolutionModel):
         self.maintenance_choice = utils.get_maintenance_choice(self.parameters, self.maintenance_choice_percentage)
         self.real_production_time_matrix = utils.get_real_production_time_matrix(self.parameters, self.maintenance_choice)
         self.WEDD_list = utils.get_WEDD_list(self.parameters)
-        self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix)
+        self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix, 0, 1)
     def generate_initial_job_listing(self, shared_job_order: list[int] = None) -> list[list]:
         """
         Run the initial job listing part\n
@@ -396,3 +396,11 @@ class GreedyModel(SolutionModel):
         return df
         # with open(self.file_path, 'w+') as f:
         #     json.dump(self.final_result, f)
+
+    def run_initial_and_save_result(self, file_path) -> None:
+        """
+        Run the initial job listing function and save the result, which is list of list, each list indicates the job order for each machine on each stage
+        """
+        initial_job_listing = self.generate_initial_job_listing()
+        df = pd.DataFrame({'output': initial_job_listing})
+        df.to_csv(file_path, index=False)

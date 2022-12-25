@@ -116,6 +116,22 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
         
         return maint_order
     
+    def insert_new_maintenance(current_machine_time, maintenance_length, maint_time_list):
+        if (maint_time_list == []):
+            maint_time_list.append([current_machine_time, current_machine_time + maintenance_length])
+            return current_machine_time, maint_time_list
+        if (maint_time_list[0][0] >= current_machine_time + maintenance_length): # insert to head of maint_time
+            maint_time_list = [[current_machine_time, current_machine_time + maintenance_length]] + maint_time_list 
+            return current_machine_time, maint_time_list
+        for i in range(len(maint_time_list)-1): # insert to middle of maint_time
+            if maint_time_list[i+1][0] - max(current_machine_time, maint_time_list[i][1]) >= maintenance_length:
+                start_time = max(current_machine_time, maint_time_list[i][1])
+                maint_time_list = maint_time_list[:i+1] + [[start_time, start_time + maintenance_length]] + maint_time_list[i+1:]
+                return start_time, maint_time_list
+        start_time = max(current_machine_time, maint_time_list[len(maint_time_list)-1][1]) # insert to tail of maint_time
+        maint_time_list.append([start_time, start_time + maintenance_length])
+        return start_time, maint_time_list
+    
     current_end_time = [0] * instance.JOBS_NUM
     total_machines_num = sum(instance.MACHINES_NUM)
     current_machine_time = [0] * total_machines_num
@@ -125,7 +141,7 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
     for i in range(total_machines_num): # initialize current machine time
         current_machine_time[i] = instance.REMAIN[i]
 
-    current_maint_time = 0
+    maint_time_list = [] # sorted list containing the current [maintenance_start_time, maintenanace_end_time]'s
     for i in range(len(shared_job_order)):  # loop all jobs in shared job order
         maint_order = [] # store the maintenance order
         for j in range(total_machines_num): # mark all machines that need maintenance
@@ -135,12 +151,10 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
         sorted_maintenance_order = sort_maintenance(maint_order) # sort the maintenance order
         # print(sorted_maintenance_order)
         for j in range(len(sorted_maintenance_order)): # append maintenance to schedule
-            maint_start_time = max(current_machine_time[sorted_maintenance_order[j]], current_maint_time)
+            maint_start_time, maint_time_list = insert_new_maintenance(current_machine_time[sorted_maintenance_order[j]], instance.MAINT_LEN[sorted_maintenance_order[j]], maint_time_list)
             current_machine_time[sorted_maintenance_order[j]] = maint_start_time + instance.MAINT_LEN[sorted_maintenance_order[j]]
-            current_maint_time = maint_start_time + instance.MAINT_LEN[sorted_maintenance_order[j]]
             current_machine_index[sorted_maintenance_order[j]] += 1
             machine_has_maintained[sorted_maintenance_order[j]] = True
-            # print("current maint time", current_maint_time)
         # print(machine_has_maintained)
         current_job_time = [[0, 0] for i in range(instance.STAGES_NUMBER)] # initialize current job time
         

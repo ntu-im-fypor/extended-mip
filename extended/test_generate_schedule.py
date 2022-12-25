@@ -3,12 +3,36 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original
-from utils.schedule_objective_value_calculation import calculate_objective_value, transform_parameters_to_instance, print_instance
+from utils.common import cast_parameters_to_instance
 from utils.generate_schedule import generate_schedule
 from Models.heuristic import MetaPSOModel, MetaGAModel
 import pandas as pd
 import numpy as np
-from check_cycle import ResultParameters, Graph
+
+class ResultParameters:
+    def __init__(self, file_id, instance) -> None:
+        self.file_id = file_id
+        self.instance = instance
+        self.objVal = 0 # objective value
+        self.shared_job_order = [] # shared job order
+        self.job_maintenance_order = [] # job and maintenance order on each machine
+    
+    def read_result(self, job_order_file_path, maint_order_file_path) -> None:
+        job_order_data = pd.read_csv(job_order_file_path)
+        self.shared_job_order = list(map(int, job_order_data['benchmark'][int(self.file_id)-1].replace("[", "").replace("]", "").split()))
+        maint_order_data = pd.read_csv(maint_order_file_path)
+        maint_order = list(map(int, maint_order_data['benchmark'][int(self.file_id)-1].replace("[", "").replace("]", "").replace(".", "").split()))
+        self.job_maintenance_order = []
+        for i in range(sum(self.instance.MACHINES_NUM)):
+            job_order_for_machine = []
+            for _, job in enumerate(self.shared_job_order):
+                if maint_order[i] == len(job_order_for_machine):
+                    job_order_for_machine.append('M')
+                    job_order_for_machine.append(job)
+                else:
+                    job_order_for_machine.append(job)
+            self.job_maintenance_order.append(job_order_for_machine)
+
 
 def test_objective_function():
     # read parameters from file
@@ -17,47 +41,26 @@ def test_objective_function():
         return
     file_id = sys.argv[1]
     parameters = Parameters()
-    parameters.read_parameters('tests/base/base_'+ str(file_id) +'.txt')
-    instance = transform_parameters_to_instance(parameters)
-
-    resultParameters = ResultParameters()
-    resultParameters.read_result('tests/base/base_'+ str(file_id) +'.txt','tests/base_result_1107/base_result_'+ str(file_id) +'.txt')
-    resultParameters.generateJobMaintenanceOrder()
-    resultParameters.generateSharedJobOrder()
+    parameters.read_parameters('tests/benchmark_1203/benchmark_'+ str(file_id) +'.txt')
+    instance = cast_parameters_to_instance(parameters)
+    
+    resultParameters = ResultParameters(file_id, instance)
+    resultParameters.read_result('./tests/sol-before/dueweight_greedy_noswapping_sol.csv','./tests/sol-before/dueweight_greedy_noswapping_maint_sol.csv')
 
     print(resultParameters.job_maintenance_order)
-    print(resultParameters.shared_job_order)
-    gurobi_obj = resultParameters.objVal
-    print(gurobi_obj)
-
-    heuristic_obj = None
-    if resultParameters.shared_job_order != None:
-        heuristic_obj = generate_schedule(resultParameters.shared_job_order, resultParameters.job_maintenance_order, instance)
+    heuristic_obj = generate_schedule(resultParameters.shared_job_order, resultParameters.job_maintenance_order, instance)
     print(heuristic_obj)
-    return gurobi_obj, heuristic_obj
-
-    
-    # # generate a schedule from the base results
-    # resultParameters = ResultParameters()
-    # resultParameters.read_result('tests/base/base_'+ str(file_id) +'.txt','tests/base_result_1107/base_result_'+ str(file_id) +'.txt')
-    # resultParameters.generateOrder()
-    # print("Generated Ordering:")
-    # print(resultParameters.schedule)
-    # heuristic_model.record_result(resultParameters.schedule)
-    # print("Gurobi objective value: ", resultParameters.objVal)
-    # ### for listing and comparing all objective values
-    # # return resultParameters.objVal, heuristic_model.record_result(resultParameters.schedule) # gurobi value, fn value
-
+    return heuristic_obj
 
 
 if __name__ == '__main__':
     test_objective_function()
 
     ### function to list and compare all objective values
-    # data = [['Gurobi obj', 'Generate Schedule obj']]
-    # for i in range(1, 51):
-    #     gurobi_obj, heuristic_obj = test_objective_function(i)
-    #     # print(real_obj, unconstrained_obj)
-    #     data.append([gurobi_obj, heuristic_obj])
-    # df = pd.DataFrame(data)
-    # df.to_csv('./tests/1124_test_generate_schedule.csv')
+    # heuristic_obj_list = []
+    # for i in range(1, 31):
+    #     heuristic_obj = test_objective_function(i)
+    #     heuristic_obj_list.append(heuristic_obj)
+    # obj_before = pd.read_csv('./tests/sol-before/dueweight_greedy_noswapping_obj.csv')
+    # df = pd.DataFrame(data = {'Obj fn before': obj_before['benchmark'], 'Our Obj fn': heuristic_obj_list})
+    # df.to_csv('./tests/compare_obj_fn.csv')
