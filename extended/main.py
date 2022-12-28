@@ -53,9 +53,9 @@ def test_heuristic_model():
     for i in range(50): # base_1125/base_1130: 50, 學姊's benchmark: 30
         print("base_" + str(i+1))
         # test with base_1125
-        file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
+        # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
         # test with base_1130
-        # file_path = "tests/base_1130/base_" + str(i+1) + ".txt"
+        file_path = "tests/base_1130/base_" + str(i+1) + ".txt"
         # test with 學姊's benchmark
         # file_path = "tests/benchmark/benchmark_" + str(i+1) + ".txt"
         parameters = Parameters()
@@ -81,9 +81,9 @@ def test_heuristic_model():
         print("Run time: ", run_time)
         print("=====")
     # test with base_1125
-    df.to_csv('greedy-results/base_1125.csv')
+    # df.to_csv('greedy-results/base_1125.csv')
     # test with base_1130
-    # df.to_csv('greedy-results/base_1130.csv')
+    df.to_csv('greedy-results/base_1130_1229update.csv')
     # test with 學姊's benchmark
     # df.to_csv('greedy-results/benchmark.csv')
 
@@ -104,5 +104,5 @@ def run_initial_job_listing_for_GA_team():
 
 if __name__ == '__main__':
     # test_relaxation_result()
-    # test_heuristic_model()
-    run_initial_job_listing_for_GA_team()
+    test_heuristic_model()
+    # run_initial_job_listing_for_GA_team()
