@@ -63,35 +63,35 @@ class Data:
                 self.M_PROFIT[i, j] = self.AFTER_DIS_SAVE_TIME[i, j] - self.MAINT_LEN[i]
         self.M[0] = m_temp
 
-        # !改 上游 B_i 大或 B_i 小
-        if discount_reverse != None:
-            discount.sort(reverse=discount_reverse)  # True 上游老 大到小
-            for i in range(1, self.n_i+1):
-                self.PROD_DISCOUNT[i] = discount[i-1]
+        # # !改 上游 B_i 大或 B_i 小
+        # if discount_reverse != None:
+        #     discount.sort(reverse=discount_reverse)  # True 上游老 大到小
+        #     for i in range(1, self.n_i+1):
+        #         self.PROD_DISCOUNT[i] = discount[i-1]
 
-            # self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT[i] = dis_prod_temp / self.MAINT_LEN[i]
+        #     # self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT[i] = dis_prod_temp / self.MAINT_LEN[i]
 
-        AFTER_DIS_SAVE_TIME_LIST = np.array(
-                list(self.AFTER_DIS_SAVE_TIME.values())
-            ).reshape(5, -1)
-        # distributed_maint
-        self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT = dict(
-            enumerate(
-                (AFTER_DIS_SAVE_TIME_LIST.sum(axis=1) / np.array(list(self.MAINT_LEN.values())))
-                , 1)
-            )
-        # max or min A_ij for all J / min or max F_i
-        self.UB_AFTER_DIS_SAVE_TIME_DIV_MAINT = AFTER_DIS_SAVE_TIME_LIST.max(axis=0).sum() / min(self.MAINT_LEN.values())
-        self.LB_AFTER_DIS_SAVE_TIME_DIV_MAINT = AFTER_DIS_SAVE_TIME_LIST.min(axis=0).sum() / max(self.MAINT_LEN.values())
+        # AFTER_DIS_SAVE_TIME_LIST = np.array(
+        #         list(self.AFTER_DIS_SAVE_TIME.values())
+        #     ).reshape(5, -1)
+        # # distributed_maint
+        # self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT = dict(
+        #     enumerate(
+        #         (AFTER_DIS_SAVE_TIME_LIST.sum(axis=1) / np.array(list(self.MAINT_LEN.values())))
+        #         , 1)
+        #     )
+        # # max or min A_ij for all J / min or max F_i
+        # self.UB_AFTER_DIS_SAVE_TIME_DIV_MAINT = AFTER_DIS_SAVE_TIME_LIST.max(axis=0).sum() / min(self.MAINT_LEN.values())
+        # self.LB_AFTER_DIS_SAVE_TIME_DIV_MAINT = AFTER_DIS_SAVE_TIME_LIST.min(axis=0).sum() / max(self.MAINT_LEN.values())
 
-        # 內插法後 得到 MODE 眾數
-        self.MODE_AFTER_DIS_SAVE_TIME_DIV_MAINT = dict(
-            enumerate(
-                (np.interp(list(
-                    self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT.values()
-                    ), [self.LB_AFTER_DIS_SAVE_TIME_DIV_MAINT, self.UB_AFTER_DIS_SAVE_TIME_DIV_MAINT], [0, self.n_j]))
-                , 1)
-            )
+        # # 內插法後 得到 MODE 眾數
+        # self.MODE_AFTER_DIS_SAVE_TIME_DIV_MAINT = dict(
+        #     enumerate(
+        #         (np.interp(list(
+        #             self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT.values()
+        #             ), [self.LB_AFTER_DIS_SAVE_TIME_DIV_MAINT, self.UB_AFTER_DIS_SAVE_TIME_DIV_MAINT], [0, self.n_j]))
+        #         , 1)
+        #     )
 
         for j in range(1, self.n_j+1):
             line = f.readline().split()
@@ -147,15 +147,20 @@ class MaintModel:
     def add_constr(self) -> None:
         # 定義限制式
         # add constraints defining z_{n_i,j} - D_j = lateness_j
+        # self.model_maint.addConstrs((
+        #         self.job_cmpl_time[self.Data.N_MACHINE[-1], j] -
+        #         self.Data.DUE_TIME[j] - self.lateness[j] == 0 for j in self.Data.N_JOB
+        #     ), name='lateness')
+        # add constraints defining tardiness_j = max(latenes9s_j, 0)
+        # self.model_maint.addConstrs((
+        #         self.tardiness[j] == gp.max_([self.lateness[j], 0.0])
+        #         for j in self.Data.N_JOB
+        #     ), name='tardiness')
+
         self.model_maint.addConstrs((
-                self.job_cmpl_time[self.Data.N_MACHINE[-1], j] -
-                self.Data.DUE_TIME[j] - self.lateness[j] == 0 for j in self.Data.N_JOB
-            ), name='lateness')
-        # add constraints defining tardiness_j = max(lateness_j, 0)
-        self.model_maint.addConstrs((
-                self.tardiness[j] == gp.max_([self.lateness[j], 0.0])
+                self.tardiness[j] >= self.job_cmpl_time[self.Data.N_MACHINE[-1], j] - self.Data.DUE_TIME[j]
                 for j in self.Data.N_JOB
-            ), name='tardiness')
+            ), name='tardiness1')
 
         # nextMachineCompletionTime z_{i+1,j} >= z_{ij} + p_{i+1,j}
         self.model_maint.addConstrs((
@@ -207,9 +212,9 @@ class MaintModel:
         #         for i in self.Data.N_MACHINE
         #     ), name='maintenanceFirst')
 
-        # maintenanceFirst z_i^R >= (U_i + F_i) y_{i, 1}
+        # maintenanceFirst z_i^R >= U_i + F_i
         self.model_maint.addConstrs((
-                self.maint_cmpl_time[i] >= (self.Data.REMAIN[i] + self.Data.MAINT_LEN[i]) * self.maint_order[i, 1]
+                self.maint_cmpl_time[i] >= self.Data.REMAIN[i] + self.Data.MAINT_LEN[i]
                 for i in self.Data.N_MACHINE
             ), name='maintenanceFirst')
 
@@ -252,67 +257,67 @@ class MaintModel:
         print('obj = ', self.model_maint.objVal)
         print('The run time is %f' % self.model_maint.Runtime)
 
-        # '''
-        ## x_jk 對角線不用看
-        print('x_jk', 'job_order', sep='\t')   # head of the result table
-        for j in self.Data.N_JOB:
-            print('JOB' + str(j), '\t', end='') # mark which item is printed now
-            for k in self.Data.N_JOB:
-                try:
-                    print(abs(round(self.job_order[j, k].x, 5)), ' ', end='') # print qty of each kind of item
-                except:
-                    print(0, ' ', end='')
-            print('')  # use for change line
-        print('\n')
-
-        ## maint_order y_ij
-        print('y_ij', 'maint_order', sep='\t')   # head of the result table
-        for i in self.Data.N_MACHINE:
-            print('MACHINE' + str(i), ' ', end='') # mark which item is printed now
-            for j in self.Data.N_JOB:
-                try:
-                    print(abs(round(self.maint_order[i, j].x, 5)), ' ', end='') # print qty of each kind of item
-                except:
-                    print(0, ' ', end='')
-            print('')  # use for change line
-        print('\n')
-
-        ## w_il 對角線不用看
-        print('w_il', 'machine_maint_order', sep='\t')   # head of the result table
-        for i in self.Data.N_MACHINE:
-            print('MACHINE' + str(i), '\t', end='') # mark which item is printed now
-            for l in self.Data.N_MACHINE:
-                try:
-                    print(abs(round(self.machine_maint_order[i, l].x, 5)), ' ', end='') # print qty of each kind of item
-                except:
-                    print(0, ' ', end='')
-            print('')  # use for change line
-        print('\n')
-
-        ## maint_cmpl_time z_iR
-        print('z_iR', 'maint_cmpl_time', sep='\t')
-        print('MACHINE', ' ', end='')
-        for i in self.Data.N_MACHINE:
-            try:
-                # print('Y:' if self.maint[i].x > 0 else 'N:', '', end='')
-                print(round(self.maint_cmpl_time[i].x, 5), ' ', end='') # print qty of each kind of item
-            except:
-                print(0, ' ', end='')
-        print('\n')
-
-        ## job_cmpl_time z_ij
-        print('z_ij', 'job_cmpl_time', sep='\t')   # head of the result table
-        for j in self.Data.N_JOB:
-            print('JOB' + str(j), ' ', end='') # mark which item is printed now
-            for i in self.Data.N_MACHINE:
-                try:
-                    print(round(self.job_cmpl_time[i, j].x, 5), ' ', end='') # print qty of each kind of item
-                except:
-                    print(0, ' ', end='')
-            print(f'due: {self.Data.DUE_TIME[j]}, tardiness: {self.tardiness[j].x}')
-            # print('')  # use for change line
+        # # '''
+        # ## x_jk 對角線不用看
+        # print('x_jk', 'job_order', sep='\t')   # head of the result table
+        # for j in self.Data.N_JOB:
+        #     print('JOB' + str(j), '\t', end='') # mark which item is printed now
+        #     for k in self.Data.N_JOB:
+        #         try:
+        #             print(abs(round(self.job_order[j, k].x, 5)), ' ', end='') # print qty of each kind of item
+        #         except:
+        #             print(0, ' ', end='')
+        #     print('')  # use for change line
         # print('\n')
-        # '''
+
+        # ## maint_order y_ij
+        # print('y_ij', 'maint_order', sep='\t')   # head of the result table
+        # for i in self.Data.N_MACHINE:
+        #     print('MACHINE' + str(i), ' ', end='') # mark which item is printed now
+        #     for j in self.Data.N_JOB:
+        #         try:
+        #             print(abs(round(self.maint_order[i, j].x, 5)), ' ', end='') # print qty of each kind of item
+        #         except:
+        #             print(0, ' ', end='')
+        #     print('')  # use for change line
+        # print('\n')
+
+        # ## w_il 對角線不用看
+        # print('w_il', 'machine_maint_order', sep='\t')   # head of the result table
+        # for i in self.Data.N_MACHINE:
+        #     print('MACHINE' + str(i), '\t', end='') # mark which item is printed now
+        #     for l in self.Data.N_MACHINE:
+        #         try:
+        #             print(abs(round(self.machine_maint_order[i, l].x, 5)), ' ', end='') # print qty of each kind of item
+        #         except:
+        #             print(0, ' ', end='')
+        #     print('')  # use for change line
+        # print('\n')
+
+        # ## maint_cmpl_time z_iR
+        # print('z_iR', 'maint_cmpl_time', sep='\t')
+        # print('MACHINE', ' ', end='')
+        # for i in self.Data.N_MACHINE:
+        #     try:
+        #         # print('Y:' if self.maint[i].x > 0 else 'N:', '', end='')
+        #         print(round(self.maint_cmpl_time[i].x, 5), ' ', end='') # print qty of each kind of item
+        #     except:
+        #         print(0, ' ', end='')
+        # print('\n')
+
+        # ## job_cmpl_time z_ij
+        # print('z_ij', 'job_cmpl_time', sep='\t')   # head of the result table
+        # for j in self.Data.N_JOB:
+        #     print('JOB' + str(j), ' ', end='') # mark which item is printed now
+        #     for i in self.Data.N_MACHINE:
+        #         try:
+        #             print(round(self.job_cmpl_time[i, j].x, 5), ' ', end='') # print qty of each kind of item
+        #         except:
+        #             print(0, ' ', end='')
+        #     print(f'due: {self.Data.DUE_TIME[j]}, tardiness: {self.tardiness[j].x}')
+        #     # print('')  # use for change line
+        # # print('\n')
+        # # '''
         return self.model_maint.objVal, self.model_maint.Runtime, self.model_maint.MIPGap, self.model_maint.ObjBoundC
 
 def test():
@@ -326,4 +331,3 @@ def test():
     print(f'obj: {obj}, runtime: {runtime: .6f}')
 
 # test()
-
