@@ -15,18 +15,19 @@ class JointScheduleProb:
         # self.scheduled_maint_pos = np.ones(self.Data.n_i) * (self.Data.n_j)  # n_i: 0 在第一個工作前 初始為最後才維修
         self.scheduled_maint_pos = np.zeros(self.Data.n_i)  # 初始為一開始就維修
         # self.duration = np.zeros((self.Data.n_i, self.Data.n_j+1))  # 有考慮是否維修 [:, -1] 為 F_i
-        # self.shift = np.zeros(self.Data.n_i)
+        self.shift = np.zeros(self.Data.n_i)
 
     def cal_time_state(self) -> None:
         '''
         按順序排列出每個工作所需時間
         '''
         self.time_state = np.zeros((self.Data.n_i, self.Data.n_j+1))  # [:, -1] 為維修後時間
-        if self.first_check == True:
-            self.maint_period = np.zeros((self.Data.n_i, 2))  # 記錄維修開始與結束
+        self.maint_period = np.zeros((self.Data.n_i, 2))  # 記錄維修開始與結束
         for machine_order, maint_pos in enumerate(self.scheduled_maint_pos):
+            # 0,1,2 machine id-1 / 3,2,6 maint 位置
             maint = False
             for job_pos, job_id in enumerate(self.scheduled_job_id):
+                # 0,1,2 job 位置 / 3,2,7 job id
                 # check duration
                 if maint_pos > job_pos:  # 沒維修
                     duration = self.Data.INIT_PROD_TIME[machine_order+1, job_id]
@@ -34,55 +35,45 @@ class JointScheduleProb:
                     duration = self.Data.AFTER_DIS_PROD_TIME[machine_order+1, job_id]
                     if maint_pos == job_pos:
                         maint = True  # 轉成維修點
-                        if self.maint_period[machine_order][0] < self.time_state[machine_order][job_pos-1] and self.first_check == False:
-                            self.fix_maint = True
-                            self.maint_period[machine_order][0] = self.time_state[machine_order][job_pos-1]
-                            self.maint_period[machine_order][1] = self.time_state[machine_order][job_pos-1] + self.Data.MAINT_LEN[machine_order+1]
-                            return
 
                 # check before state
                 if job_pos == 0:  # 各機台第一個 job
                     if machine_order == 0:
                         if maint:  # 若剛修 maint = T
-                            if self.first_check == True:
-                                self.time_state[machine_order][-1] = self.Data.REMAIN[machine_order+1] + self.Data.MAINT_LEN[machine_order+1]
-                                start_maint = self.Data.REMAIN[machine_order+1]
-                            else:
-                                self.time_state[machine_order][-1] = self.maint_period[machine_order][1]
+                            self.time_state[machine_order][-1] = self.Data.REMAIN[machine_order+1] + self.Data.MAINT_LEN[machine_order+1] + self.shift[machine_order]
                             before_state = self.time_state[machine_order][-1]
+                            start_maint = self.Data.REMAIN[machine_order+1]
+                            # end_maint = self.time_state[machine_order][-1]
                         else:
                             before_state = self.Data.REMAIN[machine_order+1]
                     else:
                         if maint:  # 若剛修 maint = T
-                            self.time_state[machine_order][-1] = self.Data.REMAIN[machine_order+1] + self.Data.MAINT_LEN[machine_order+1]
+                            self.time_state[machine_order][-1] = self.Data.REMAIN[machine_order+1] + self.Data.MAINT_LEN[machine_order+1] + self.shift[machine_order]
                             before_state = max(self.time_state[machine_order][-1], self.time_state[machine_order-1][job_pos])
                             start_maint = self.Data.REMAIN[machine_order+1]
+                            # end_maint = self.time_state[machine_order][-1]
                         else:
                             before_state = max(self.Data.REMAIN[machine_order+1], self.time_state[machine_order-1][job_pos])
                 elif machine_order == 0:  # 第一個機台
                     if maint:  # 若剛修 maint = T
-                        if self.first_check == True:
-                            self.time_state[machine_order][-1] = self.time_state[machine_order][job_pos-1] + self.Data.MAINT_LEN[machine_order+1]
-                            start_maint = self.time_state[machine_order][job_pos-1]
-                        else:
-                            self.time_state[machine_order][-1] = self.maint_period[machine_order][1]
+                        self.time_state[machine_order][-1] = self.time_state[machine_order][job_pos-1] + self.Data.MAINT_LEN[machine_order+1] + self.shift[machine_order]
                         before_state = self.time_state[machine_order][-1]
+                        start_maint = self.time_state[machine_order][job_pos-1]
+                        # end_maint = self.time_state[machine_order][-1]
                     else:  # 前個 state 為維修後的時間
                         before_state = self.time_state[machine_order][job_pos-1]
                 else:
                     if maint:  # 若剛修 維修後的時間 和上個機台 job 結束時間比較
-                        if self.first_check == True:
-                            self.time_state[machine_order][-1] = self.time_state[machine_order][job_pos-1] + self.Data.MAINT_LEN[machine_order+1]
-                            start_maint = self.time_state[machine_order][job_pos-1]
-                        else:
-                            self.time_state[machine_order][-1] = self.maint_period[machine_order][1]
+                        self.time_state[machine_order][-1] = self.time_state[machine_order][job_pos-1] + self.Data.MAINT_LEN[machine_order+1] + self.shift[machine_order]
                         before_state = max(self.time_state[machine_order][-1], self.time_state[machine_order-1][job_pos])
+                        start_maint = self.time_state[machine_order][job_pos-1]
+                        # end_maint = self.time_state[machine_order][-1]
                     else:
                         before_state = max(self.time_state[machine_order][job_pos-1], self.time_state[machine_order-1][job_pos])
 
                 self.time_state[machine_order][job_pos] = before_state + duration
 
-                if maint and self.first_check == True:
+                if maint:
                     self.maint_period[machine_order][0] = start_maint
                     self.maint_period[machine_order][1] = self.time_state[machine_order][-1]
 
@@ -97,18 +88,11 @@ class JointScheduleProb:
         for rank in range(self.Data.n_i - 1):
             # 第二名開始 小於（更改維修時間）/大於等於（正常） 第一名結束
             if self.maint_period[maint_seq[rank+1]][0] < self.maint_period[maint_seq[rank]][1]:
-                self.fix_maint = True
+                self.shift[maint_seq[rank+1]] = self.maint_period[maint_seq[rank]][1] - self.maint_period[maint_seq[rank+1]][0]
                 self.maint_period[maint_seq[rank+1]][0] = self.maint_period[maint_seq[rank]][1]
-                self.maint_period[maint_seq[rank+1]][1] = self.maint_period[maint_seq[rank+1]][1] + self.Data.MAINT_LEN[maint_seq[rank+1]+1]
-        while self.fix_maint == True:
-            self.fix_maint = False
-            maint_seq = np.argsort(self.maint_period[:, 0])
-            for rank in range(self.Data.n_i - 1):
-                if self.maint_period[maint_seq[rank+1]][0] < self.maint_period[maint_seq[rank]][1]:
-                    self.maint_period[maint_seq[rank+1]][0] = self.maint_period[maint_seq[rank]][1]
-                    self.maint_period[maint_seq[rank+1]][1] = self.maint_period[maint_seq[rank+1]][1] + self.Data.MAINT_LEN[maint_seq[rank+1]+1]
+                self.maint_period[maint_seq[rank+1]][1] = self.maint_period[maint_seq[rank+1]][1] + self.shift[maint_seq[rank+1]]
+        if np.sum(self.shift) != 0:
             self.cal_time_state()
-
         # print(self.time_state)
 
         # 確認一個時間點只能一個機台維修 self.check_maint = T 為正確
@@ -119,17 +103,14 @@ class JointScheduleProb:
         #         break
 
     def obj_value(self) -> float:
-        # self.shift = np.zeros(self.Data.n_i)
-        self.first_check = True
-        self.fix_maint = False
+        self.shift = np.zeros(self.Data.n_i)
         self.cal_time_state()
-        self.first_check = False
         self.check_maint_one_at_a_time()
         value = 0
         for job_pos, job_id in enumerate(self.scheduled_job_id):
             value += max(self.time_state[-1][job_pos] - self.Data.DUE_TIME[job_id], 0) * self.Data.WEIGHT[job_id]
 
-        # self.shift = np.zeros(self.Data.n_i)
+        self.shift = np.zeros(self.Data.n_i)
 
         return value
 

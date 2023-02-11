@@ -21,9 +21,9 @@ def output_message(tabu_search):
 factors_key = ['init_prod_time', 'prod_discount', 'weight', 'due_time', 'maint_len']
 
 scenario_list = ['benchmark']
-for key in factors_key:
-    for level in ['L', 'H']:
-        scenario_list.append(key + '_' + level)
+# for key in factors_key:
+#     for level in ['L', 'H']:
+#         scenario_list.append(key + '_' + level)
 
 # read data
 # data_path = 'code/scenario/'
@@ -35,7 +35,7 @@ for key in factors_key:
 def run_scen(
     title, jobinit_mode='due_sort', instance_num=10, scenario_list=scenario_list,
     tabu_size=5, iter_num=20, maint_iter_num=10, maint_mode='rij_insert_maint',
-    data_path='code/scenario/', save_path='code/record/tabu/', discount_reverse=None,
+    data_path='experiment/scenario/', save_path='code/record/tabu/', discount_reverse=None,
     use_tabu=True) -> None:
 
     obj_df = pd.DataFrame(index=range(1, instance_num+1))
@@ -139,7 +139,7 @@ maint_mode: greedy_maint, rij_insert_maint, random_maint, distributed_maint, all
 '''
 
 
-save_path='code/record/tabu/0811/'
+save_path='experiment/record/heuristic_update/'
 # scenario_list = ['prod_discount_H']
 
 
