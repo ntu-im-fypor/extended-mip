@@ -139,7 +139,7 @@ maint_mode: greedy_maint, rij_insert_maint, random_maint, distributed_maint, all
 '''
 
 
-save_path='experiment/record/heuristic_update_test/'
+save_path='experiment/record/heuristic_update/'
 # scenario_list = ['prod_discount_H']
 
 
