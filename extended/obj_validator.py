@@ -17,8 +17,8 @@ index_tewnty = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
 obj_df = pd.DataFrame(columns=scenario_list, index=index_thirty)
 maint_df = pd.DataFrame(columns=stage_list, index=index_thirty)
 
-all_sol = pd.read_csv('tests/sol-before/dueweight_greedy_noswapping_sol.csv')
-all_maint_sol = pd.read_csv('tests/sol-before/dueweight_greedy_noswapping_maint_sol.csv')
+all_sol = pd.read_csv('tests/sol-before-0210/dueweight_greedy_noswapping_sol.csv')
+all_maint_sol = pd.read_csv('tests/sol-before-0210/dueweight_greedy_noswapping_maint_sol.csv')
 
 # Set number of machines and number of jobs
 num_machine = 5
@@ -67,60 +67,70 @@ for scenario in scenario_list:
         current_end_time[sol[j] - 1] = production_start_time + production_time
         current_machine_time = production_start_time + production_time
 
-    # Check maintenance conflict
-    maint_check = [False, False, False, False, False]
-    maint_end_time = 0
-    for i in range(num_machine):
-      first_false = False
-      for j in range(num_machine):
-        if (maint_check[j] == False and first_false == False):
-          min_start = maint_time[j][0]
-          min_finish = maint_time[j][1]
-          min_index = j
-          first_false = True
-        if (maint_check[j] == False and maint_time[j][0] < min_start):
-          min_start = maint_time[j][0]
-          min_finish = maint_time[j][1]
-          min_index = j
-      maint_check[min_index] = True
-      if (min_start < maint_end_time):
-        maint_time[min_index][0] = maint_end_time
-        maint_time[min_index][1] = maint_end_time + data.MAINT_LEN[min_index + 1]
-      maint_end_time = maint_time[min_index][1]
-    
-    print("instance", instance+1)
-    print("maint_time for each stage", maint_time)
-    for i in range(5):
-      maint_df[stage_list[2*i]][instance+1] = maint_time[i][0]
-      maint_df[stage_list[2*i+1]][instance+1] = maint_time[i][1]
+    recalculation = True
 
-    # Reset [Array to store the current end time of each job, will update after looping each machine] for re-calculation
-    current_end_time = [0] * num_job
+    while recalculation == True:
+      print("recalculation hiiiiiii")
+      recalculation = False
+      # Check maintenance conflict
+      maint_check = [False, False, False, False, False]
+      maint_end_time = 0
+      for i in range(num_machine):
+        first_false = False
+        for j in range(num_machine):
+          if (maint_check[j] == False and first_false == False):
+            min_start = maint_time[j][0]
+            min_finish = maint_time[j][1]
+            min_index = j
+            first_false = True
+          if (maint_check[j] == False and maint_time[j][0] < min_start):
+            min_start = maint_time[j][0]
+            min_finish = maint_time[j][1]
+            min_index = j
+        maint_check[min_index] = True
+        if (min_start < maint_end_time):
+          maint_time[min_index][0] = maint_end_time
+          maint_time[min_index][1] = maint_end_time + data.MAINT_LEN[min_index + 1]
+        maint_end_time = maint_time[min_index][1]
+      
+      print("instance", instance+1)
+      # print("maint_time for each stage", maint_time)
+      for i in range(5):
+        maint_df[stage_list[2*i]][instance+1] = maint_time[i][0]
+        maint_df[stage_list[2*i+1]][instance+1] = maint_time[i][1]
 
-    # Time re-calculation to eliminate maintenance conflict
-    for i in range(num_machine): # loop all machines in order
-      current_machine_time = 0
-      current_machine_time += data.REMAIN[i + 1]
+      # Reset [Array to store the current end time of each job, will update after looping each machine] for re-calculation
+      current_end_time = [0] * num_job
 
-      print("stage", i+1)
+      # Time re-calculation to eliminate maintenance conflict
+      for i in range(num_machine): # loop all machines in order
+        current_machine_time = 0
+        current_machine_time += data.REMAIN[i + 1]
 
-      for j in range(num_job): # loop all jobs in order
-        if (maint_sol[i] == j):
-          current_machine_time = maint_time[i][1]
-        
-        production_time = data.INIT_PROD_TIME[(i + 1, sol[j])]
-        if (maint_sol[i] <= j): # the job is after maintenance
-          production_time *= data.PROD_DISCOUNT[i + 1]
-        
-        production_start_time = max(current_machine_time, current_end_time[sol[j] - 1])
-        current_end_time[sol[j] - 1] = production_start_time + production_time
-        current_machine_time = production_start_time + production_time
+        # print("stage", i+1)
 
-        print("job", sol[j], production_start_time, production_start_time+production_time)
-        job_df[stage_list[2*i]][sol[j]] = production_start_time
-        job_df[stage_list[2*i+1]][sol[j]] = production_start_time+production_time
+        for j in range(num_job): # loop all jobs in order
+          if (maint_sol[i] == j):
+            if maint_time[i][0] < current_machine_time and recalculation == False:
+              print(maint_time[i][0], current_machine_time)
+              maint_time[i][0] = current_machine_time
+              maint_time[i][1] = current_machine_time + data.MAINT_LEN[i + 1]
+              recalculation = True
+            current_machine_time = maint_time[i][1]
+          
+          production_time = data.INIT_PROD_TIME[(i + 1, sol[j])]
+          if (maint_sol[i] <= j): # the job is after maintenance
+            production_time *= data.PROD_DISCOUNT[i + 1]
+          
+          production_start_time = max(current_machine_time, current_end_time[sol[j] - 1])
+          current_end_time[sol[j] - 1] = production_start_time + production_time
+          current_machine_time = production_start_time + production_time
 
-    job_df.to_csv('tests/validator/job_time_benchmark_' + str(instance+1) + '.csv')
+          # print("job", sol[j], production_start_time, production_start_time+production_time)
+          job_df[stage_list[2*i]][sol[j]] = production_start_time
+          job_df[stage_list[2*i+1]][sol[j]] = production_start_time+production_time
+
+    job_df.to_csv('tests/validator_0210/job_time_benchmark_' + str(instance+1) + '.csv')
 
     obj = 0
     for i in range(num_job):
@@ -131,5 +141,5 @@ for scenario in scenario_list:
 
     print("obj", obj)
 
-obj_df.to_csv('tests/validator/validator_obj.csv')
-maint_df.to_csv('tests/validator/maint_time_benchmarks.csv')
+obj_df.to_csv('tests/validator_0210/validator_obj.csv')
+maint_df.to_csv('tests/validator_0210/maint_time_benchmarks.csv')

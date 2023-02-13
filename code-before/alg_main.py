@@ -81,15 +81,15 @@ def run_scen(
 
             # 初始化問題
             sched = JointScheduleProb(sched_init)
-            obj_value = sched.obj_value()
+            obj_value = sched.obj_value(num)
             # print(obj_value)
             if use_tabu:
                 start_time = time.time()
                 tabu = TabuSearch(
                     prob=sched, tabu_size=tabu_size, iter_num=iter_num,
-                    after_iter=output_message, maint_iter_num=maint_iter_num, maint_mode=maint_mode)
+                    after_iter=output_message, maint_iter_num=maint_iter_num, maint_mode=maint_mode, instance_num=num)
 
-                tabu.run_with_maint()
+                tabu.run_with_maint(instance_num=num)
 
                 obj_list.append(tabu.best_val)
                 runtime_list.append(time.time() - start_time)
@@ -139,7 +139,7 @@ maint_mode: greedy_maint, rij_insert_maint, random_maint, distributed_maint, all
 '''
 
 
-save_path='experiment/record/heuristic_update/'
+save_path='experiment/record/heuristic_update_test/'
 # scenario_list = ['prod_discount_H']
 
 

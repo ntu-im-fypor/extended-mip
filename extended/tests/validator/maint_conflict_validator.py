@@ -23,12 +23,12 @@ class Job:
             print(f"Job {self.job_id} on stage {stage_id + 1} from {self.stage_info[stage_id].start_time} to {self.stage_info[stage_id].end_time}")
 
 # every instance is a csv file having 20 jobs and 10 stage info (stage1_start_time, stage1_end_time, stage2_start_time, stage2_end_time, etc.)
-maint_instance = pd.read_csv(f"tests/validator/maint_time_benchmarks.csv")
+maint_instance = pd.read_csv(f"maint_time_benchmarks.csv")
 
 for i in range(NUM_OF_INSTANCES):
     jobs = []
     # read instance csv file
-    job_instance = pd.read_csv(f"tests/validator/job_time_benchmark_{i + 1}.csv")
+    job_instance = pd.read_csv(f"job_time_benchmark_{i + 1}.csv")
     # read maintenance info
     for j in range(1, JOBS_PER_INSTANCE + 1):
         job = Job(j)

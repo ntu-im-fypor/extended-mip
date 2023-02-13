@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 import math
 import copy
@@ -7,6 +8,15 @@ from itertools import combinations
 
 from alg_joblisting import InitSchedule
 
+scenario_list = ['benchmark']
+stage_list = ['stage1_start', 'stage1_end', 'stage2_start', 'stage2_end', 'stage3_start', 'stage3_end',
+              'stage4_start', 'stage4_end', 'stage5_start', 'stage5_end']
+index_thirty = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+index_tewnty = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+
+# Create empty dataframes to store maint_time
+maint_df = pd.DataFrame(columns=stage_list, index=index_thirty)
+job_df = pd.DataFrame(columns=stage_list, index=index_tewnty)
 
 class JointScheduleProb:
     def __init__(self, initSched: InitSchedule) -> None:
@@ -22,6 +32,7 @@ class JointScheduleProb:
         按順序排列出每個工作所需時間
         '''
         self.time_state = np.zeros((self.Data.n_i, self.Data.n_j+1))  # [:, -1] 為維修後時間
+        self.time_state_start = np.zeros((self.Data.n_i, self.Data.n_j+1))
         if self.first_check == True:
             self.maint_period = np.zeros((self.Data.n_i, 2))  # 記錄維修開始與結束
         for machine_order, maint_pos in enumerate(self.scheduled_maint_pos):
@@ -33,12 +44,17 @@ class JointScheduleProb:
                 else:  # 維修
                     duration = self.Data.AFTER_DIS_PROD_TIME[machine_order+1, job_id]
                     if maint_pos == job_pos:
-                        maint = True  # 轉成維修點
-                        if self.maint_period[machine_order][0] < self.time_state[machine_order][job_pos-1] and self.first_check == False:
+                        if self.maint_period[machine_order][0] < self.time_state[machine_order][job_pos-1] and self.first_check == False and maint_pos != 0:
                             self.fix_maint = True
                             self.maint_period[machine_order][0] = self.time_state[machine_order][job_pos-1]
                             self.maint_period[machine_order][1] = self.time_state[machine_order][job_pos-1] + self.Data.MAINT_LEN[machine_order+1]
                             return
+                        elif self.maint_period[machine_order][0] < self.Data.REMAIN[machine_order+1] and maint_pos == 0:
+                            self.fix_maint = True
+                            self.maint_period[machine_order][0] = self.Data.REMAIN[machine_order+1]
+                            self.maint_period[machine_order][1] = self.Data.REMAIN[machine_order+1] + self.Data.MAINT_LEN[machine_order+1]
+                            return
+                        maint = True  # 轉成維修點
 
                 # check before state
                 if job_pos == 0:  # 各機台第一個 job
@@ -54,9 +70,12 @@ class JointScheduleProb:
                             before_state = self.Data.REMAIN[machine_order+1]
                     else:
                         if maint:  # 若剛修 maint = T
-                            self.time_state[machine_order][-1] = self.Data.REMAIN[machine_order+1] + self.Data.MAINT_LEN[machine_order+1]
+                            if self.first_check == True:
+                                self.time_state[machine_order][-1] = self.Data.REMAIN[machine_order+1] + self.Data.MAINT_LEN[machine_order+1]
+                                start_maint = self.Data.REMAIN[machine_order+1]
+                            else:
+                                self.time_state[machine_order][-1] = self.maint_period[machine_order][1]
                             before_state = max(self.time_state[machine_order][-1], self.time_state[machine_order-1][job_pos])
-                            start_maint = self.Data.REMAIN[machine_order+1]
                         else:
                             before_state = max(self.Data.REMAIN[machine_order+1], self.time_state[machine_order-1][job_pos])
                 elif machine_order == 0:  # 第一個機台
@@ -80,6 +99,7 @@ class JointScheduleProb:
                     else:
                         before_state = max(self.time_state[machine_order][job_pos-1], self.time_state[machine_order-1][job_pos])
 
+                self.time_state_start[machine_order][job_pos] = before_state
                 self.time_state[machine_order][job_pos] = before_state + duration
 
                 if maint and self.first_check == True:
@@ -118,8 +138,7 @@ class JointScheduleProb:
         #     if not self.check_maint:
         #         break
 
-    def obj_value(self) -> float:
-        # self.shift = np.zeros(self.Data.n_i)
+    def obj_value(self, instance_num) -> float:
         self.first_check = True
         self.fix_maint = False
         self.cal_time_state()
@@ -129,7 +148,19 @@ class JointScheduleProb:
         for job_pos, job_id in enumerate(self.scheduled_job_id):
             value += max(self.time_state[-1][job_pos] - self.Data.DUE_TIME[job_id], 0) * self.Data.WEIGHT[job_id]
 
-        # self.shift = np.zeros(self.Data.n_i)
+        # 若要紀錄 schedule 可以使用
+    
+        # for i in range(5):
+        #     maint_df[stage_list[2*i]][instance_num] = self.maint_period[i][0]
+        #     maint_df[stage_list[2*i+1]][instance_num] = self.maint_period[i][1]
+
+        # for i in range(5):
+        #     for j in range(20):
+        #         job_df[stage_list[2*i]][j+1] = self.time_state_start[i][j]
+        #         job_df[stage_list[2*i+1]][j+1] = self.time_state[i][j]
+        
+        # maint_df.to_csv('experiment/record/heuristic_update_test/maint_time_benchmarks.csv')
+        # job_df.to_csv('experiment/record/heuristic_update_test/job_time_benchmark_' + str(instance_num) + '.csv')
 
         return value
 
@@ -138,7 +169,7 @@ Move = namedtuple('Tabu', ['job_pos1', 'job_id1', 'job_pos2', 'job_id2'])
 class TabuSearch:
     def __init__(
         self, prob: JointScheduleProb, tabu_size,
-        iter_num=50, after_iter=None, maint_iter_num=10, maint_mode='rij_insert_maint') -> None:
+        iter_num=50, after_iter=None, maint_iter_num=10, maint_mode='rij_insert_maint', instance_num=0) -> None:
 
         self.prob = prob
         self.Data = prob.Data
@@ -149,6 +180,7 @@ class TabuSearch:
         self.after_iter = after_iter
         self.maint_iter_num = maint_iter_num
         self.maint_mode = maint_mode
+        self.instance_num = instance_num
 
         self.reset()
 
@@ -164,7 +196,7 @@ class TabuSearch:
         # initialize solution
         self.current_sol = copy.deepcopy(self.prob.scheduled_job_id)
         self.best_sol = copy.deepcopy(self.current_sol)
-        self.best_val = self.prob.obj_value()
+        self.best_val = self.prob.obj_value(self.instance_num)
         self.best_maint_sol = copy.deepcopy(self.prob.scheduled_maint_pos)
 
         self.scheduled_maint_pos = copy.deepcopy(self.prob.scheduled_maint_pos)
@@ -181,7 +213,7 @@ class TabuSearch:
         self.prob.scheduled_job_id = copy.deepcopy(sol)
         return
 
-    def run_with_maint(self):
+    def run_with_maint(self, instance_num):
         # !0808
         self.run()
         self.last_best_val = copy.deepcopy(self.best_val)
@@ -191,7 +223,7 @@ class TabuSearch:
         # for iter in range(self.maint_iter_num):
         while same_val_count < self.maint_iter_num:
             if self.maint_mode == 'greedy_maint':
-                self.greedy_maint()
+                self.greedy_maint(instance_num)
             elif self.maint_mode == 'rij_insert_maint':
                 self.rij_insert_maint()
             elif self.maint_mode == 'random_maint':
@@ -217,7 +249,7 @@ class TabuSearch:
         # 記錄上一個最佳解
         last_best_sol = copy.deepcopy(self.best_sol)
         for iter in range(self.iter_num):
-            self.run_one_iter(iter)
+            self.run_one_iter(iter, self.instance_num)
             # !
             # if self.best_val == 0:
             #     break
@@ -231,7 +263,7 @@ class TabuSearch:
 
 
 
-    def run_one_iter(self, iter):
+    def run_one_iter(self, iter, instance_num):
         self.current_sol = copy.deepcopy(self.prob.scheduled_job_id)
         neighbor_best_val = math.inf
         neighbor_best_sol = None
@@ -248,7 +280,7 @@ class TabuSearch:
 
             neighbor_sol = copy.deepcopy(self.current_sol)
             self.swap_move(neighbor_sol, move)
-            neighbor_value = self.prob.obj_value()
+            neighbor_value = self.prob.obj_value(instance_num)
 
 
             #check if it is in tabu
@@ -304,7 +336,7 @@ class TabuSearch:
         if self.after_iter:
             self.after_iter(self)
 
-    def greedy_maint(self):
+    def greedy_maint(self, instance_num):
         count, no_change = 0, 0
 
         # for machine_order, maint_pos in enumerate(self.scheduled_maint_pos):
@@ -316,7 +348,7 @@ class TabuSearch:
             for pos in range(self.Data.n_j):
                 self.scheduled_maint_pos[machine_order] = pos
                 self.prob.scheduled_maint_pos = copy.deepcopy(self.scheduled_maint_pos)
-                temp_value = self.prob.obj_value()
+                temp_value = self.prob.obj_value(instance_num)
                 # print(machine_order, pos, temp_value)
                 if temp_value < min_temp_value:
                     min_temp_value = temp_value
