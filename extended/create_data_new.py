@@ -29,7 +29,13 @@ class Create:
         self.MACHINE_NUM = random.randint(1, 4, size=self.STAGE_NUM)
         self.TOTAL_MACHINE_NUM = np.sum(self.MACHINE_NUM)
 
-        self.INIT_PROD_TIME = random.randint(self.init_prod_time_set[0], self.init_prod_time_set[1], size=(self.TOTAL_MACHINE_NUM, self.JOB_NUM))
+        # self.INIT_PROD_TIME = random.randint(self.init_prod_time_set[0], self.init_prod_time_set[1], size=(self.TOTAL_MACHINE_NUM, self.JOB_NUM))
+        bottleneck = np.array([0, 1]*10)[:self.TOTAL_MACHINE_NUM]
+        random.shuffle(bottleneck)
+        # np.array([stats.mode(random.choice([0, 1], 10))[0][0] for x in range(10)])
+        self.INIT_PROD_TIME = np.array(
+            [random.randint(self.init_prod_time_set[b][0], self.init_prod_time_set[b][1], size=self.JOB_NUM)
+            for b in bottleneck])
         self.PROD_DISCOUNT = random.uniform(self.prod_discount_set[0], self.prod_discount_set[1], size=self.TOTAL_MACHINE_NUM)
         self.MAINT_LEN = random.uniform(self.maint_len_set[0], self.maint_len_set[1], size=self.TOTAL_MACHINE_NUM)
         self.REMAIN = np.array(random.randint(self.remain[0], self.remain[1], size=self.TOTAL_MACHINE_NUM))
@@ -76,8 +82,8 @@ class Create:
 
 
     def run(self, instance_num=10, start_instance_num=1):
-        folder_name = 'instance/'
-        path = folder_name + 'base_1124'
+        folder_name = 'tests/'
+        path = folder_name + 'long_queue_time_0314'
         print(f'scenario: {self.file}')
         if not os.path.isdir(path):
             os.makedirs(path)
@@ -122,7 +128,7 @@ class Create:
 
 
 factors = {
-    'init_prod_time': [5, 30],
+    'init_prod_time': [[5, 30], [5, 30]],
     'prod_discount': [0.8, 0.9],
     'weight': {'L': [1, 1], 'M': [0.8, 1.2], 'H': [0.6, 1.4]},
     'due_time': {'L': 0.4, 'M': 0.6, 'H': 0.8, 'sig_ratio': 0.25},
