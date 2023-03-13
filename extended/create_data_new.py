@@ -24,9 +24,12 @@ class Create:
         self.file = 'base'
 
     def sample(self):
-        self.STAGE_NUM = random.randint(3, 6)
-        self.JOB_NUM = random.randint(5, 10)
-        self.MACHINE_NUM = random.randint(1, 4, size=self.STAGE_NUM)
+        # self.STAGE_NUM = random.randint(3, 6)
+        # self.JOB_NUM = random.randint(5, 10)
+        # self.MACHINE_NUM = random.randint(1, 4, size=self.STAGE_NUM)
+        self.STAGE_NUM = 2
+        self.JOB_NUM = 10
+        self.MACHINE_NUM = [2, 2]
         self.TOTAL_MACHINE_NUM = np.sum(self.MACHINE_NUM)
 
         # self.INIT_PROD_TIME = random.randint(self.init_prod_time_set[0], self.init_prod_time_set[1], size=(self.TOTAL_MACHINE_NUM, self.JOB_NUM))
@@ -83,7 +86,7 @@ class Create:
 
     def run(self, instance_num=10, start_instance_num=1):
         folder_name = 'tests/'
-        path = folder_name + 'long_queue_time_0314'
+        path = folder_name + 'significant_bottleneck_0314'
         print(f'scenario: {self.file}')
         if not os.path.isdir(path):
             os.makedirs(path)
