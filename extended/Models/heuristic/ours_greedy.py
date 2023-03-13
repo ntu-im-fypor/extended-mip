@@ -281,6 +281,40 @@ class GreedyModel(SolutionModel):
             if accumulated_no_improvement_count >= len(shared_job_order_copy) * (len(shared_job_order_copy) - 1) / 2: # stopping criteria: no improvement for the number of possible swaps
                 break
         return shared_job_order, best_objective_value
+    
+    def _try_swapping_shared_job_order_and_insert_maint(self, job_order_on_machines: list[list], shared_job_order: list[int], initial_best_obj: float) -> tuple[list[list], float]:
+        """
+        Try swapping shared job order and insert maintenance to find the best job order\n
+        Return a list of list that represents the schedule
+        #### Parameters\n
+        `job_order_on_machines`: the job order on machines for each stage, it should be a list of list\n
+        `shared_job_order`: the shared job order, it should be a list, every element is a job index
+        `initial_best_obj`: the initial best objective value, used to see whether there is any swap that can improve the objective value
+        """
+        # do a deep copy of the job order on machines
+        job_order_on_machines_copy = copy.deepcopy(job_order_on_machines)
+        best_schedule = copy.deepcopy(job_order_on_machines)
+        shared_job_order_copy = copy.deepcopy(shared_job_order)
+        best_objective_value = initial_best_obj
+        accumulated_no_improvement_count = 0
+        while True:
+            # use combinations to generate all possible pairs of jobs to swap
+            for i, j in combinations(range(len(shared_job_order_copy)), 2):
+                shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
+                # sort job order on machines according to the new shared job order
+                job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
+                # put this swapped shared job order into the insert maintenance function to find best maintenance schedule and calculate the objective value
+                cur_best_schedule, cur_best_obj = self._decide_best_maintenance_position(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
+                if cur_best_obj < best_objective_value:
+                    best_objective_value = cur_best_obj
+                    best_schedule = cur_best_schedule
+                    accumulated_no_improvement_count = 1
+                else:
+                    shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i] # swap back because this swap doesn't improve
+                    accumulated_no_improvement_count += 1
+            if accumulated_no_improvement_count >= len(shared_job_order_copy) * (len(shared_job_order_copy) - 1) / 2: # stopping criteria: no improvement for the number of possible swaps
+                break
+        return best_schedule, best_objective_value
 
     def _try_swapping_two_jobs_on_same_stage(self, job_order_on_machines: list[list], shared_job_order: list[int], initial_best_obj: float) -> tuple[list[list], float]:
         """
