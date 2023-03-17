@@ -63,35 +63,35 @@ class Data:
                 self.M_PROFIT[i, j] = self.AFTER_DIS_SAVE_TIME[i, j] - self.MAINT_LEN[i]
         self.M[0] = m_temp
 
-        # # !改 上游 B_i 大或 B_i 小
-        # if discount_reverse != None:
-        #     discount.sort(reverse=discount_reverse)  # True 上游老 大到小
-        #     for i in range(1, self.n_i+1):
-        #         self.PROD_DISCOUNT[i] = discount[i-1]
+        # !改 上游 B_i 大或 B_i 小
+        if discount_reverse != None:
+            discount.sort(reverse=discount_reverse)  # True 上游老 大到小
+            for i in range(1, self.n_i+1):
+                self.PROD_DISCOUNT[i] = discount[i-1]
 
-        #     # self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT[i] = dis_prod_temp / self.MAINT_LEN[i]
+            # self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT[i] = dis_prod_temp / self.MAINT_LEN[i]
 
-        # AFTER_DIS_SAVE_TIME_LIST = np.array(
-        #         list(self.AFTER_DIS_SAVE_TIME.values())
-        #     ).reshape(5, -1)
-        # # distributed_maint
-        # self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT = dict(
-        #     enumerate(
-        #         (AFTER_DIS_SAVE_TIME_LIST.sum(axis=1) / np.array(list(self.MAINT_LEN.values())))
-        #         , 1)
-        #     )
-        # # max or min A_ij for all J / min or max F_i
-        # self.UB_AFTER_DIS_SAVE_TIME_DIV_MAINT = AFTER_DIS_SAVE_TIME_LIST.max(axis=0).sum() / min(self.MAINT_LEN.values())
-        # self.LB_AFTER_DIS_SAVE_TIME_DIV_MAINT = AFTER_DIS_SAVE_TIME_LIST.min(axis=0).sum() / max(self.MAINT_LEN.values())
+        AFTER_DIS_SAVE_TIME_LIST = np.array(
+                list(self.AFTER_DIS_SAVE_TIME.values())
+            ).reshape(6, -1)
+        # distributed_maint
+        self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT = dict(
+            enumerate(
+                (AFTER_DIS_SAVE_TIME_LIST.sum(axis=1) / np.array(list(self.MAINT_LEN.values())))
+                , 1)
+            )
+        # max or min A_ij for all J / min or max F_i
+        self.UB_AFTER_DIS_SAVE_TIME_DIV_MAINT = AFTER_DIS_SAVE_TIME_LIST.max(axis=0).sum() / min(self.MAINT_LEN.values())
+        self.LB_AFTER_DIS_SAVE_TIME_DIV_MAINT = AFTER_DIS_SAVE_TIME_LIST.min(axis=0).sum() / max(self.MAINT_LEN.values())
 
-        # # 內插法後 得到 MODE 眾數
-        # self.MODE_AFTER_DIS_SAVE_TIME_DIV_MAINT = dict(
-        #     enumerate(
-        #         (np.interp(list(
-        #             self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT.values()
-        #             ), [self.LB_AFTER_DIS_SAVE_TIME_DIV_MAINT, self.UB_AFTER_DIS_SAVE_TIME_DIV_MAINT], [0, self.n_j]))
-        #         , 1)
-        #     )
+        # 內插法後 得到 MODE 眾數
+        self.MODE_AFTER_DIS_SAVE_TIME_DIV_MAINT = dict(
+            enumerate(
+                (np.interp(list(
+                    self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT.values()
+                    ), [self.LB_AFTER_DIS_SAVE_TIME_DIV_MAINT, self.UB_AFTER_DIS_SAVE_TIME_DIV_MAINT], [0, self.n_j]))
+                , 1)
+            )
 
         for j in range(1, self.n_j+1):
             line = f.readline().split()
