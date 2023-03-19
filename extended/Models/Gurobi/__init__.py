@@ -1,2 +1,3 @@
 from .gurobi_original_problem import CompleteMIPModel_original
 from .complete_mip_gurobi import CompleteMIPModel
+from .relaxed_mip_gurobi import RelaxedMIPModel
