@@ -35,7 +35,7 @@ scenario_list = ['benchmark']
 def run_scen(
     title, jobinit_mode='due_sort', instance_num=10, scenario_list=scenario_list,
     tabu_size=5, iter_num=20, maint_iter_num=10, maint_mode='rij_insert_maint',
-    data_path='experiment/scenario/', save_path='code/record/tabu/', discount_reverse=None,
+    data_path='experiment/scenario/final(6,100)/', save_path='code/record/tabu/', discount_reverse=None,
     use_tabu=True) -> None:
 
     obj_df = pd.DataFrame(index=range(1, instance_num+1))
@@ -53,6 +53,14 @@ def run_scen(
         iter_list = []
         history_best_list = []
         for num in range(1, instance_num+1):
+            # if num in [18]:
+            #     obj_list.append(-1)
+            #     runtime_list.append(-1)
+            #     sol_list.append(-1)
+            #     maint_sol_list.append(-1)
+            #     iter_list.append([])
+            #     history_best_list.append([])
+            #     continue
             print('='*100)
             print('='*100)
             if discount_reverse != None:
@@ -139,7 +147,7 @@ maint_mode: greedy_maint, rij_insert_maint, random_maint, distributed_maint, all
 '''
 
 
-save_path='experiment/record/heuristic_update/'
+save_path='experiment/record/heuristic_update/final/'
 # scenario_list = ['prod_discount_H']
 
 
@@ -159,7 +167,7 @@ save_path='experiment/record/heuristic_update/'
 
 
 run_scen(title='dueweight_greedy_noswapping', jobinit_mode='due_weight_sort', instance_num=30, \
-    scenario_list=scenario_list, tabu_size=5, iter_num=1, maint_iter_num=10,
+    scenario_list=scenario_list, tabu_size=5, iter_num=20, maint_iter_num=10,
     maint_mode='greedy_maint', use_tabu=True, save_path=save_path)
 
 # run_scen(title='dueweight_greedy_upstream_L', jobinit_mode='due_weight_sort', instance_num=30, \

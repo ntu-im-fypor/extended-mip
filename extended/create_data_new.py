@@ -98,7 +98,7 @@ class Create:
 
     def run(self, instance_num=10, start_instance_num=1):
         folder_name = 'tests/'
-        path = folder_name + 'inf_queue_0317'
+        path = folder_name + 'no_maint_inf_queue_0317'
         print(f'scenario: {self.file}')
         if not os.path.isdir(path):
             os.makedirs(path)
@@ -147,7 +147,7 @@ factors = {
     'prod_discount': [0.8, 0.9],
     'weight': {'L': [1, 1], 'M': [0.8, 1.2], 'H': [0.6, 1.4]},
     'due_time': {'L': 0.4, 'M': 0.6, 'H': 0.8, 'sig_ratio': 0.25},
-    'maint_len': [5, 30],
+    'maint_len': [0, 0],
 	'remain': [0, 20],
     'stage_num': [1, 5],
     'machine_num': [1, 5],

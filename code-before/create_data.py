@@ -77,7 +77,7 @@ class Create:
 
 
     def run(self, instance_num=10, start_instance_num=1):
-        folder_name = 'code/scenario/'
+        folder_name = 'experiment/scenario/final(6,15)/'
         path = folder_name + self.file
         print(f'scenario: {self.file}')
         if not os.path.isdir(path):
@@ -111,7 +111,7 @@ factors = {
     },
     'prod_discount': {'L': [0.85, 0.85], 'M': [0.8, 0.9], 'H': [0.75, 0.95]},
     'weight': {'L': [1, 1], 'M': [0.8, 1.2], 'H': [0.6, 1.4]},
-    'due_time': {'L': 0.4, 'M': 0.6, 'H': 0.8, 'sig_ratio': 0.25},
+    'due_time': {'L': 0.4, 'M': 0.5, 'H': 0.6, 'sig_ratio': 0.25},
     'maint_len': {'L': [1, 1], 'M': [0.8, 1.2], 'H': [0.6, 1.4], 'mu': 150},
 	'remain': [500, 1000],
   }
@@ -129,4 +129,4 @@ def main(instance_num=10, machine_num=5, job_num=20, all=True, start_instance_nu
                 create_cls.run(instance_num=instance_num, start_instance_num=start_instance_num)
 
 # main(instance_num=1, machine_num=5, job_num=20, all=False)  # 只跑 M
-main(instance_num=5, machine_num=5, job_num=20, all=True, start_instance_num=31)  # 只跑 M
+main(instance_num=30, machine_num=6, job_num=15, all=True, start_instance_num=1)  # 只跑 M
