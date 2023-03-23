@@ -1,4 +1,5 @@
 import math
+import pandas as pd
 from operator import itemgetter
 # from Models import Parameters
 
@@ -100,7 +101,7 @@ def compute_tardiness(current_end_time, instance):
 
 
 # function for generating schedule and computing objective value
-def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
+def generate_schedule(shared_job_order, order_on_machines, instance, instance_num, best_objective_value) -> float:
 
     def sort_maintenance(maint_order): # TODO: sort maintenance order according to stage and machine length
         # print('maint_order', maint_order)
@@ -138,6 +139,10 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
     current_machine_index = [0] * total_machines_num
     machine_has_maintained = [False] * total_machines_num
 
+    column_list = ['stage1_machine', 'stage1_start', 'stage1_end', 'stage2_machine', 'stage2_start', 'stage2_end']
+    index_ten = [1,2,3,4,5,6,7,8,9,10]
+    job_df = pd.DataFrame(columns=column_list, index=index_ten)
+
     for i in range(total_machines_num): # initialize current machine time
         current_machine_time[i] = instance.REMAIN[i]
 
@@ -149,13 +154,11 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
                 if (order_on_machines[j][current_machine_index[j]] == 'M' and current_machine_index[j] != len(order_on_machines[j])-1):
                     maint_order.append(j) # append the machine that needs maintenance
         sorted_maintenance_order = sort_maintenance(maint_order) # sort the maintenance order
-        # print(sorted_maintenance_order)
         for j in range(len(sorted_maintenance_order)): # append maintenance to schedule
             maint_start_time, maint_time_list = insert_new_maintenance(current_machine_time[sorted_maintenance_order[j]], instance.MAINT_LEN[sorted_maintenance_order[j]], maint_time_list)
             current_machine_time[sorted_maintenance_order[j]] = maint_start_time + instance.MAINT_LEN[sorted_maintenance_order[j]]
             current_machine_index[sorted_maintenance_order[j]] += 1
             machine_has_maintained[sorted_maintenance_order[j]] = True
-        # print(machine_has_maintained)
         current_job_time = [[0, 0] for i in range(instance.STAGES_NUMBER)] # initialize current job time
         
         current_job_machines = [] # get the machines job j work on
@@ -164,7 +167,6 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
                 if order_on_machines[j][current_machine_index[j]] == shared_job_order[i]: # if the machine processes the job
                     current_machine_index[j] += 1
                     current_job_machines.append(j)
-        # print(current_job_machines)
         for j in range(instance.STAGES_NUMBER): 
             machine = current_job_machines[j] # get machine no, production time of current job current stage
             production_time = instance.INIT_PROD_TIME[machine][shared_job_order[i]-1]
@@ -183,12 +185,18 @@ def generate_schedule(shared_job_order, order_on_machines, instance) -> float:
                     current_job_time[k-1][1] += shift
                 else:
                     break
-        # print(current_job_time)
+            job_df[column_list[3*j+1]][shared_job_order[i]] = current_job_time[j][0]
+            job_df[column_list[3*j+2]][shared_job_order[i]] = current_job_time[j][1]
+
+        job_df['stage1_machine'][shared_job_order[i]] = current_job_machines[0]+1 # 0 -> 1, 1 -> 2
+        job_df['stage2_machine'][shared_job_order[i]] = current_job_machines[1]-1 # 2 -> 1, 3 -> 2 
+
         for j in range(instance.STAGES_NUMBER): # update current machine time
             current_machine_time[current_job_machines[j]] = current_job_time[j][1]
         current_end_time[shared_job_order[i]-1] = current_job_time[instance.STAGES_NUMBER-1][1]
-    # print(current_end_time)
     obj = compute_tardiness(current_end_time, instance)
+    if obj < best_objective_value:
+        job_df.to_csv('greedy-results/no_maint_inf_queue_schedule/job_time_' + str(instance_num) + '.csv')
     return obj
 
 

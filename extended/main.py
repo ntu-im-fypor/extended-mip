@@ -67,7 +67,7 @@ def test_heuristic_model():
         elif model_type == "2":
             heuristic_model = MetaGAModel(parameters)
         elif model_type == "3":
-            heuristic_model = GreedyModel(parameters, file_path="greedy-results/test.json")
+            heuristic_model = GreedyModel(parameters, file_path="greedy-results/test.json", instance_num=i+1)
         elif model_type == "4":
             heuristic_model = CompleteMIPModel(parameters)
         else:
@@ -83,7 +83,7 @@ def test_heuristic_model():
     # test with base_1125
     # df.to_csv('greedy-results/base_1125.csv')
     # test with base_1130
-    df.to_csv('greedy-results/no_maint_inf_queue_0317.csv')
+    df.to_csv('greedy-results/no_maint_inf_queue_schedule/no_maint_inf_queue_0317.csv')
     # test with 學姊's benchmark
     # df.to_csv('greedy-results/benchmark.csv')
 

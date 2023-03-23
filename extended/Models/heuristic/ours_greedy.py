@@ -9,7 +9,7 @@ import pandas as pd
 import copy
 
 class GreedyModel(SolutionModel):
-    def __init__(self, parameters: Parameters, maintenance_choice_percentage: float = 0.5, file_path: str = None):
+    def __init__(self, parameters: Parameters, maintenance_choice_percentage: float = 0.5, file_path: str = None, instance_num: int = 0):
         """
         Initialize the model with the parameters and the maintenance choice percentage
         #### Parameters
@@ -23,6 +23,7 @@ class GreedyModel(SolutionModel):
             return
         self.file_path = file_path
         self.maintenance_choice_percentage = maintenance_choice_percentage
+        self.instance_num = instance_num
 
     def run_and_solve(self):
         """
@@ -75,7 +76,6 @@ class GreedyModel(SolutionModel):
         print(f"Shared Job Order: {best_shared_job_order}")
         print(f"Schedule: {best_job_schedule}")
         print("=====")
-        self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
 
         # store the current results for final reference (after swapping shared job order)
         self.process_result = {
@@ -83,6 +83,8 @@ class GreedyModel(SolutionModel):
             "objective_value": best_objective_value,
             "shared_job_order": best_shared_job_order
         }
+
+        best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
 
         # store the best schedule
         self.final_result = {
@@ -231,7 +233,7 @@ class GreedyModel(SolutionModel):
                         # replace the job order on this machine with the new job order
                         job_order_on_machines_copy[machine_index] = job_order_copy
                         # calculate the objective value for this job order under the situation that other machines maintain the same job order
-                        cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances)
+                        cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
                         if cur_objective_value < best_objective_value:
                             best_job_order_on_this_machine = copy.deepcopy(job_order_copy)
                             best_objective_value = cur_objective_value
@@ -271,7 +273,7 @@ class GreedyModel(SolutionModel):
                 # sort job order on machines according to the new shared job order
                 job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
                 # calculate the objective value for this job order under the situation that other machines maintain the same job order
-                cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances)
+                cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
                 if cur_objective_value < best_objective_value:
                     best_objective_value = cur_objective_value
                     shared_job_order = copy.deepcopy(shared_job_order_copy)
@@ -332,7 +334,7 @@ class GreedyModel(SolutionModel):
                     # sort job order after swapping two jobs
                     job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order, job_order_on_machines_copy)
                     # calculate the objective value for this job order under the situation that other machines maintain the same job order
-                    cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances)
+                    cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
                     if cur_objective_value < best_objective_value:
                         best_objective_value = cur_objective_value
                         machines_on_this_stage[machine1_index] = machine1_job_order_copy
