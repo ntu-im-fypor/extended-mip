@@ -267,7 +267,7 @@ class GreedyModel(SolutionModel):
         best_objective_value = initial_best_obj
         accumulated_no_improvement_count = 0
         # keep writing the shared job order and current best objective value into a file
-        with open('extended/swap-job-records/no_maint_inf_queue_time_3.txt', 'a') as f:
+        with open('extended/swap-job-records/no_maint_inf_queue_time.txt', 'a') as f:
             while True:
                 # use combinations to generate all possible pairs of jobs to swap
                 for i, j in combinations(range(len(shared_job_order_copy)), 2):
@@ -277,7 +277,7 @@ class GreedyModel(SolutionModel):
                     # calculate the objective value for this job order under the situation that other machines maintain the same job order
                     cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
                     if cur_objective_value < best_objective_value:
-                        f.write("shared job order: " + str(shared_job_order_copy) + "; objective value: " + str(cur_objective_value) + "\n")
+                        f.write(f"best obj value: [{best_objective_value}] shared job order: " + str(shared_job_order_copy) + "; objective value: " + str(cur_objective_value) + "\n")
                         best_objective_value = cur_objective_value
                         shared_job_order = copy.deepcopy(shared_job_order_copy)
                         accumulated_no_improvement_count = 1
@@ -312,40 +312,44 @@ class GreedyModel(SolutionModel):
                 all_stages_machines_job_order[i].append(job_order_on_machines_copy[machine_index])
                 machine_index += 1
         # then we try swapping two jobs between two machines on the same stage
-        completed_machines_count = 0
-        for cur_stage_index, machines_on_this_stage in enumerate(all_stages_machines_job_order):
-            # if there is only one machine on this stage, we don't need to swap
-            if len(machines_on_this_stage) == 1:
-                completed_machines_count += 1
-                continue
-            # use combinations to generate all possible pairs of machines to swap
-            for machine1_index, machine2_index in combinations(range(len(machines_on_this_stage)), 2):
-                # generate a list of pairs, first element is the job index on machine1, second element is the job index on machine2
-                machine1_indexes_have_jobs = [i for i in range(len(machines_on_this_stage[machine1_index])) if machines_on_this_stage[machine1_index][i] != 'M']
-                machine2_indexes_have_jobs = [i for i in range(len(machines_on_this_stage[machine2_index])) if machines_on_this_stage[machine2_index][i] != 'M']
-                swaps = [[machine1_job_index, machine2_job_index] for machine1_job_index in machine1_indexes_have_jobs for machine2_job_index in machine2_indexes_have_jobs]
-                for swap in swaps:
-                    # do a deep copy of the two machines's original job order
-                    machine1_job_order_copy = copy.deepcopy(machines_on_this_stage[machine1_index])
-                    machine2_job_order_copy = copy.deepcopy(machines_on_this_stage[machine2_index])
-                    job_order_on_machines_before_swap = copy.deepcopy(job_order_on_machines_copy)
-                    # swap the two jobs
-                    machine1_job_order_copy[swap[0]], machine2_job_order_copy[swap[1]] = machine2_job_order_copy[swap[1]], machine1_job_order_copy[swap[0]]
-                    # update the job order on job schedule
-                    job_order_on_machines_copy[completed_machines_count + machine1_index] = machine1_job_order_copy
-                    job_order_on_machines_copy[completed_machines_count + machine2_index] = machine2_job_order_copy
-                    # sort job order after swapping two jobs
-                    job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order, job_order_on_machines_copy)
-                    # calculate the objective value for this job order under the situation that other machines maintain the same job order
-                    cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
-                    if cur_objective_value < best_objective_value:
-                        best_objective_value = cur_objective_value
-                        machines_on_this_stage[machine1_index] = machine1_job_order_copy
-                        machines_on_this_stage[machine2_index] = machine2_job_order_copy
-                    else:
-                        job_order_on_machines_copy = job_order_on_machines_before_swap
-            completed_machines_count += len(machines_on_this_stage)
-        return job_order_on_machines_copy, best_objective_value
+        with open("extended/swap-2-jobs-on-same-stage/no_maint_inf_queue_time.txt", 'w') as f:
+            completed_machines_count = 0
+            for cur_stage_index, machines_on_this_stage in enumerate(all_stages_machines_job_order):
+                # if there is only one machine on this stage, we don't need to swap
+                if len(machines_on_this_stage) == 1:
+                    completed_machines_count += 1
+                    continue
+                # use combinations to generate all possible pairs of machines to swap
+                for machine1_index, machine2_index in combinations(range(len(machines_on_this_stage)), 2):
+                    # generate a list of pairs, first element is the job index on machine1, second element is the job index on machine2
+                    machine1_indexes_have_jobs = [i for i in range(len(machines_on_this_stage[machine1_index])) if machines_on_this_stage[machine1_index][i] != 'M']
+                    machine2_indexes_have_jobs = [i for i in range(len(machines_on_this_stage[machine2_index])) if machines_on_this_stage[machine2_index][i] != 'M']
+                    swaps = [[machine1_job_index, machine2_job_index] for machine1_job_index in machine1_indexes_have_jobs for machine2_job_index in machine2_indexes_have_jobs]
+                    for swap in swaps:
+                        # do a deep copy of the two machines's original job order
+                        machine1_job_order_copy = copy.deepcopy(machines_on_this_stage[machine1_index])
+                        machine2_job_order_copy = copy.deepcopy(machines_on_this_stage[machine2_index])
+                        job_order_on_machines_before_swap = copy.deepcopy(job_order_on_machines_copy)
+                        # swap the two jobs
+                        machine1_job_order_copy[swap[0]], machine2_job_order_copy[swap[1]] = machine2_job_order_copy[swap[1]], machine1_job_order_copy[swap[0]]
+                        # update the job order on job schedule
+                        job_order_on_machines_copy[completed_machines_count + machine1_index] = machine1_job_order_copy
+                        job_order_on_machines_copy[completed_machines_count + machine2_index] = machine2_job_order_copy
+                        # sort job order after swapping two jobs
+                        job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order, job_order_on_machines_copy)
+                        # calculate the objective value for this job order under the situation that other machines maintain the same job order
+                        cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
+                        f.write(f"Stage {cur_stage_index + 1}, Machine {machine1_index + 1} and Machine {machine2_index + 1}, Swap {machine1_job_order_copy[swap[0]]} and {machine2_job_order_copy[swap[1]]}, Objective Value {cur_objective_value} | ")
+                        if cur_objective_value < best_objective_value:
+                            f.write("improved!\n")
+                            best_objective_value = cur_objective_value
+                            machines_on_this_stage[machine1_index] = machine1_job_order_copy
+                            machines_on_this_stage[machine2_index] = machine2_job_order_copy
+                        else:
+                            f.write("not improved!\n")
+                            job_order_on_machines_copy = job_order_on_machines_before_swap
+                completed_machines_count += len(machines_on_this_stage)
+            return job_order_on_machines_copy, best_objective_value
                         
 
     def _sort_schedule_with_shared_job_order(self, shared_job_order: list[int], schedule: list[list]) -> list[list]:
