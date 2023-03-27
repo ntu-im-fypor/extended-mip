@@ -1,9 +1,8 @@
 import gurobipy as gp
 from gurobipy import *
 from Models import Parameters
-import xlsxwriter
 
-class RelaxedMIPModel:
+class SharedRelaxedMIPModel:
     def __init__(self, parameters: Parameters, run_time_limit=1800, mip_gap=0.01) -> None:
         self.gp_model = gp.Model("Relaxed_MIP")
         self.gp_model.Params.LogToConsole = 0
@@ -35,6 +34,12 @@ class RelaxedMIPModel:
             for m in M_i:
                 for j in self.J:
                     self.p_imj[i, m, j] = self.gp_model.addVar(vtype=GRB.CONTINUOUS, name=f'p_{i}_{m}_{j}')
+        # s_j_1j_2 = 1 if job j_1 precedes job j_2 or 0, otherwise
+        self.s = {}
+        for j in self.J:
+            for k in self.J:
+                if j != k:
+                    self.s[j, k] = self.gp_model.addVar(vtype=GRB.BINARY, name=f"s_{j}_{k}")
         # x_imj_1j_2 = 1 if job j_1 precedes job j_2 on machine m in stage i or 0, otherwise
         self.x = {}
         for i in self.I:
@@ -82,7 +87,7 @@ class RelaxedMIPModel:
             for m in M_i:
                 for j in self.J:
                     self.gp_model.addConstr(
-                        self.p_imj[i, m, j] == self.parameters.Initial_Production_Time[i - 1][m - 1][j - 1] * self.parameters.Production_Time_Discount[i - 1][m - 1]
+                        self.p_imj[i, m, j] >= self.parameters.Initial_Production_Time[i - 1][m - 1][j - 1] * self.parameters.Production_Time_Discount[i - 1][m - 1]
                     )
         # constraint9
         for i in self.I:
@@ -97,9 +102,26 @@ class RelaxedMIPModel:
             for m in M_i:
                 for j1 in self.J:
                     for j2 in self.J:
-                        if j1 != j2:
+                        if j1 < j2:
                             self.gp_model.addConstr(
                                 self.x[i, m, j1, j2] + self.x[i, m, j2, j1] >= self.r_imj[i, m, j1] + self.r_imj[i, m, j2] - 1
+                            )
+        # constraint new 1 (shared job order)
+        for j1 in self.J:
+            for j2 in self.J:
+                if j1 < j2:
+                    self.gp_model.addConstr(
+                        self.s[j1, j2] + self.s[j2, j1] == 1
+                    )
+        # constraint new 2 (follow shared job order)
+        for i in self.I:
+            M_i = self.M[i - 1]
+            for m in M_i:
+                for j1 in self.J:
+                    for j2 in self.J:
+                        if j1 != j2:
+                            self.gp_model.addConstr(
+                                self.x[i, m, j1, j2] + 2 >= self.s[j1, j2] + self.r_imj[i, m, j1] + self.r_imj[i, m, j2]
                             )
         # tardiness for each job
         for j in self.J:
@@ -118,13 +140,13 @@ class RelaxedMIPModel:
             quicksum(self.tardiness[j] * self.parameters.Tardiness_Penalty[j - 1] for j in self.J), GRB.MINIMIZE
         )
 
-    def run_and_solve(self, result_path) -> None:
+    def run_and_solve(self) -> None:
         print("Start solving relaxed...")
         # run Gurobi
         self.gp_model.optimize()
-        return self.__record_result(result_path)
+        return self.__record_result()
     
-    def __record_result(self, result_path) -> None:
+    def __record_result(self) -> None:
         # record the result
         print("Runtime: ", self.gp_model.Runtime)
         print("Best objective value: ", self.gp_model.objVal)
@@ -132,22 +154,6 @@ class RelaxedMIPModel:
         print("Best bound: ", self.gp_model.ObjBound)
         # for v in self.gp_model.getVars():
         #     print(v.varName, v.x)
-        workbook = xlsxwriter.Workbook(result_path)
-        worksheet = workbook.add_worksheet()
-        for j in self.J:
-            worksheet.write(j, 0, j)
-        for i in self.I:
-            worksheet.write(0, -2 + 3 * i, "stage" + str(i) + "_machine")
-            worksheet.write(0, -1 + 3 * i, "stage" + str(i) + "_start")
-            worksheet.write(0, 3 * i, "stage" + str(i) + "_end")
-            M_i = self.M[i - 1]
-            for m in M_i:
-                for j in self.J:
-                    if self.r_imj[i, m, j].X == 1:
-                        worksheet.write(j, -2 + 3 * i, m)
-                        worksheet.write(j, -1 + 3 * i, self.z_ij[i, j].X - self.p_imj[i, m, j].X)
-                    worksheet.write(j, 3 * i, self.z_ij[i, j].X)
-        workbook.close()
 
         return [self.gp_model.Runtime, self.gp_model.objVal, self.gp_model.ObjBound]
         # print out all decision variables
