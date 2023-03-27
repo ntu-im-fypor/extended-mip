@@ -11,14 +11,13 @@ from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMI
 def test_relaxation_result():
     result = []
     for i in range(1, 31):
-        file_path = "tests/inf_queue_0317/base_" + str(i) + ".txt"
-        # file_path = "/Users/ckocp3/Downloads/base_1105/base_" + str(i) + ".txt"
-        # result_path = "/Users/ckocp3/Downloads/base_result_1107/base_result_" + str(i) + ".txt"
+        file_path = "tests/base_0317/base_" + str(i) + ".txt"
+        result_path = "Gurobi_results/0317_base_schedule/job_time_" + str(i) + ".csv"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         # build and solve the model
         model = RelaxedMIPModel(parameters)
-        result.append(model.run_and_solve())
+        result.append(model.run_and_solve(result_path))
 
     workbook = xlsxwriter.Workbook('relaxation_result.xlsx')
     worksheet = workbook.add_worksheet()
