@@ -6,7 +6,7 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel
-# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 
 def test_relaxation_result():
     result = []
@@ -56,7 +56,7 @@ def test_heuristic_model():
         # test with base_1125
         # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
         # test with base_1130
-        file_path = "tests/no_maint_inf_queue_0317/base_" + str(i+1) + ".txt"
+        file_path = "tests/base_0328/base_" + str(i+1) + ".txt"
         # test with 學姊's benchmark
         # file_path = "tests/benchmark/benchmark_" + str(i+1) + ".txt"
         parameters = Parameters()
@@ -84,7 +84,7 @@ def test_heuristic_model():
     # test with base_1125
     # df.to_csv('greedy-results/base_1125.csv')
     # test with base_1130
-    df.to_csv('greedy-results/no_maint_inf_queue_schedule/no_maint_inf_queue_0317.csv')
+    df.to_csv('greedy-results/base_0328.csv')
     # test with 學姊's benchmark
     # df.to_csv('greedy-results/benchmark.csv')
 
@@ -104,6 +104,6 @@ def test_heuristic_model():
 
 
 if __name__ == '__main__':
-    test_relaxation_result()
-    # test_heuristic_model()
+    # test_relaxation_result()
+    test_heuristic_model()
     # run_initial_job_listing_for_GA_team()
