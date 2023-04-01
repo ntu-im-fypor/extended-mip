@@ -50,7 +50,7 @@ def test_heuristic_model():
         "process objective value", "process shared job order", "process schedule",
         "final objective value", "final shared job order", "final schedule",
         "time"])
-    for i in range(2, 3): # base_1125/base_1130: 50, 學姊's benchmark: 30
+    for i in range(0, 1): # base_1125/base_1130: 50, 學姊's benchmark: 30
         print("base_" + str(i+1))
         # test with base_1125
         # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
@@ -100,7 +100,6 @@ def test_heuristic_model():
 #         parameters.read_parameters(file_path)
 #         heuristic_model = GreedyModel(parameters, file_path=f"tests/benchmark_1203/benchmark_{i}.json")
 #         heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/benchmark_1203/benchmark_{i}.csv")
-
 
 if __name__ == '__main__':
     test_relaxation_result()
