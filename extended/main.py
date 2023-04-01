@@ -1,22 +1,22 @@
 import sys
 import time
-# import xlsxwriter
+import xlsxwriter
 import pandas as pd
 from tokenize import String
 from unittest import result
 from Models import Parameters
-from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel
-from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
+# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 
 def test_relaxation_result():
     result = []
     for i in range(1, 31):
-        file_path = "tests/base_0317/base_" + str(i) + ".txt"
-        result_path = "Gurobi_results/0317_base_schedule/job_time_" + str(i) + ".csv"
+        file_path = "tests/no_maint_inf_queue_0317/base_" + str(i) + ".txt"
+        result_path = "Gurobi_results/shared_no_maint_inf_queue_schedule/job_time_" + str(i) + ".csv"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         # build and solve the model
-        model = RelaxedMIPModel(parameters)
+        model = SharedRelaxedMIPModel(parameters)
         result.append(model.run_and_solve(result_path))
 
     workbook = xlsxwriter.Workbook('relaxation_result.xlsx')
@@ -103,6 +103,6 @@ def test_heuristic_model():
 
 
 if __name__ == '__main__':
-    # test_relaxation_result()
-    test_heuristic_model()
+    test_relaxation_result()
+    # test_heuristic_model()
     # run_initial_job_listing_for_GA_team()
