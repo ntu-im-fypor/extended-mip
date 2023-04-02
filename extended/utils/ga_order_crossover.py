@@ -21,7 +21,7 @@ def ga_order_crossover(job_order_lists) -> list:
     del job_unarranged[first_job_index]
     del job_initial_order[first_job_index]
 
-  print(new_job_order)
+  # print(new_job_order)
   return new_job_order
 
 # test
