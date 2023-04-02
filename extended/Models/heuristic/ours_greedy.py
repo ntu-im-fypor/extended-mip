@@ -84,7 +84,7 @@ class GreedyModel(SolutionModel):
             "shared_job_order": best_shared_job_order
         }
 
-        best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
+        # best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
 
         # store the best schedule
         self.final_result = {
@@ -274,6 +274,8 @@ class GreedyModel(SolutionModel):
                     shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
                     # sort job order on machines according to the new shared job order
                     job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
+                    # swap two jobs on the same stage for better performance
+                    job_order_on_machines_copy, best_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
                     # calculate the objective value for this job order under the situation that other machines maintain the same job order
                     cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
                     if cur_objective_value < best_objective_value:
@@ -350,7 +352,6 @@ class GreedyModel(SolutionModel):
                             job_order_on_machines_copy = job_order_on_machines_before_swap
                 completed_machines_count += len(machines_on_this_stage)
             return job_order_on_machines_copy, best_objective_value
-                        
 
     def _sort_schedule_with_shared_job_order(self, shared_job_order: list[int], schedule: list[list]) -> list[list]:
         """

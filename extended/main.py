@@ -6,12 +6,12 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
-# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 
 def test_relaxation_result():
     result = []
     for i in range(1, 31):
-        file_path = "tests/no_maint_inf_queue_0317/base_" + str(i) + ".txt"
+        file_path = "extended/tests/no_maint_inf_queue_0317/base_" + str(i) + ".txt"
         result_path = "Gurobi_results/shared_no_maint_inf_queue_schedule/job_time_" + str(i) + ".csv"
         parameters = Parameters()
         parameters.read_parameters(file_path)
@@ -50,12 +50,12 @@ def test_heuristic_model():
         "process objective value", "process shared job order", "process schedule",
         "final objective value", "final shared job order", "final schedule",
         "time"])
-    for i in range(0, 1): # base_1125/base_1130: 50, 學姊's benchmark: 30
+    for i in range(30): # base_1125/base_1130: 50, 學姊's benchmark: 30
         print("base_" + str(i+1))
         # test with base_1125
         # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
         # test with base_1130
-        file_path = "tests/base_0328/base_" + str(i+1) + ".txt"
+        file_path = "extended/tests/no_maint_inf_queue_0317/base_" + str(i+1) + ".txt"
         # test with 學姊's benchmark
         # file_path = "tests/benchmark/benchmark_" + str(i+1) + ".txt"
         parameters = Parameters()
@@ -67,7 +67,7 @@ def test_heuristic_model():
         elif model_type == "2":
             heuristic_model = MetaGAModel(parameters)
         elif model_type == "3":
-            heuristic_model = GreedyModel(parameters, file_path="greedy-results/test.json", instance_num=i+1)
+            heuristic_model = GreedyModel(parameters, file_path="extended/greedy-results/test.json", instance_num=i+1)
         elif model_type == "4":
             heuristic_model = CompleteMIPModel(parameters)
         else:
@@ -83,7 +83,7 @@ def test_heuristic_model():
     # test with base_1125
     # df.to_csv('greedy-results/base_1125.csv')
     # test with base_1130
-    df.to_csv('greedy-results/base_0328.csv')
+    df.to_csv('extended/greedy-results/no_maint_inf_queue_0317_test_in_0402.csv')
     # test with 學姊's benchmark
     # df.to_csv('greedy-results/benchmark.csv')
 
@@ -102,6 +102,6 @@ def test_heuristic_model():
 #         heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/benchmark_1203/benchmark_{i}.csv")
 
 if __name__ == '__main__':
-    test_relaxation_result()
-    # test_heuristic_model()
+    # test_relaxation_result()
+    test_heuristic_model()
     # run_initial_job_listing_for_GA_team()
