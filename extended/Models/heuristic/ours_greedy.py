@@ -9,7 +9,7 @@ import pandas as pd
 import copy
 
 class GreedyModel(SolutionModel):
-    def __init__(self, parameters: Parameters, maintenance_choice_percentage: float = 0.5, file_path: str = None, instance_num: int = 0):
+    def __init__(self, parameters: Parameters, use_gurobi_order = False, maintenance_choice_percentage: float = 0.5, file_path: str = None, instance_num: int = 0):
         """
         Initialize the model with the parameters and the maintenance choice percentage
         #### Parameters
@@ -21,6 +21,7 @@ class GreedyModel(SolutionModel):
         if file_path is None:
             print("No file path specified!")
             return
+        self.use_gurobi_order = use_gurobi_order
         self.file_path = file_path
         self.maintenance_choice_percentage = maintenance_choice_percentage
         self.instance_num = instance_num
@@ -34,7 +35,12 @@ class GreedyModel(SolutionModel):
         # run initial job listing with maintenance
         initial_job_listing = self.generate_initial_job_listing()
         # get the shared job order for the initial job listing
-        initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
+        initial_shared_job_order = list[int]
+        if self.use_gurobi_order:
+            initial_shared_job_order = utils.get_shared_job_order_from_Gurobi(self.instance_num)
+            initial_job_listing = self._sort_schedule_with_shared_job_order(initial_shared_job_order, initial_job_listing)
+        else:
+            initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
         # start to consider the best maintenance position for each machine
         initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order, np.inf)
         print(f"Initial Objective Value: {initial_best_objective_value}")
