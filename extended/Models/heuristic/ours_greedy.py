@@ -38,6 +38,7 @@ class GreedyModel(SolutionModel):
         initial_shared_job_order = list[int]
         if self.use_gurobi_order:
             initial_shared_job_order = utils.get_shared_job_order_from_Gurobi(self.instance_num)
+            initial_job_listing = self._sort_schedule_with_shared_job_order(initial_shared_job_order, initial_job_listing)
         else:
             initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
         # start to consider the best maintenance position for each machine
