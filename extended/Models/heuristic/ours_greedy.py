@@ -188,7 +188,10 @@ class GreedyModel(SolutionModel):
         current_job_priority = {}
         current_jobs_info = []
         for k in range(self.parameters.Number_of_Jobs):
-            current_jobs_info.append((k, self.WEDD_list[k]))
+            # original version with pure WEDD
+            # current_jobs_info.append((k, self.WEDD_list[k]))
+            # new version with WEDD/first stage production time
+            current_jobs_info.append((k, self.WEDD_list[k]/min(self.real_production_time_matrix, key=lambda x: x[k])))
         # sort the current jobs info by the WEDD
         current_jobs_info.sort(key=lambda x: x[1]) # first shared job order is sorted by WEDD, the lower the WEDD, the higher the priority
         # keep this information in a dictionary
