@@ -62,7 +62,7 @@ def test_heuristic_model():
         parameters = Parameters()
         parameters.read_parameters(file_path)
         start_time = time.time()
-        heuristic_model = GreedyModel(parameters, False, file_path="extended/greedy-results/test.json", instance_num=i+1)
+        heuristic_model = GreedyModel(parameters, True, file_path="extended/greedy-results/test.json", instance_num=i+1)
 
         heuristic_model.run_and_solve()
         df = heuristic_model.record_result(df, i)
@@ -73,7 +73,7 @@ def test_heuristic_model():
     # test with base_1125
     # df.to_csv('greedy-results/base_1125.csv')
     # test with base_1130
-    df.to_csv('greedy-results/no_maint_inf_queue_0404.csv')
+    df.to_csv('extended/greedy-results/no-maint-inf-queue-results/merge-step3-step2/no_maint_inf_queue_0406.csv')
     # test with 學姊's benchmark
     # df.to_csv('greedy-results/benchmark.csv')
 
