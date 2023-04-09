@@ -50,7 +50,7 @@ def test_heuristic_model():
         "process objective value", "process shared job order", "process schedule",
         "final objective value", "final shared job order", "final schedule",
         "time"])
-    for i in range(5): # base_1125/base_1130: 50, 學姊's benchmark: 30
+    for i in range(30): # base_1125/base_1130: 50, 學姊's benchmark: 30
         print("base_" + str(i+1))
         # test with base_1125
         # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
@@ -75,7 +75,7 @@ def test_heuristic_model():
     # test with base_1125
     # df.to_csv('greedy-results/base_1125.csv')
     # test with base_1130
-    df.to_csv('extended/greedy-results/no-maint-inf-queue-results/no_maint_inf_queue_0411_1.csv')
+    df.to_csv('extended/greedy-results/no-maint-inf-queue-results/no_maint_inf_queue_0411_4.csv')
     # test with 學姊's benchmark
     # df.to_csv('greedy-results/benchmark.csv')
 
