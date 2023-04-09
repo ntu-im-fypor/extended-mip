@@ -50,7 +50,7 @@ def test_heuristic_model():
         "process objective value", "process shared job order", "process schedule",
         "final objective value", "final shared job order", "final schedule",
         "time"])
-    for i in range(30): # base_1125/base_1130: 50, 學姊's benchmark: 30
+    for i in range(5): # base_1125/base_1130: 50, 學姊's benchmark: 30
         print("base_" + str(i+1))
         # test with base_1125
         # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
@@ -64,7 +64,7 @@ def test_heuristic_model():
         start_time = time.time()
         # 1st T/F: use gurobi job order as initial job order
         # 2nd T/F: use ga after greedy
-        heuristic_model = GreedyModel(parameters, False, False, file_path="extended/greedy-results/test.json", instance_num=i+1)
+        heuristic_model = GreedyModel(parameters, False, True, file_path="extended/greedy-results/test.json", instance_num=i+1)
         
         heuristic_model.run_and_solve()
         df = heuristic_model.record_result(df, i)

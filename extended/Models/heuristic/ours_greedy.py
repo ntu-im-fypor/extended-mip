@@ -113,12 +113,8 @@ class GreedyModel(SolutionModel):
                 }
                 ga_pop.append(pop)
             # find the current worst objective value
-            current_worst_value = ga_pop[0]["objective_value"]
-            current_worst_index = 0
-            for i in range(len(ga_pop)):
-                if ga_pop[i]["objective_value"] > current_worst_value:
-                    current_worst_value = ga_pop[i]["objective_value"]
-                    current_worst_index = i
+            current_worst_index = max(range(len(ga_pop)), key=lambda i: ga_pop[i]['objective_value'])
+            current_worst_value = ga_pop[current_worst_index]["objective_value"]
             # run ga for 50 iterations
             for i in range(50):
                 # random choose two in the population to be parents for crossover
@@ -126,9 +122,7 @@ class GreedyModel(SolutionModel):
                 r2 = random.randint(0, 29)
                 while r2 == r1:
                     r2 = random.randint(0, 29)
-                parent = []
-                parent.append(ga_pop[r1]["shared_job_order"])
-                parent.append(ga_pop[r2]["shared_job_order"])
+                parent = [ga_pop[r1]["shared_job_order"], ga_pop[r2]["shared_job_order"]]
                 child = ga_order_crossover(parent)
                 for j in range(len(child)):
                     tmp_job_listing = self.generate_initial_job_listing(child[j])
@@ -142,19 +136,11 @@ class GreedyModel(SolutionModel):
                         }
                         ga_pop.append(pop)
                         # update the current worst objective value
-                        current_worst_value = ga_pop[0]["objective_value"]
-                        current_worst_index = 0
-                        for k in range(len(ga_pop)):
-                            if ga_pop[k]["objective_value"] > current_worst_value:
-                                current_worst_value = ga_pop[k]["objective_value"]
-                                current_worst_index = k
+                        current_worst_index = max(range(len(ga_pop)), key=lambda k: ga_pop[k]['objective_value'])
+                        current_worst_value = ga_pop[current_worst_index]["objective_value"]
             # find best objective value and compare with the objective value before ga
-            current_best_value = ga_pop[0]["objective_value"]
-            current_best_index = 0
-            for i in range(len(ga_pop)):
-                if ga_pop[i]["objective_value"] < current_best_value:
-                    current_best_value = ga_pop[i]["objective_value"]
-                    current_best_index = i
+            current_best_index = min(range(len(ga_pop)), key=lambda k: ga_pop[k]['objective_value'])
+            current_best_value = ga_pop[current_best_index]["objective_value"]
             if current_best_value < best_objective_value:
                 best_objective_value = ga_pop[current_best_index]["objective_value"]
                 best_shared_job_order = ga_pop[current_best_index]["shared_job_order"]
