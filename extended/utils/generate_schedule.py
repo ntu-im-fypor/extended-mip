@@ -195,8 +195,8 @@ def generate_schedule(shared_job_order, order_on_machines, instance, instance_nu
             current_machine_time[current_job_machines[j]] = current_job_time[j][1]
         current_end_time[shared_job_order[i]-1] = current_job_time[instance.STAGES_NUMBER-1][1]
     obj = compute_tardiness(current_end_time, instance)
-    if obj < best_objective_value:
-        job_df.to_csv('extended/greedy-results/no_maint_inf_queue_schedule/job_time_' + str(instance_num) + '.csv')
+    # if obj < best_objective_value:
+    #     job_df.to_csv('extended/greedy-results/no_maint_inf_queue_schedule/job_time_' + str(instance_num) + '.csv')
     return obj
 
 

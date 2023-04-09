@@ -3,13 +3,16 @@ import json
 from Models import Parameters, SolutionModel
 from utils.common import cast_parameters_to_instance
 from utils.generate_schedule import generate_schedule
+from utils.ga_order_gen_pop import ga_order_gen_pop
+from utils.ga_order_crossover import ga_order_crossover
 import utils.ours_utils as utils
 import numpy as np
 import pandas as pd
 import copy
+import random
 
 class GreedyModel(SolutionModel):
-    def __init__(self, parameters: Parameters, use_gurobi_order = False, maintenance_choice_percentage: float = 0.5, file_path: str = None, instance_num: int = 0):
+    def __init__(self, parameters: Parameters, use_gurobi_order = False, use_ga = False, maintenance_choice_percentage: float = 0.5, file_path: str = None, instance_num: int = 0):
         """
         Initialize the model with the parameters and the maintenance choice percentage
         #### Parameters
@@ -22,6 +25,7 @@ class GreedyModel(SolutionModel):
             print("No file path specified!")
             return
         self.use_gurobi_order = use_gurobi_order
+        self.use_ga = use_ga
         self.file_path = file_path
         self.maintenance_choice_percentage = maintenance_choice_percentage
         self.instance_num = instance_num
@@ -48,7 +52,7 @@ class GreedyModel(SolutionModel):
         print(f"Initial Schedule: {initial_job_schedule}")
         print("=====")
 
-        # store the initial results for final reference (after swapping shared job order)
+        # store the initial results for final reference (before swapping shared job order)
         self.initial_result = {
             "schedule": initial_job_schedule,
             "objective_value": initial_best_objective_value,
@@ -78,9 +82,9 @@ class GreedyModel(SolutionModel):
                 has_improved = False
             if not has_improved:
                 break
-        print(f"Objective Value: {best_objective_value}")
-        print(f"Shared Job Order: {best_shared_job_order}")
-        print(f"Schedule: {best_job_schedule}")
+        print(f"Swap Order Objective Value: {best_objective_value}")
+        print(f"Swap Order Shared Job Order: {best_shared_job_order}")
+        print(f"Swap Order Schedule: {best_job_schedule}")
         print("=====")
 
         # store the current results for final reference (after swapping shared job order)
@@ -91,6 +95,77 @@ class GreedyModel(SolutionModel):
         }
 
         # best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
+
+        # run ga after heuristic, using WEDD job order, best job order by heuristic, and a randomly generated population
+        if self.use_ga:
+            # generate initial population
+            ga_int_pop = ga_order_gen_pop(self.parameters.Number_of_Jobs, self.initial_result['shared_job_order'], self.process_result['shared_job_order'])
+            # list of dictionaries, with schedule, objective_value, shared_job_order
+            ga_pop = []
+            # calculate and record objective value of each order
+            for i in range(len(ga_int_pop)):
+                job_listing = self.generate_initial_job_listing(ga_int_pop[i])
+                job_schedule, objective_value = self._decide_best_maintenance_position(job_listing, ga_int_pop[i], np.inf)
+                pop = {
+                    "schedule": job_schedule,
+                    "objective_value": objective_value,
+                    "shared_job_order": ga_int_pop[i]
+                }
+                ga_pop.append(pop)
+            # find the current worst objective value
+            current_worst_value = ga_pop[0]["objective_value"]
+            current_worst_index = 0
+            for i in range(len(ga_pop)):
+                if ga_pop[i]["objective_value"] > current_worst_value:
+                    current_worst_value = ga_pop[i]["objective_value"]
+                    current_worst_index = i
+            # run ga for 50 iterations
+            for i in range(50):
+                # random choose two in the population to be parents for crossover
+                r1 = random.randint(0, 29)
+                r2 = random.randint(0, 29)
+                while r2 == r1:
+                    r2 = random.randint(0, 29)
+                parent = []
+                parent.append(ga_pop[r1]["shared_job_order"])
+                parent.append(ga_pop[r2]["shared_job_order"])
+                child = ga_order_crossover(parent)
+                for j in range(len(child)):
+                    tmp_job_listing = self.generate_initial_job_listing(child[j])
+                    tmp_job_schedule, tmp_objective_value = self._decide_best_maintenance_position(tmp_job_listing, child[j], np.inf)
+                    if tmp_objective_value > current_worst_value:
+                        del ga_pop[current_worst_index]
+                        pop = {
+                            "schedule": tmp_job_schedule,
+                            "objective_value": tmp_objective_value,
+                            "shared_job_order": child[j]
+                        }
+                        ga_pop.append(pop)
+                        # update the current worst objective value
+                        current_worst_value = ga_pop[0]["objective_value"]
+                        current_worst_index = 0
+                        for k in range(len(ga_pop)):
+                            if ga_pop[k]["objective_value"] > current_worst_value:
+                                current_worst_value = ga_pop[k]["objective_value"]
+                                current_worst_index = k
+            # find best objective value and compare with the objective value before ga
+            current_best_value = ga_pop[0]["objective_value"]
+            current_best_index = 0
+            for i in range(len(ga_pop)):
+                if ga_pop[i]["objective_value"] < current_best_value:
+                    current_best_value = ga_pop[i]["objective_value"]
+                    current_best_index = i
+            if current_best_value < best_objective_value:
+                best_objective_value = ga_pop[current_best_index]["objective_value"]
+                best_shared_job_order = ga_pop[current_best_index]["shared_job_order"]
+                best_job_schedule = ga_pop[current_best_index]["schedule"]
+                print(f"GA Objective Value: {best_objective_value}")
+                print(f"GA Shared Job Order: {best_shared_job_order}")
+                print(f"GA Schedule: {best_job_schedule}")
+                print("=====")
+            else:
+                print("Used GA but no improvement:(")
+                print("=====")
 
         # store the best schedule
         self.final_result = {
