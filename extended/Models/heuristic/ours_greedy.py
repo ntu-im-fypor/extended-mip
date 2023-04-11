@@ -127,7 +127,7 @@ class GreedyModel(SolutionModel):
                 for j in range(len(child)):
                     tmp_job_listing = self.generate_initial_job_listing(child[j])
                     tmp_job_schedule, tmp_objective_value = self._decide_best_maintenance_position(tmp_job_listing, child[j], np.inf)
-                    if tmp_objective_value > current_worst_value:
+                    if tmp_objective_value < current_worst_value:
                         del ga_pop[current_worst_index]
                         pop = {
                             "schedule": tmp_job_schedule,
