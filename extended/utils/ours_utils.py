@@ -69,8 +69,8 @@ def get_WEDD_list(parameters: Parameters):
     """
     WEDD_list = np.zeros(parameters.Number_of_Jobs)
     for k in range(parameters.Number_of_Jobs):
-        # WEDD_list[k] = parameters.Due_Time[k] / parameters.Tardiness_Penalty[k]
-        WEDD_list[k] = (parameters.Due_Time[k] / parameters.Tardiness_Penalty[k]) * min(sublist[k] for sublist in parameters.Initial_Production_Time[0])
+        WEDD_list[k] = parameters.Due_Time[k] / parameters.Tardiness_Penalty[k]
+        # WEDD_list[k] = (parameters.Due_Time[k] / parameters.Tardiness_Penalty[k]) * min(sublist[k] for sublist in parameters.Initial_Production_Time[0])
     return WEDD_list
 
 def get_average_machine_time_for_each_stage(parameters: Parameters, production_time_matrix: np.ndarray, method_choice: int, sensitive_denominator: float) -> np.ndarray:
