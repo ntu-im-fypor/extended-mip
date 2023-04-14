@@ -98,7 +98,7 @@ class Create:
 
     def run(self, instance_num=10, start_instance_num=1):
         folder_name = 'tests/'
-        path = folder_name + 'base_0328'
+        path = folder_name + 'due_time_02_0418'
         print(f'scenario: {self.file}')
         if not os.path.isdir(path):
             os.makedirs(path)
@@ -143,7 +143,7 @@ class Create:
 
 
 factors = {
-    'init_prod_time': [[50, 75], [50, 75]],
+    'init_prod_time': [[5, 30], [5, 30]],
     'prod_discount': [0.8, 0.9],
     'weight': {'L': [1, 1], 'M': [0.8, 1.2], 'H': [0.6, 1.4]},
     'due_time': {'L': 0.4, 'M': 0.6, 'H': 0.8, 'sig_ratio': 0.25},
