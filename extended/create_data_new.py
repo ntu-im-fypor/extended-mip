@@ -98,7 +98,7 @@ class Create:
 
     def run(self, instance_num=10, start_instance_num=1):
         folder_name = 'tests/'
-        path = folder_name + 'single_machine_0418'
+        path = folder_name + 'due_time_02_0418'
         print(f'scenario: {self.file}')
         if not os.path.isdir(path):
             os.makedirs(path)
