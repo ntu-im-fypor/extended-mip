@@ -1256,3 +1256,10 @@ best obj value: [21.39104062948826] shared job order: [6, 7, 5, 9, 8, 10, 2, 4, 
 best obj value: [19.7038322167882] shared job order: [6, 7, 5, 9, 8, 3, 2, 4, 10, 1]; objective value: 13.902834955357678
 best obj value: [13.902834955357678] shared job order: [6, 7, 5, 9, 8, 3, 2, 10, 4, 1]; objective value: 13.14851133893768
 best obj value: [34.86606299154302] shared job order: [8, 3, 6, 10, 4, 5, 9, 7, 2, 1]; objective value: 32.92383237625143
+best obj value: [198.777707186489] shared job order: [7, 6, 1, 9, 10, 2, 4, 3, 5, 8]; objective value: 197.07472556621906
+best obj value: [196.9985241117326] shared job order: [7, 6, 3, 1, 9, 2, 5, 4, 10, 8]; objective value: 190.27259415392865
+best obj value: [190.27259415392865] shared job order: [7, 9, 3, 1, 6, 2, 5, 4, 10, 8]; objective value: 173.89119091260835
+best obj value: [206.0823860566514] shared job order: [3, 7, 1, 2, 8, 5, 6, 10, 4, 9]; objective value: 204.42945183805955
+best obj value: [204.42945183805955] shared job order: [3, 7, 1, 5, 8, 2, 6, 10, 4, 9]; objective value: 200.0846592247214
+best obj value: [277.8564989514092] shared job order: [1, 7, 6, 3, 10, 2, 8, 5, 4, 9]; objective value: 277.6898002619461
+best obj value: [268.1067898287082] shared job order: [1, 7, 6, 3, 2, 10, 8, 5, 4, 9]; objective value: 267.85643398325385

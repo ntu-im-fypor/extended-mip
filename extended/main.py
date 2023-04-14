@@ -55,7 +55,7 @@ def test_heuristic_model():
         # test with base_1125
         # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
         # test with base_1130
-        file_path = "extended/tests/due_time_large_0418/base_" + str(i+1) + ".txt"
+        file_path = "extended/tests/due_time_02_0418/base_" + str(i+1) + ".txt"
         # test with 學姊's benchmark
         # file_path = "tests/benchmark/benchmark_" + str(i+1) + ".txt"
         parameters = Parameters()
@@ -74,7 +74,7 @@ def test_heuristic_model():
     # test with base_1125
     # df.to_csv('greedy-results/base_1125.csv')
     # test with base_1130
-    df.to_csv('extended/greedy-results/due_time_large_0418.csv')
+    df.to_csv('extended/greedy-results/due_time_02_0418.csv')
     # test with 學姊's benchmark
     # df.to_csv('greedy-results/benchmark.csv')
 
