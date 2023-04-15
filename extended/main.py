@@ -6,21 +6,21 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
-from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
-from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 
 def test_relaxation_result():
     result = []
     for i in range(1, 31):
-        file_path = "extended/tests/no_maint_inf_queue_0317/base_" + str(i) + ".txt"
-        result_path = "Gurobi_results/shared_no_maint_inf_queue_schedule/job_time_" + str(i) + ".csv"
+        file_path = "tests/single_machine_0418/base_" + str(i) + ".txt"
+        result_path = "Gurobi_results/single_machine_0418/job_time_" + str(i) + ".csv"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         # build and solve the model
-        model = SharedRelaxedMIPModel(parameters)
+        model = RelaxedMIPModel(parameters)
         result.append(model.run_and_solve(result_path))
 
-    workbook = xlsxwriter.Workbook('relaxation_result.xlsx')
+    workbook = xlsxwriter.Workbook('Gurobi_results/single_machine_0418_result.xlsx')
     worksheet = workbook.add_worksheet()
     for i in range(1, 31):
         # write operation perform
@@ -93,6 +93,6 @@ def test_heuristic_model():
 #         heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/benchmark_1203/benchmark_{i}.csv")
 
 if __name__ == '__main__':
-    # test_relaxation_result()
-    test_heuristic_model()
+    test_relaxation_result()
+    # test_heuristic_model()
     # run_initial_job_listing_for_GA_team()
