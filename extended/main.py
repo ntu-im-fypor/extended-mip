@@ -6,20 +6,21 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
-from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 
 def test_relaxation_result():
     result = []
     for i in range(1, 31):
-        file_path = "tests/no_maint_inf_queue_0317/base_" + str(i) + ".txt"
-        result_path = "Gurobi_results/shared_no_maint_inf_queue_schedule/job_time_" + str(i) + ".csv"
+        file_path = "tests/single_machine_0418/base_" + str(i) + ".txt"
+        result_path = "Gurobi_results/single_machine_0418/job_time_" + str(i) + ".csv"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         # build and solve the model
-        model = SharedRelaxedMIPModel(parameters)
+        model = RelaxedMIPModel(parameters)
         result.append(model.run_and_solve(result_path))
 
-    workbook = xlsxwriter.Workbook('relaxation_result.xlsx')
+    workbook = xlsxwriter.Workbook('Gurobi_results/single_machine_0418_result.xlsx')
     worksheet = workbook.add_worksheet()
     for i in range(1, 31):
         # write operation perform
@@ -49,19 +50,21 @@ def test_heuristic_model():
         "process objective value", "process shared job order", "process schedule",
         "final objective value", "final shared job order", "final schedule",
         "time"])
-    for i in range(0, 1): # base_1125/base_1130: 50, 學姊's benchmark: 30
+    for i in range(30): # base_1125/base_1130: 50, 學姊's benchmark: 30
         print("base_" + str(i+1))
         # test with base_1125
         # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
         # test with base_1130
-        file_path = "extended/tests/no_maint_inf_queue_0317/base_" + str(i+1) + ".txt"
+        file_path = "extended/tests/due_time_02_long_prod_0418/base_" + str(i+1) + ".txt"
         # test with 學姊's benchmark
         # file_path = "tests/benchmark/benchmark_" + str(i+1) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         start_time = time.time()
-        heuristic_model = GreedyModel(parameters, False, file_path="greedy-results/test.json", instance_num=i+1)
-
+        # 1st T/F: use gurobi job order as initial job order
+        # 2nd T/F: use ga after greedy
+        heuristic_model = GreedyModel(parameters, False, False, file_path="extended/greedy-results/test.json", instance_num=i+1)
+        
         heuristic_model.run_and_solve()
         df = heuristic_model.record_result(df, i)
         run_time = time.time() - start_time
@@ -71,7 +74,7 @@ def test_heuristic_model():
     # test with base_1125
     # df.to_csv('greedy-results/base_1125.csv')
     # test with base_1130
-    df.to_csv('greedy-results/no_maint_inf_queue_0404.csv')
+    df.to_csv('extended/greedy-results/due_time_02_long_prod_0418.csv')
     # test with 學姊's benchmark
     # df.to_csv('greedy-results/benchmark.csv')
 
@@ -90,6 +93,6 @@ def test_heuristic_model():
 #         heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/benchmark_1203/benchmark_{i}.csv")
 
 if __name__ == '__main__':
-    # test_relaxation_result()
-    test_heuristic_model()
+    test_relaxation_result()
+    # test_heuristic_model()
     # run_initial_job_listing_for_GA_team()
