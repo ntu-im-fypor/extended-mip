@@ -12,7 +12,7 @@ import copy
 import random
 
 class GreedyModel(SolutionModel):
-    def __init__(self, parameters: Parameters, use_gurobi_order = False, maintenance_choice_percentage: float = 0.5, file_path: str = None, instance_num: int = 0, job_weight_choice: str = "WEDD"):
+    def __init__(self, parameters: Parameters, use_gurobi_order = False, use_ga = False, maintenance_choice_percentage: float = 0.5, file_path: str = None, instance_num: int = 0, job_weight_choice: str = "WEDD"):
         """
         Initialize the model with the parameters and the maintenance choice percentage
         #### Parameters
@@ -173,7 +173,7 @@ class GreedyModel(SolutionModel):
         elif self.job_weight_choice == "EDD":
             self.job_weight_list = utils.get_EDD_list(self.parameters)
         elif self.job_weight_choice == "SPT":
-            self.job_weight_list = utils.get_SPT_list(self.parameters)
+            self.job_weight_list = utils.get_SPT_list(self.parameters, self.real_production_time_matrix)
         # self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix, 0, 1)
         self.average_machine_time_for_each_stage = np.zeros(self.parameters.Number_of_Stages)
     def generate_initial_job_listing(self, shared_job_order: list[int] = None) -> list[list]:
@@ -263,10 +263,7 @@ class GreedyModel(SolutionModel):
         current_job_priority = {}
         current_jobs_info = []
         for k in range(self.parameters.Number_of_Jobs):
-            # original version with pure WEDD
-            # current_jobs_info.append((k, self.WEDD_list[k]))
-            # new version with WEDD/first stage production time
-            current_jobs_info.append((k, self.job_weight_list[k]*min(self.real_production_time_matrix, key=lambda x: x[k])))
+            current_jobs_info.append((k, self.job_weight_list[k]))
         # sort the current jobs info by the WEDD
         current_jobs_info.sort(key=lambda x: x[1]) # first shared job order is sorted by WEDD, the lower the WEDD, the higher the priority
         # keep this information in a dictionary
