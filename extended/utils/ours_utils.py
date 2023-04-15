@@ -72,6 +72,28 @@ def get_WEDD_list(parameters: Parameters):
         WEDD_list[k] = parameters.Due_Time[k] / parameters.Tardiness_Penalty[k]
     return WEDD_list
 
+def get_EDD_list(parameters: Parameters):
+    """
+    Get the EDD list for each job
+    EDD = due time of the job
+
+    return a 1d array of shape `Number_of_Jobs`
+    every element is the EDD for that job
+    """
+    EDD_list = np.zeros(parameters.Number_of_Jobs)
+    for k in range(parameters.Number_of_Jobs):
+        EDD_list[k] = parameters.Due_Time[k]
+    return EDD_list
+
+def get_SPT_list(parameters: Parameters, production_time_matrix: np.ndarray):
+    """
+    Get the SPT list for each job
+    SPT = shortest production time of the job on stage 1
+    """
+    SPT_list = np.zeros(parameters.Number_of_Jobs)
+    for k in range(parameters.Number_of_Jobs):
+        SPT_list[k] = np.min(production_time_matrix[0][:, k])
+    return SPT_list
 def get_average_machine_time_for_each_stage(parameters: Parameters, production_time_matrix: np.ndarray, method_choice: int, sensitive_denominator: float) -> np.ndarray:
     """
     Get the average machine time for each stage\n
@@ -126,15 +148,15 @@ def get_average_machine_time_for_each_stage(parameters: Parameters, production_t
 
     return average_machine_time
 
-def get_shared_job_order_from_WEDD_list(WEDD_list):
+def get_shared_job_order(weight_list):
     """
-    Get the shared job order from the WEDD list\n
+    Get the shared job order from the weight list, the weight list can be WEDD, EDD, SPT.
     Return a 1d array of shape `Number_of_Jobs`, every element is the job index, the job index starts from 1
     """
     job_order = []
-    for job_index in range(1, len(WEDD_list) + 1):
+    for job_index in range(1, len(weight_list) + 1):
         job_order.append(job_index)
-    job_order.sort(key=lambda x: WEDD_list[x - 1]) 
+    job_order.sort(key=lambda x: weight_list[x - 1]) 
     return job_order
 
 def get_shared_job_order_from_Gurobi(instance_num: int) -> list[int]:
