@@ -99,7 +99,7 @@ class GreedyModel(SolutionModel):
         # run ga after heuristic, using WEDD job order, best job order by heuristic, and a randomly generated population
         if self.use_ga:
             population_num = 30
-            pick_pop_method = 1 # 1 if weight is [pop_num, pop_num - 1, ..., 1] and 2 if weight is the objective value
+            pick_pop_method = 2 # 1 if weight is [pop_num, pop_num - 1, ..., 1] and 2 if weight is the objective value
             # generate initial population
             ga_int_pop = ga_order_gen_pop(self.parameters.Number_of_Jobs, self.initial_result['shared_job_order'], self.process_result['shared_job_order'], population_num)
             # list of dictionaries, with schedule, objective_value, shared_job_order
@@ -128,7 +128,7 @@ class GreedyModel(SolutionModel):
                 r2 = random.choices(list(range(population_num)), weights=weight_list, k=1)
                 while r2 == r1:
                     r2 = random.choices(list(range(population_num)), weights=weight_list, k=1)
-                parent = [ga_pop[r1]["shared_job_order"], ga_pop[r2]["shared_job_order"]]
+                parent = [ga_pop[r1[0]]["shared_job_order"], ga_pop[r2[0]]["shared_job_order"]]
                 child = ga_order_crossover(parent)
                 for j in range(len(child)):
                     tmp_job_listing = self.generate_initial_job_listing(child[j])
