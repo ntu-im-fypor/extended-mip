@@ -126,7 +126,7 @@ class GreedyModel(SolutionModel):
                     weight_list = [x+1 for x in list(range(population_num))]
                     weight_list.reverse()
                 elif pick_pop_method == 2:
-                    weight_list = [x["objective_value"] for x in ga_pop]
+                    weight_list = [1 / x["objective_value"] for x in ga_pop]
                 r1 = random.choices(list(range(population_num)), weights=weight_list, k=1)
                 r2 = random.choices(list(range(population_num)), weights=weight_list, k=1)
                 while r2 == r1:
