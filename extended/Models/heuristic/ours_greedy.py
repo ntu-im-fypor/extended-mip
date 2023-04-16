@@ -12,13 +12,15 @@ import copy
 import random
 
 class GreedyModel(SolutionModel):
-    def __init__(self, parameters: Parameters, use_gurobi_order = False, use_ga = False, maintenance_choice_percentage: float = 0.5, file_path: str = None, instance_num: int = 0):
+    def __init__(self, parameters: Parameters, use_gurobi_order = False, use_ga = False, maintenance_choice_percentage: float = 0.5, file_path: str = None, instance_num: int = 0, job_weight_choice: str = "WEDD"):
         """
         Initialize the model with the parameters and the maintenance choice percentage
         #### Parameters
         - `parameters`: the parameters of the problem
         - `maintenance_choice_percentage`: the percentage of the maintenance choice, that is, after calculating maintenance benefit, we choose first `maintenance_choice_percentage` of the machines to do maintenance
         - `file_path`: the file path to store the result
+        - `instance_num`: the instance number of the problem
+        - `job_weight_choice`: the choice of the job weight method, can be "WEDD", "EDD", or "SPT"
         """
         super().__init__(parameters)
         if file_path is None:
@@ -29,6 +31,7 @@ class GreedyModel(SolutionModel):
         self.file_path = file_path
         self.maintenance_choice_percentage = maintenance_choice_percentage
         self.instance_num = instance_num
+        self.job_weight_choice = job_weight_choice
 
     def run_and_solve(self):
         """
@@ -44,7 +47,7 @@ class GreedyModel(SolutionModel):
             initial_shared_job_order = utils.get_shared_job_order_from_Gurobi(self.instance_num)
             initial_job_listing = self._sort_schedule_with_shared_job_order(initial_shared_job_order, initial_job_listing)
         else:
-            initial_shared_job_order = utils.get_shared_job_order_from_WEDD_list(self.WEDD_list)
+            initial_shared_job_order = utils.get_shared_job_order(self.job_weight_list)
         # start to consider the best maintenance position for each machine
         initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order, np.inf)
         print(f"Initial Objective Value: {initial_best_objective_value}")
@@ -165,7 +168,12 @@ class GreedyModel(SolutionModel):
         """
         self.maintenance_choice = utils.get_maintenance_choice(self.parameters, self.maintenance_choice_percentage)
         self.real_production_time_matrix = utils.get_real_production_time_matrix(self.parameters, self.maintenance_choice)
-        self.WEDD_list = utils.get_WEDD_list(self.parameters)
+        if self.job_weight_choice == "WEDD":
+            self.job_weight_list = utils.get_WEDD_list(self.parameters)
+        elif self.job_weight_choice == "EDD":
+            self.job_weight_list = utils.get_EDD_list(self.parameters)
+        elif self.job_weight_choice == "SPT":
+            self.job_weight_list = utils.get_SPT_list(self.parameters, self.real_production_time_matrix)
         # self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix, 0, 1)
         self.average_machine_time_for_each_stage = np.zeros(self.parameters.Number_of_Stages)
     def generate_initial_job_listing(self, shared_job_order: list[int] = None) -> list[list]:
@@ -255,7 +263,7 @@ class GreedyModel(SolutionModel):
         current_job_priority = {}
         current_jobs_info = []
         for k in range(self.parameters.Number_of_Jobs):
-            current_jobs_info.append((k, self.WEDD_list[k]))
+            current_jobs_info.append((k, self.job_weight_list[k]))
         # sort the current jobs info by the WEDD
         current_jobs_info.sort(key=lambda x: x[1]) # first shared job order is sorted by WEDD, the lower the WEDD, the higher the priority
         # keep this information in a dictionary
