@@ -12,15 +12,15 @@ from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMI
 def test_relaxation_result():
     result = []
     for i in range(1, 31):
-        file_path = "tests/single_machine_0418/base_" + str(i) + ".txt"
-        result_path = "Gurobi_results/single_machine_0418/job_time_" + str(i) + ".csv"
+        file_path = "tests/due_time_02_long_prod_0418/base_" + str(i) + ".txt"
+        result_path = "Gurobi_results/due_time_02_long_prod_0418/job_time_" + str(i) + ".csv"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         # build and solve the model
         model = RelaxedMIPModel(parameters)
         result.append(model.run_and_solve(result_path))
 
-    workbook = xlsxwriter.Workbook('Gurobi_results/single_machine_0418_result.xlsx')
+    workbook = xlsxwriter.Workbook('Gurobi_results/due_time_02_long_prod_0418_result.xlsx')
     worksheet = workbook.add_worksheet()
     for i in range(1, 31):
         # write operation perform
