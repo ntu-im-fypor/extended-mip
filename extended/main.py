@@ -54,7 +54,7 @@ def test_heuristic_model():
         # test with base_1125
         # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
         # test with base_1130
-        file_path = "extended/tests/single_machine_0418/base_" + str(i+1) + ".txt"
+        file_path = "extended/tests/weight_big_range_0418/base_" + str(i+1) + ".txt"
         # test with 學姊's benchmark
         # file_path = "tests/benchmark/benchmark_" + str(i+1) + ".txt"
         parameters = Parameters()
@@ -62,7 +62,7 @@ def test_heuristic_model():
         start_time = time.time()
         # 1st T/F: use gurobi job order as initial job order
         # 2nd T/F: use ga after greedy
-        heuristic_model = GreedyModel(parameters, False, False, file_path="extended/greedy-results/test.json", instance_num=i+1, job_weight_choice="SPT")
+        heuristic_model = GreedyModel(parameters, False, True, file_path="extended/greedy-results/test.json", instance_num=i+1, job_weight_choice="WEDD")
         
         heuristic_model.run_and_solve()
         df = heuristic_model.record_result(df, i)
@@ -73,7 +73,7 @@ def test_heuristic_model():
     # test with base_1125
     # df.to_csv('greedy-results/base_1125.csv')
     # test with base_1130
-    df.to_csv('extended/greedy-results/single-machine-results/single_machine_0418_SPT.csv')
+    df.to_csv('extended/greedy-results/weight_big_range_0418_new_ga_obj.csv')
     # test with 學姊's benchmark
     # df.to_csv('greedy-results/benchmark.csv')
 
