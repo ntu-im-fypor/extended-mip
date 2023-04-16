@@ -101,8 +101,10 @@ class GreedyModel(SolutionModel):
 
         # run ga after heuristic, using WEDD job order, best job order by heuristic, and a randomly generated population
         if self.use_ga:
+            population_num = 30
+            pick_pop_method = 2 # 1 if weight is [pop_num, pop_num - 1, ..., 1] and 2 if weight is the objective value
             # generate initial population
-            ga_int_pop = ga_order_gen_pop(self.parameters.Number_of_Jobs, self.initial_result['shared_job_order'], self.process_result['shared_job_order'])
+            ga_int_pop = ga_order_gen_pop(self.parameters.Number_of_Jobs, self.initial_result['shared_job_order'], self.process_result['shared_job_order'], population_num)
             # list of dictionaries, with schedule, objective_value, shared_job_order
             ga_pop = []
             # calculate and record objective value of each order
@@ -115,32 +117,34 @@ class GreedyModel(SolutionModel):
                     "shared_job_order": ga_int_pop[i]
                 }
                 ga_pop.append(pop)
-            # find the current worst objective value
-            current_worst_index = max(range(len(ga_pop)), key=lambda i: ga_pop[i]['objective_value'])
-            current_worst_value = ga_pop[current_worst_index]["objective_value"]
-            # run ga for 50 iterations
-            for i in range(50):
+            ga_pop = sorted(ga_pop, key=lambda d: d['objective_value'])
+            # run ga for 1000 iterations
+            for i in range(1000):
                 # random choose two in the population to be parents for crossover
-                r1 = random.randint(0, 29)
-                r2 = random.randint(0, 29)
+                weight_list = []
+                if pick_pop_method == 1:
+                    weight_list = [x+1 for x in list(range(population_num))]
+                    weight_list.reverse()
+                elif pick_pop_method == 2:
+                    weight_list = [x["objective_value"] for x in ga_pop]
+                r1 = random.choices(list(range(population_num)), weights=weight_list, k=1)
+                r2 = random.choices(list(range(population_num)), weights=weight_list, k=1)
                 while r2 == r1:
-                    r2 = random.randint(0, 29)
-                parent = [ga_pop[r1]["shared_job_order"], ga_pop[r2]["shared_job_order"]]
+                    r2 = random.choices(list(range(population_num)), weights=weight_list, k=1)
+                parent = [ga_pop[r1[0]]["shared_job_order"], ga_pop[r2[0]]["shared_job_order"]]
                 child = ga_order_crossover(parent)
                 for j in range(len(child)):
                     tmp_job_listing = self.generate_initial_job_listing(child[j])
                     tmp_job_schedule, tmp_objective_value = self._decide_best_maintenance_position(tmp_job_listing, child[j], np.inf)
-                    if tmp_objective_value < current_worst_value:
-                        del ga_pop[current_worst_index]
-                        pop = {
-                            "schedule": tmp_job_schedule,
-                            "objective_value": tmp_objective_value,
-                            "shared_job_order": child[j]
-                        }
-                        ga_pop.append(pop)
-                        # update the current worst objective value
-                        current_worst_index = max(range(len(ga_pop)), key=lambda k: ga_pop[k]['objective_value'])
-                        current_worst_value = ga_pop[current_worst_index]["objective_value"]
+                    pop = {
+                        "schedule": tmp_job_schedule,
+                        "objective_value": tmp_objective_value,
+                        "shared_job_order": child[j]
+                    }
+                    ga_pop.append(pop)
+                ga_pop = sorted(ga_pop, key=lambda d: d['objective_value'])
+                ga_pop.pop()
+                ga_pop.pop()
             # find best objective value and compare with the objective value before ga
             current_best_index = min(range(len(ga_pop)), key=lambda k: ga_pop[k]['objective_value'])
             current_best_value = ga_pop[current_best_index]["objective_value"]
