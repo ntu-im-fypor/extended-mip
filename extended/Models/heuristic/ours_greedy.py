@@ -40,13 +40,15 @@ class GreedyModel(SolutionModel):
         """
         print("Running and solving using GreedyModel")
         # run initial job listing with maintenance
-        initial_job_listing = self.generate_initial_job_listing()
+        initial_job_listing = None
         # get the shared job order for the initial job listing
         initial_shared_job_order = list[int]
         if self.use_gurobi_order:
             initial_shared_job_order = utils.get_shared_job_order_from_Gurobi(self.instance_num)
+            initial_job_listing = self.generate_initial_job_listing(initial_shared_job_order)
             initial_job_listing = self._sort_schedule_with_shared_job_order(initial_shared_job_order, initial_job_listing)
         else:
+            initial_job_listing = self.generate_initial_job_listing()
             initial_shared_job_order = utils.get_shared_job_order(self.job_weight_list)
         # start to consider the best maintenance position for each machine
         initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order, np.inf)
