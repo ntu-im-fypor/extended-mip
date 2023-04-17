@@ -109,7 +109,6 @@ class GreedyModel(SolutionModel):
             "shared_job_order": best_shared_job_order
         }
 
-        #TODO: if we want to merge step3 to step2, please comment the next line of code
         if not self.merge_step3_to_step2:
             best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
 
@@ -368,7 +367,6 @@ class GreedyModel(SolutionModel):
                     # sort job order on machines according to the new shared job order
                     job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
                     # swap two jobs on the same stage for better performance
-                    ## TODO: need next line of code if we want to merge step3 to step2
                     if self.merge_step3_to_step2:
                         job_order_on_machines_copy, best_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
                     # calculate the objective value for this job order under the situation that other machines maintain the same job order
