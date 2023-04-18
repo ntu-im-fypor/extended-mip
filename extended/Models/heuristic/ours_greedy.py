@@ -12,7 +12,17 @@ import copy
 import random
 
 class GreedyModel(SolutionModel):
-    def __init__(self, parameters: Parameters, use_gurobi_order = False, use_ga = False, maintenance_choice_percentage: float = 0.5, file_path: str = None, instance_num: int = 0, job_weight_choice: str = "WEDD"):
+    def __init__(
+            self, 
+            parameters: Parameters, 
+            use_gurobi_order = False, 
+            use_ga = False, 
+            maintenance_choice_percentage: float = 0.5, 
+            file_path: str = None, 
+            instance_num: int = 0, 
+            job_weight_choice: str = "WEDD",
+            merge_step3_to_step2: bool = False
+        ):
         """
         Initialize the model with the parameters and the maintenance choice percentage
         #### Parameters
@@ -32,6 +42,7 @@ class GreedyModel(SolutionModel):
         self.maintenance_choice_percentage = maintenance_choice_percentage
         self.instance_num = instance_num
         self.job_weight_choice = job_weight_choice
+        self.merge_step3_to_step2 = merge_step3_to_step2
 
     def run_and_solve(self):
         """
@@ -98,8 +109,8 @@ class GreedyModel(SolutionModel):
             "shared_job_order": best_shared_job_order
         }
 
-        #TODO: if we want to merge step3 to step2, please comment the next line of code
-        # best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
+        if not self.merge_step3_to_step2:
+            best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
 
         # run ga after heuristic, using WEDD job order, best job order by heuristic, and a randomly generated population
         if self.use_ga:
@@ -358,8 +369,8 @@ class GreedyModel(SolutionModel):
                     # sort job order on machines according to the new shared job order
                     job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
                     # swap two jobs on the same stage for better performance
-                    ## TODO: need next line of code if we want to merge step3 to step2
-                    job_order_on_machines_copy, best_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
+                    if self.merge_step3_to_step2:
+                        job_order_on_machines_copy, best_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
                     # calculate the objective value for this job order under the situation that other machines maintain the same job order
                     cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
                     if cur_objective_value < best_objective_value:
