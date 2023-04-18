@@ -15,89 +15,83 @@ class Create:
     def __init__(self, factors: dict) -> None:
         self.factors = factors
         self.init_prod_time_set = factors['init_prod_time']
-        self.weight_set = factors['weight']['M']
+        self.weight_set = factors['weight']
         self.prod_discount_set = factors['prod_discount']
-        self.maint_len_set = factors['maint_len']
+        self.maint_len_set = factors['maint_len']['M']
         self.due_time_set = factors['due_time']['M']
         self.remain = self.factors['remain']
-        self.queue_time_set = self.factors['queue_time']
+        self.queue_time_set = self.factors['queue_time']['M']
+        self.bottleneck = self.factors['bottleneck']['M']
         self.file = 'base'
 
+    def scenario(self, factor_name: str, level='M') -> str:
+        self.file = str(factor_name) + '_' + level
+
+        self.maint_len_set = factors['maint_len']['M']
+        self.due_time_set = factors['due_time']['M']
+        self.queue_time_set = self.factors['queue_time']['M']
+        self.bottleneck = self.factors['bottleneck']['M']
+
+        if factor_name == 'maint_len':
+            self.maint_len_set = self.factors['maint_len'][level]
+        elif factor_name == 'due_time':
+            self.due_time_set = self.factors['due_time'][level]
+        elif factor_name == 'queue_time':
+            self.queue_time_set = self.factors['queue_time'][level]
+        elif factor_name == 'bottleneck':
+            self.bottleneck = self.factors['bottleneck'][level]
+
     def sample(self):
-        # self.STAGE_NUM = random.randint(3, 6)
-        # self.JOB_NUM = random.randint(5, 10)
-        # self.MACHINE_NUM = random.randint(1, 4, size=self.STAGE_NUM)
-        self.STAGE_NUM = 2
-        self.JOB_NUM = 10
-        self.MACHINE_NUM = [2, 2]
+        self.STAGE_NUM = 3
+        self.JOB_NUM = 15
+        self.MACHINE_NUM = [2, 2, 2]
         self.TOTAL_MACHINE_NUM = np.sum(self.MACHINE_NUM)
 
-        # self.INIT_PROD_TIME = random.randint(self.init_prod_time_set[0], self.init_prod_time_set[1], size=(self.TOTAL_MACHINE_NUM, self.JOB_NUM))
-        # bottleneck = np.array([0, 1]*10)[:self.TOTAL_MACHINE_NUM]
-        # random.shuffle(bottleneck)
-        # np.array([stats.mode(random.choice([0, 1], 10))[0][0] for x in range(10)])
+        # INIT_PROD_TIME
         machine_status = random.uniform(0.7, 1, size=self.TOTAL_MACHINE_NUM)
-        print(machine_status)
-        tmp_prod_time = random.randint(self.init_prod_time_set[0][0], self.init_prod_time_set[0][1], size=(self.STAGE_NUM, self.JOB_NUM))
-        print(tmp_prod_time)
+        tmp_prod_time = random.randint(self.init_prod_time_set[0], self.init_prod_time_set[1], size=(self.STAGE_NUM, self.JOB_NUM))
         self.INIT_PROD_TIME = []
         for i in range(self.STAGE_NUM):
             for j in range(self.MACHINE_NUM[i]):
                 self.INIT_PROD_TIME.append(tmp_prod_time[i]*machine_status[i+j])
-        # self.INIT_PROD_TIME = np.array(
-        #     [random.randint(self.init_prod_time_set[b][0], self.init_prod_time_set[b][1], size=self.JOB_NUM)
-        #     for b in bottleneck])
-        print(self.INIT_PROD_TIME)
+
+        # TODO: Consider bottleneck, 目前寫死在只有三個 stage & 調整中間 stage
+        for i in range(self.MACHINE_NUM[0], self.MACHINE_NUM[0] + self.MACHINE_NUM[1]):
+            for j in range(self.JOB_NUM):
+                self.INIT_PROD_TIME[i][j] *= self.bottleneck
+
         self.PROD_DISCOUNT = random.uniform(self.prod_discount_set[0], self.prod_discount_set[1], size=self.TOTAL_MACHINE_NUM)
         self.MAINT_LEN = random.uniform(self.maint_len_set[0], self.maint_len_set[1], size=self.TOTAL_MACHINE_NUM)
         self.REMAIN = np.array(random.randint(self.remain[0], self.remain[1], size=self.TOTAL_MACHINE_NUM))
-        print(np.sum(self.INIT_PROD_TIME))
-        # self.QUEUE_TIME_LIMIT = np.array(random.randint(self.queue_time_set[0], self.queue_time_set[1], size=(self.STAGE_NUM, self.JOB_NUM)))
-        self.QUEUE_TIME_LIMIT = [[np.sum(self.INIT_PROD_TIME) for i in range(self.JOB_NUM)] for j in range(self.STAGE_NUM-1)]
-        print(self.QUEUE_TIME_LIMIT)
+        # TODO: the line below is for creating normal queue time limits
+        self.QUEUE_TIME_LIMIT = np.array(random.randint(self.queue_time_set[0], self.queue_time_set[1], size=(self.STAGE_NUM, self.JOB_NUM)))
+        # TODO: the line below is for creating queue time limits that can be considered as inf in the case
+        # self.QUEUE_TIME_LIMIT = [[np.sum(self.INIT_PROD_TIME) for i in range(self.JOB_NUM)] for j in range(self.STAGE_NUM-1)]
 
         # DUE_TIME
-        self.tmp_state = np.zeros((self.STAGE_NUM, self.JOB_NUM))
+        # record the current finish time of the job
+        self.tmp_job_time = np.zeros(self.JOB_NUM)
+        # record the current finish time of each machine, using REMAIN
+        self.tmp_machine_time = self.REMAIN
+        # Create a schedule with "job listing = job index", not considering any maintenance/ queue time limit
         machine_count = 0
-        # Use average time on a stage as the production time
-        # for i in range(self.STAGE_NUM):
-        #     tmp = np.zeros(self.JOB_NUM)
-        #     for j in range(self.MACHINE_NUM[i]):
-        #         for k in range(self.JOB_NUM):
-        #             tmp[k] += self.INIT_PROD_TIME[machine_count][k]
-        #         machine_count += 1
-        #     for j in range(self.JOB_NUM):
-        #         tmp[j] /= self.MACHINE_NUM[i]
-        #     self.tmp_state[i] = tmp
-        # Use min time on a stage as the production time
         for i in range(self.STAGE_NUM):
-            tmp = np.zeros(self.JOB_NUM)
-            for j in range(self.MACHINE_NUM[i]):
-                for k in range(self.JOB_NUM):
-                    if (self.INIT_PROD_TIME[machine_count][k] < tmp[k] or tmp[k] == 0):
-                        tmp[k] = self.INIT_PROD_TIME[machine_count][k]
-                machine_count += 1
             for j in range(self.JOB_NUM):
-                tmp[j] /= self.MACHINE_NUM[i]
-            self.tmp_state[i] = tmp
+                best_machine = min(range(machine_count, machine_count + self.MACHINE_NUM[i]),
+                                   key=lambda k: max(self.tmp_machine_time[k], self.tmp_job_time[j]) + self.INIT_PROD_TIME[k][j])
+                current_time = max(self.tmp_machine_time[best_machine], self.tmp_job_time[j]) + self.INIT_PROD_TIME[best_machine][j]
+                self.tmp_job_time[j] += current_time
+                self.tmp_machine_time[best_machine] += current_time
+            machine_count += self.MACHINE_NUM[i]
 
-        self.state = np.zeros((self.STAGE_NUM, self.JOB_NUM))
-        self.state[0] = np.cumsum(self.tmp_state[0])
-        self.state[:, 0] = np.cumsum(self.tmp_state[:,0])
-
-        for i in range(1, self.STAGE_NUM):
-            for j in range(1, self.JOB_NUM):
-                self.state[i][j] = max(self.state[i][j-1], self.state[i-1][j]) + self.tmp_state[i][j]
-
-        self.due_mu = np.mean(self.state[:, -1]) * self.due_time_set + np.average(self.REMAIN)
+        self.due_mu = np.mean(self.tmp_job_time) * self.due_time_set
         self.due_sigma = self.due_mu * self.factors['due_time']['sig_ratio']
-
         self.DUE_TIME = np.array([pos_normal(self.due_mu, self.due_sigma) for j in range(self.JOB_NUM)]).reshape(-1)
         self.WEIGHT = random.uniform(self.weight_set[0], self.weight_set[1], size=self.JOB_NUM)
 
-
     def run(self, instance_num=10, start_instance_num=1):
         folder_name = 'tests/'
+        # TODO: fix path name 王待辦
         path = folder_name + 'due_time_02_long_prod_0418'
         print(f'scenario: {self.file}')
         if not os.path.isdir(path):
@@ -143,21 +137,34 @@ class Create:
 
 
 factors = {
-    'init_prod_time': [[30, 50], [30, 50]],
+    'init_prod_time': [5, 30],
     'prod_discount': [0.8, 0.9],
-    'weight': {'L': [1, 1], 'M': [0.8, 1.2], 'H': [0.6, 1.4]},
-    'due_time': {'L': 0.4, 'M': 0.2, 'H': 0.8, 'sig_ratio': 0.25},
-    'maint_len': [0, 0],
+    'weight': [0.8, 1.2],
+    'due_time': {'L': 0.4, 'M': 0.6, 'H': 0.8, 'sig_ratio': 0.25},
+    'maint_len': {'L': [0, 0], 'M': [5, 30], 'H': [20, 45]},
 	'remain': [0, 20],
-    'stage_num': [1, 5],
-    'machine_num': [1, 5],
-    'queue_time': [0, 20],
+    # Need to fix code directly if want to create inf queue time
+    'queue_time': {'L': [0, 10], 'M': [10, 20]},
+    'bottleneck': {'L': 1, 'M': 1.2, 'H': 1.4}
   }
-factors_key = factors.keys()
+# factors_key = factors.keys()
+factors_key = ['maint_len', 'queue_time', 'bottleneck']
 
 
 def main(instance_num=10, start_instance_num=1):
+    # base
     create_cls = Create(factors)
     create_cls.run(instance_num=instance_num, start_instance_num=start_instance_num)
+
+    # other scenarios
+    for key in factors_key:
+        if key != 'queue_time':
+            for level in ['L', 'H']:
+                create_cls.scenario(key, level=level)
+                create_cls.run(instance_num=instance_num, start_instance_num=start_instance_num)
+        # TODO: queue_time_H uses inf as queue time, need to fix code directly
+        else:
+            create_cls.scenario(key, level='L')
+            create_cls.run(instance_num=instance_num, start_instance_num=start_instance_num)
 
 main(instance_num=30)
