@@ -4,6 +4,7 @@ from numpy import random
 import numpy as np
 from scipy import stats
 import os
+import copy
 
 
 def pos_normal(mu, sigma):
@@ -36,7 +37,7 @@ class Create:
             self.maint_len_set = self.factors['maint_len'][level]
         elif factor_name == 'due_time':
             self.due_time_set = self.factors['due_time'][level]
-        elif factor_name == 'queue_time':
+        elif factor_name == 'queue_time' and level != 'H':
             self.queue_time_set = self.factors['queue_time'][level]
         elif factor_name == 'bottleneck':
             self.bottleneck = self.factors['bottleneck'][level]
@@ -72,7 +73,7 @@ class Create:
         # record the current finish time of the job
         self.tmp_job_time = np.zeros(self.JOB_NUM)
         # record the current finish time of each machine, using REMAIN
-        self.tmp_machine_time = self.REMAIN
+        self.tmp_machine_time = copy.deepcopy(self.REMAIN)
         # Create a schedule with "job listing = job index", not considering any maintenance/ queue time limit
         machine_count = 0
         for i in range(self.STAGE_NUM):
@@ -80,8 +81,8 @@ class Create:
                 best_machine = min(range(machine_count, machine_count + self.MACHINE_NUM[i]),
                                    key=lambda k: max(self.tmp_machine_time[k], self.tmp_job_time[j]) + self.INIT_PROD_TIME[k][j])
                 current_time = max(self.tmp_machine_time[best_machine], self.tmp_job_time[j]) + self.INIT_PROD_TIME[best_machine][j]
-                self.tmp_job_time[j] += current_time
-                self.tmp_machine_time[best_machine] += current_time
+                self.tmp_job_time[j] = current_time
+                self.tmp_machine_time[best_machine] = current_time
             machine_count += self.MACHINE_NUM[i]
 
         self.due_mu = np.mean(self.tmp_job_time) * self.due_time_set
@@ -90,9 +91,8 @@ class Create:
         self.WEIGHT = random.uniform(self.weight_set[0], self.weight_set[1], size=self.JOB_NUM)
 
     def run(self, instance_num=10, start_instance_num=1):
-        folder_name = 'tests/'
-        # TODO: fix path name 王待辦
-        path = folder_name + 'due_time_02_long_prod_0418'
+        folder_name = 'tests/multiple_machine/'
+        path = folder_name + self.file
         print(f'scenario: {self.file}')
         if not os.path.isdir(path):
             os.makedirs(path)
@@ -166,5 +166,10 @@ def main(instance_num=10, start_instance_num=1):
         else:
             create_cls.scenario(key, level='L')
             create_cls.run(instance_num=instance_num, start_instance_num=start_instance_num)
+
+    # # queue_time_H, need to fix code, can't run together with other scenarios
+    # create_cls = Create(factors)
+    # create_cls.scenario('queue_time', level='H')
+    # create_cls.run(instance_num=instance_num, start_instance_num=start_instance_num)
 
 main(instance_num=30)
