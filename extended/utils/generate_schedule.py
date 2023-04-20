@@ -139,9 +139,10 @@ def generate_schedule(shared_job_order, order_on_machines, instance, instance_nu
     current_machine_index = [0] * total_machines_num
     machine_has_maintained = [False] * total_machines_num
 
-    column_list = ['stage1_machine', 'stage1_start', 'stage1_end', 'stage2_machine', 'stage2_start', 'stage2_end']
+    column_list = ['stage1_machine', 'stage1_start', 'stage1_end', 'stage2_machine', 'stage2_start', 'stage2_end', 'stage3_machine', 'stage3_start', 'stage3_end']
     index_ten = [1,2,3,4,5,6,7,8,9,10]
-    job_df = pd.DataFrame(columns=column_list, index=index_ten)
+    index_fifteen = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    job_df = pd.DataFrame(columns=column_list, index=index_fifteen)
 
     for i in range(total_machines_num): # initialize current machine time
         current_machine_time[i] = instance.REMAIN[i]
@@ -190,6 +191,7 @@ def generate_schedule(shared_job_order, order_on_machines, instance, instance_nu
 
         job_df['stage1_machine'][shared_job_order[i]] = current_job_machines[0]+1 # 0 -> 1, 1 -> 2
         job_df['stage2_machine'][shared_job_order[i]] = current_job_machines[1]-1 # 2 -> 1, 3 -> 2 
+        job_df['stage3_machine'][shared_job_order[i]] = current_job_machines[2]-3 # 4 -> 1, 5 -> 2 
 
         for j in range(instance.STAGES_NUMBER): # update current machine time
             current_machine_time[current_job_machines[j]] = current_job_time[j][1]

@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import copy
 import random
+import time
 
 class GreedyModel(SolutionModel):
     def __init__(
@@ -50,6 +51,7 @@ class GreedyModel(SolutionModel):
         Then calculate the objective value of the schedule using record_result()
         """
         print("Running and solving using GreedyModel")
+        start_time = time.time()
         # run initial job listing with maintenance
         initial_job_listing = None
         # get the shared job order for the initial job listing
@@ -102,6 +104,10 @@ class GreedyModel(SolutionModel):
         print(f"Swap Order Shared Job Order: {best_shared_job_order}")
         print(f"Swap Order Schedule: {best_job_schedule}")
         print("=====")
+
+        print("Time before GA:", time.time() - start_time)
+        print("=====")
+
         # store the current results for final reference (after swapping shared job order)
         self.process_result = {
             "schedule": best_job_schedule,
@@ -132,7 +138,7 @@ class GreedyModel(SolutionModel):
                 ga_pop.append(pop)
             ga_pop = sorted(ga_pop, key=lambda d: d['objective_value'])
             # run ga for 2000 iterations
-            for i in range(2000):
+            for i in range(300):
                 if ga_pop[0]['objective_value'] == 0:
                     break
                 # random choose two in the population to be parents for crossover
