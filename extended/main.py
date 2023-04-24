@@ -33,7 +33,7 @@ def test_relaxation_result():
     # heuristic_model.run_and_solve()
     # heuristic_model.record_result()
 
-def test_heuristic_model():
+def test_heuristic_model(scenario):
     # # read parameters from fileˇ
     # if len(sys.argv) <= 1:
     #     print("No parameters file specified")
@@ -43,26 +43,22 @@ def test_heuristic_model():
     # file_path = "tests/base_1125/base_2.txt"
     # parameters = Parameters()
     # parameters.read_parameters(file_path)
+
     # use input to choose which model to use
-    df = pd.DataFrame(index=range(1, 51), columns=[ # base_1125/base_1130: 51, 學姊's benchmark: 31
+    df = pd.DataFrame(index=range(1, 31), columns=[
         "initial objective value", "initial shared job order", "initial schedule",
         "process objective value", "process shared job order", "process schedule",
         "final objective value", "final shared job order", "final schedule",
         "time"])
-    for i in range(30): # base_1125/base_1130: 50, 學姊's benchmark: 30
-        print("base_" + str(i+1))
-        # test with base_1125
-        # file_path = "tests/base_1125/base_" + str(i+1) + ".txt"
-        # test with base_1130
-        file_path = "extended/tests/single_machine_0418/base_" + str(i+1) + ".txt"
-        # test with 學姊's benchmark
-        # file_path = "tests/benchmark/benchmark_" + str(i+1) + ".txt"
+    for i in range(30):
+        print(scenario + "_" + str(i+1))
+        file_path = "extended/tests/single_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         start_time = time.time()
         # 1st T/F: use gurobi job order as initial job order
         # 2nd T/F: use ga after greedy
-        heuristic_model = GreedyModel(parameters, False, True, file_path="extended/greedy-results/test.json", instance_num=i+1, job_weight_choice="WEDD")
+        heuristic_model = GreedyModel(parameters, False, True, file_path="extended/greedy-results/test.json", instance_num=i+1, job_weight_choice="WEDD", merge_step3_to_step2=True)
         
         heuristic_model.run_and_solve()
         df = heuristic_model.record_result(df, i)
@@ -70,12 +66,7 @@ def test_heuristic_model():
         df.iloc[i]["time"] = run_time
         print("Run time: ", run_time)
         print("=====")
-    # test with base_1125
-    # df.to_csv('greedy-results/base_1125.csv')
-    # test with base_1130
-    df.to_csv('extended/greedy-results/single-machine-results/single_machine_0418_WEDD_new_ga_obj.csv')
-    # test with 學姊's benchmark
-    # df.to_csv('greedy-results/benchmark.csv')
+    df.to_csv('extended/greedy-results/test_0425/single_machine/' + scenario + '.csv')
 
 # def run_initial_job_listing_for_GA_team():
 #     for i in range(1, 51):
@@ -92,6 +83,8 @@ def test_heuristic_model():
 #         heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/benchmark_1203/benchmark_{i}.csv")
 
 if __name__ == '__main__':
-    test_relaxation_result()
-    # test_heuristic_model()
+    # test_relaxation_result()
+    # test_heuristic_model(scenario = 'base')
+    test_heuristic_model(scenario = 'queue_time_H')
+    test_heuristic_model(scenario = 'queue_time_L')
     # run_initial_job_listing_for_GA_team()
