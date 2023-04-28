@@ -52,7 +52,7 @@ def test_heuristic_model(scenario):
         "time"])
     for i in range(30):
         print(scenario + "_" + str(i+1))
-        file_path = "extended/tests/machine_test/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
+        file_path = "extended/tests/stage_test/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
         # file_path = "extended/tests/multiple_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)
@@ -67,7 +67,7 @@ def test_heuristic_model(scenario):
         df.iloc[i]["time"] = run_time
         print("Run time: ", run_time)
         print("=====")
-    df.to_csv('extended/greedy-results/test_0425/machine_test/' + scenario + '.csv')
+    df.to_csv('extended/greedy-results/test_0425/stage_test/' + scenario + '.csv')
 
 # def run_initial_job_listing_for_GA_team():
 #     for i in range(1, 51):
