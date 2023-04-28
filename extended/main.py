@@ -52,13 +52,14 @@ def test_heuristic_model(scenario):
         "time"])
     for i in range(30):
         print(scenario + "_" + str(i+1))
-        file_path = "extended/tests/single_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
+        file_path = "extended/tests/machine_test/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
+        # file_path = "extended/tests/multiple_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         start_time = time.time()
         # 1st T/F: use gurobi job order as initial job order
         # 2nd T/F: use ga after greedy
-        heuristic_model = GreedyModel(parameters, False, True, file_path="extended/greedy-results/test.json", instance_num=i+1, job_weight_choice="WEDD", merge_step3_to_step2=True)
+        heuristic_model = GreedyModel(parameters, False, False, file_path="extended/greedy-results/test.json", instance_num=i+1, job_weight_choice="WEDD", merge_step3_to_step2=True)
         
         heuristic_model.run_and_solve()
         df = heuristic_model.record_result(df, i)
@@ -66,7 +67,7 @@ def test_heuristic_model(scenario):
         df.iloc[i]["time"] = run_time
         print("Run time: ", run_time)
         print("=====")
-    df.to_csv('extended/greedy-results/test_0425/single_machine/' + scenario + '.csv')
+    df.to_csv('extended/greedy-results/test_0425/machine_test/' + scenario + '.csv')
 
 # def run_initial_job_listing_for_GA_team():
 #     for i in range(1, 51):
@@ -84,8 +85,9 @@ def test_heuristic_model(scenario):
 
 if __name__ == '__main__':
     # test_relaxation_result()
-    # test_heuristic_model(scenario = 'base')
-    test_heuristic_model(scenario = 'bottleneck_H_2')
+    test_heuristic_model(scenario = 'base_4')
+    test_heuristic_model(scenario = 'base_5')
+    # test_heuristic_model(scenario = 'bottleneck_H')
     # test_heuristic_model(scenario = 'bottleneck_L')
     # test_heuristic_model(scenario = 'maint_len_H')
     # test_heuristic_model(scenario = 'maint_len_L')
