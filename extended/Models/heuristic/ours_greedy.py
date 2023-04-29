@@ -117,7 +117,8 @@ class GreedyModel(SolutionModel):
         self.process_result = {
             "schedule": best_job_schedule,
             "objective_value": best_objective_value,
-            "shared_job_order": best_shared_job_order
+            "shared_job_order": best_shared_job_order,
+            "greedy_time": time.time() - start_time
         }
 
         if not self.merge_step3_to_step2:
@@ -143,7 +144,7 @@ class GreedyModel(SolutionModel):
                 ga_pop.append(pop)
             ga_pop = sorted(ga_pop, key=lambda d: d['objective_value'])
             # run ga for 2000 iterations
-            for i in range(300):
+            for i in range(1000):
                 if ga_pop[0]['objective_value'] == 0:
                     break
                 # random choose two in the population to be parents for crossover
@@ -508,6 +509,7 @@ class GreedyModel(SolutionModel):
         df.iloc[num]["process objective value"] = self.process_result['objective_value']
         df.iloc[num]["process shared job order"] = self.process_result['shared_job_order']
         df.iloc[num]["process schedule"] = self.process_result['schedule']
+        df.iloc[num]["greedy time"] = self.process_result['greedy_time']
         df.iloc[num]["final objective value"] = self.final_result['objective_value']
         df.iloc[num]["final shared job order"] = self.final_result['shared_job_order']
         df.iloc[num]["final schedule"] = self.final_result['schedule']

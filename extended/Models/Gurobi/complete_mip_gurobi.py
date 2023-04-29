@@ -3,7 +3,7 @@ from gurobipy import *
 from Models import Parameters
 
 class CompleteMIPModel:
-    def __init__(self, parameters: Parameters, run_time_limit=300, mip_gap=0.01) -> None:
+    def __init__(self, parameters: Parameters, run_time_limit=1800, mip_gap=0.01) -> None:
         self.gp_model = gp.Model("Complete_MIP")
         self.gp_model.Params.LogToConsole = 0
         self.parameters = parameters
@@ -238,7 +238,7 @@ class CompleteMIPModel:
         print("Best objective value: ", self.gp_model.objVal)
         print("Best MIP gap: ", self.gp_model.MIPGap)
         print("Best bound: ", self.gp_model.ObjBound)
-        return [self.gp_model.Runtime, self.gp_model.objVal]
+        return [self.gp_model.Runtime, self.gp_model.objVal, self.gp_model.ObjBound]
         # print out all decision variables
         # for v in self.gp_model.getVars():
         #     print(v.varName, v.x)
