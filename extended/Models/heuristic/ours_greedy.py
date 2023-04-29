@@ -144,7 +144,7 @@ class GreedyModel(SolutionModel):
                 ga_pop.append(pop)
             ga_pop = sorted(ga_pop, key=lambda d: d['objective_value'])
             # run ga for 2000 iterations
-            for i in range(300):
+            for i in range(1000):
                 if ga_pop[0]['objective_value'] == 0:
                     break
                 # random choose two in the population to be parents for crossover
