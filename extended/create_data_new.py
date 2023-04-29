@@ -61,6 +61,16 @@ class Create:
             for j in range(self.JOB_NUM):
                 self.INIT_PROD_TIME[i][j] *= self.bottleneck
 
+        # TODO: One stage, bottleneck on first stage
+        # for i in range(self.MACHINE_NUM[0]):
+        #     for j in range(self.JOB_NUM):
+        #         self.INIT_PROD_TIME[i][j] *= self.bottleneck
+
+        # TODO: Four or five stages, bottleneck on third stage
+        # for i in range(self.MACHINE_NUM[0] + self.MACHINE_NUM[1], self.MACHINE_NUM[0] + self.MACHINE_NUM[1] + self.MACHINE_NUM[2]):
+        #     for j in range(self.JOB_NUM):
+        #         self.INIT_PROD_TIME[i][j] *= self.bottleneck
+
         self.PROD_DISCOUNT = random.uniform(self.prod_discount_set[0], self.prod_discount_set[1], size=self.TOTAL_MACHINE_NUM)
         self.MAINT_LEN = random.uniform(self.maint_len_set[0], self.maint_len_set[1], size=self.TOTAL_MACHINE_NUM)
         self.REMAIN = np.array(random.randint(self.remain[0], self.remain[1], size=self.TOTAL_MACHINE_NUM))
@@ -145,7 +155,7 @@ factors = {
 	'remain': [0, 20],
     # Need to fix code directly if want to create inf queue time
     'queue_time': {'L': [0, 10], 'M': [10, 20]},
-    'bottleneck': {'L': 1, 'M': 1.2, 'H': 1.4}
+    'bottleneck': {'L': 1, 'M': 1.2, 'H': 2}
   }
 # factors_key = factors.keys()
 factors_key = ['maint_len', 'queue_time', 'bottleneck']

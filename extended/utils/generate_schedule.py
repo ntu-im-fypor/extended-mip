@@ -186,12 +186,12 @@ def generate_schedule(shared_job_order, order_on_machines, instance, instance_nu
                     current_job_time[k-1][1] += shift
                 else:
                     break
-            job_df[column_list[3*j+1]][shared_job_order[i]] = current_job_time[j][0]
-            job_df[column_list[3*j+2]][shared_job_order[i]] = current_job_time[j][1]
+            # job_df[column_list[3*j+1]][shared_job_order[i]] = current_job_time[j][0]
+            # job_df[column_list[3*j+2]][shared_job_order[i]] = current_job_time[j][1]
 
-        job_df['stage1_machine'][shared_job_order[i]] = current_job_machines[0]+1 # 0 -> 1, 1 -> 2
-        job_df['stage2_machine'][shared_job_order[i]] = current_job_machines[1]-1 # 2 -> 1, 3 -> 2 
-        job_df['stage3_machine'][shared_job_order[i]] = current_job_machines[2]-3 # 4 -> 1, 5 -> 2 
+        # job_df['stage1_machine'][shared_job_order[i]] = current_job_machines[0]+1 # 0 -> 1, 1 -> 2
+        # job_df['stage2_machine'][shared_job_order[i]] = current_job_machines[1]-1 # 2 -> 1, 3 -> 2 
+        # job_df['stage3_machine'][shared_job_order[i]] = current_job_machines[2]-3 # 4 -> 1, 5 -> 2 
 
         for j in range(instance.STAGES_NUMBER): # update current machine time
             current_machine_time[current_job_machines[j]] = current_job_time[j][1]

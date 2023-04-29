@@ -6,7 +6,7 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
-# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 
 def test_relaxation_result():
     result = []
@@ -47,18 +47,19 @@ def test_heuristic_model(scenario):
     # use input to choose which model to use
     df = pd.DataFrame(index=range(1, 31), columns=[
         "initial objective value", "initial shared job order", "initial schedule",
-        "process objective value", "process shared job order", "process schedule",
+        "process objective value", "process shared job order", "process schedule", "greedy time"
         "final objective value", "final shared job order", "final schedule",
         "time"])
     for i in range(30):
         print(scenario + "_" + str(i+1))
-        file_path = "extended/tests/single_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
+        file_path = "extended/tests/stage_test/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
+        # file_path = "extended/tests/multiple_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         start_time = time.time()
         # 1st T/F: use gurobi job order as initial job order
         # 2nd T/F: use ga after greedy
-        heuristic_model = GreedyModel(parameters, False, True, file_path="extended/greedy-results/test.json", instance_num=i+1, job_weight_choice="WEDD", merge_step3_to_step2=True)
+        heuristic_model = GreedyModel(parameters, False, False, file_path="extended/greedy-results/test.json", instance_num=i+1, job_weight_choice="WEDD", merge_step3_to_step2=True)
         
         heuristic_model.run_and_solve()
         df = heuristic_model.record_result(df, i)
@@ -66,7 +67,7 @@ def test_heuristic_model(scenario):
         df.iloc[i]["time"] = run_time
         print("Run time: ", run_time)
         print("=====")
-    df.to_csv('extended/greedy-results/test_0425/single_machine/' + scenario + '.csv')
+    df.to_csv('extended/greedy-results/test_0425/stage_test/' + scenario + '.csv')
 
 # def run_initial_job_listing_for_GA_team():
 #     for i in range(1, 51):
@@ -84,7 +85,12 @@ def test_heuristic_model(scenario):
 
 if __name__ == '__main__':
     # test_relaxation_result()
-    # test_heuristic_model(scenario = 'base')
-    test_heuristic_model(scenario = 'queue_time_H')
-    test_heuristic_model(scenario = 'queue_time_L')
+    test_heuristic_model(scenario = 'base_4')
+    test_heuristic_model(scenario = 'base_5')
+    # test_heuristic_model(scenario = 'bottleneck_H')
+    # test_heuristic_model(scenario = 'bottleneck_L')
+    # test_heuristic_model(scenario = 'maint_len_H')
+    # test_heuristic_model(scenario = 'maint_len_L')
+    # test_heuristic_model(scenario = 'queue_time_H')
+    # test_heuristic_model(scenario = 'queue_time_L')
     # run_initial_job_listing_for_GA_team()
