@@ -166,13 +166,17 @@ save_path='experiment/record/heuristic_update/final/'
 #     maint_mode='all_maint', use_tabu=False)
 
 
-run_scen(title='dueweight_greedy_noswapping', jobinit_mode='due_weight_sort', instance_num=30, \
-    scenario_list=scenario_list, tabu_size=5, iter_num=20, maint_iter_num=10,
-    maint_mode='greedy_maint', use_tabu=True, save_path=save_path)
+# run_scen(title='dueweight_greedy_noswapping', jobinit_mode='due_weight_sort', instance_num=30, \
+#     scenario_list=scenario_list, tabu_size=5, iter_num=20, maint_iter_num=10,
+#     maint_mode='greedy_maint', use_tabu=True, save_path=save_path)
 
-# run_scen(title='dueweight_greedy_upstream_L', jobinit_mode='due_weight_sort', instance_num=30, \
-#     scenario_list=['prod_discount_H'], tabu_size=5, iter_num=20, maint_iter_num=10,
-#     maint_mode='greedy_maint', use_tabu=True, save_path=save_path, discount_reverse=True)
+run_scen(
+    title='single_machine_inf_queue_time', jobinit_mode='due_weight_sort', instance_num=30,
+    scenario_list=['queue_time_H'], tabu_size=5, iter_num=20, maint_iter_num=10,
+    maint_mode='greedy_maint', use_tabu=True, discount_reverse=True,
+    data_path="transformed_params/",
+    save_path="code-before-single-machine-inf-queue-time/"
+    )
 # run_scen(title='due_greedy_upstream_L', jobinit_mode='due_sort', instance_num=30, \
 #     scenario_list=scenario_list, tabu_size=5, iter_num=20, maint_iter_num=10,
 #     maint_mode='greedy_maint', use_tabu=True, save_path=save_path, discount_reverse=True)

@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from Models import Parameters
 
@@ -210,3 +211,32 @@ def get_Gurobi_order_dict() -> dict:
 
     # Create the dictionary with 1-indexed keys
     return {i+1: lst for i, lst in enumerate(lists_of_ints)}
+
+def transform_our_param_to_before(params: Parameters, folder_to_save: str, scenario_name: str, instance_id):
+    """
+    Transform our parameters to the parameters used before
+    params: our parameters
+    folder_to_save: the folder to save the parameters
+    scenario_name: the name of the scenario
+    instance_id: the id of the instance
+    """
+    # create the folder
+    if not os.path.exists(folder_to_save):
+        os.makedirs(folder_to_save)
+
+    # create the file
+    file_name = f"{folder_to_save}/{scenario_name}_{instance_id}.txt"
+    with open(file_name, "w") as f:
+        # sum params.Number_of_Machines, which is a list
+        f.write(f"{sum(params.Number_of_Machines)} {params.Number_of_Jobs}\n")
+        for stage in range(params.Number_of_Stages):
+            for machine in range(params.Number_of_Machines[stage]):
+                discount = params.Production_Time_Discount[stage][machine]
+                maint_len = params.Maintenance_Length[stage][machine]
+                unfinished_prod_time = params.Unfinished_Production_Time[stage][machine]
+                f.write(f"{discount} {maint_len} {unfinished_prod_time} ")
+                for job in range(params.Number_of_Jobs):
+                    f.write(f"{params.Initial_Production_Time[stage][machine][job]} ")
+                f.write("\n")
+        for j in range(params.Number_of_Jobs):
+            f.write(f"{params.Due_Time[j]} {params.Tardiness_Penalty[j]}\n")

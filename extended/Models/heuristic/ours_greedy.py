@@ -22,7 +22,8 @@ class GreedyModel(SolutionModel):
             file_path: str = None, 
             instance_num: int = 0, 
             job_weight_choice: str = "WEDD",
-            merge_step3_to_step2: bool = False
+            merge_step3_to_step2: bool = False,
+            combine_maint_and_swap: bool = True
         ):
         """
         Initialize the model with the parameters and the maintenance choice percentage
@@ -44,6 +45,7 @@ class GreedyModel(SolutionModel):
         self.instance_num = instance_num
         self.job_weight_choice = job_weight_choice
         self.merge_step3_to_step2 = merge_step3_to_step2
+        self.combine_maint_and_swap = combine_maint_and_swap
 
     def run_and_solve(self):
         """
@@ -81,25 +83,28 @@ class GreedyModel(SolutionModel):
         best_objective_value = initial_best_objective_value
         best_job_schedule = initial_job_schedule
         best_shared_job_order = initial_shared_job_order
-        has_improved = False
-        while True:
-            # try swapping shared job order to see if we can get a better solution
-            cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
-            if cur_best_obj < best_objective_value:
-                # use best swapped order to generate a new schedule
-                best_shared_job_order = cur_best_shared_job_order
-                best_job_schedule = self._sort_schedule_with_shared_job_order(best_shared_job_order, best_job_schedule)
-                best_objective_value = cur_best_obj
-            # try adjusting maintenance position to see if we can get a better solution
-            cur_best_schedule, cur_best_obj = self._decide_best_maintenance_position(best_job_schedule, best_shared_job_order, best_objective_value)
-            if cur_best_obj < best_objective_value:
-                best_job_schedule = cur_best_schedule
-                best_objective_value = cur_best_obj
-                has_improved = True
-            else:
-                has_improved = False
-            if not has_improved:
-                break
+        if not self.combine_maint_and_swap:
+            has_improved = False
+            while True:
+                # try swapping shared job order to see if we can get a better solution
+                cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
+                if cur_best_obj < best_objective_value:
+                    # use best swapped order to generate a new schedule
+                    best_shared_job_order = cur_best_shared_job_order
+                    best_job_schedule = self._sort_schedule_with_shared_job_order(best_shared_job_order, best_job_schedule)
+                    best_objective_value = cur_best_obj
+                # try adjusting maintenance position to see if we can get a better solution
+                cur_best_schedule, cur_best_obj = self._decide_best_maintenance_position(best_job_schedule, best_shared_job_order, best_objective_value)
+                if cur_best_obj < best_objective_value:
+                    best_job_schedule = cur_best_schedule
+                    best_objective_value = cur_best_obj
+                    has_improved = True
+                else:
+                    has_improved = False
+                if not has_improved:
+                    break
+        else:
+            best_job_schedule, best_objective_value = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
         print(f"Swap Order Objective Value: {best_objective_value}")
         print(f"Swap Order Shared Job Order: {best_shared_job_order}")
         print(f"Swap Order Schedule: {best_job_schedule}")
@@ -378,6 +383,8 @@ class GreedyModel(SolutionModel):
                     # swap two jobs on the same stage for better performance
                     if self.merge_step3_to_step2:
                         job_order_on_machines_copy, best_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
+                    if self.combine_maint_and_swap:
+                        job_order_on_machines_copy, best_objective_value = self._decide_best_maintenance_position(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
                     # calculate the objective value for this job order under the situation that other machines maintain the same job order
                     cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
                     if cur_objective_value < best_objective_value:
