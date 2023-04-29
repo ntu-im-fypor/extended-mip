@@ -73,7 +73,7 @@ class Data:
 
         AFTER_DIS_SAVE_TIME_LIST = np.array(
                 list(self.AFTER_DIS_SAVE_TIME.values())
-            ).reshape(6, -1)
+            ).reshape(3, -1)
         # distributed_maint
         self.SUM_AFTER_DIS_SAVE_TIME_DIV_MAINT = dict(
             enumerate(
