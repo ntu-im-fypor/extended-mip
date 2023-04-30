@@ -104,7 +104,7 @@ class GreedyModel(SolutionModel):
                 if not has_improved:
                     break
         else:
-            best_job_schedule, best_objective_value = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
+            best_shared_job_order, best_objective_value = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
         print(f"Swap Order Objective Value: {best_objective_value}")
         print(f"Swap Order Shared Job Order: {best_shared_job_order}")
         print(f"Swap Order Schedule: {best_job_schedule}")
@@ -144,7 +144,7 @@ class GreedyModel(SolutionModel):
                 ga_pop.append(pop)
             ga_pop = sorted(ga_pop, key=lambda d: d['objective_value'])
             # run ga for 2000 iterations
-            for i in range(1000):
+            for i in range(300):
                 if ga_pop[0]['objective_value'] == 0:
                     break
                 # random choose two in the population to be parents for crossover
