@@ -86,28 +86,31 @@ class GreedyModel(SolutionModel):
         
         # run merge swap and maint first
         best_shared_job_order, best_objective_value = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
+        
         # switch merge_swap to false to separately run two stages
         self.combine_maint_and_swap = False
-        if not self.combine_maint_and_swap:
-            has_improved = False
-            while True:
-                # try swapping shared job order to see if we can get a better solution
-                cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
-                if cur_best_obj < best_objective_value:
-                    # use best swapped order to generate a new schedule
-                    best_shared_job_order = cur_best_shared_job_order
-                    best_job_schedule = self._sort_schedule_with_shared_job_order(best_shared_job_order, best_job_schedule)
-                    best_objective_value = cur_best_obj
-                # try adjusting maintenance position to see if we can get a better solution
-                cur_best_schedule, cur_best_obj = self._decide_best_maintenance_position(best_job_schedule, best_shared_job_order, best_objective_value)
-                if cur_best_obj < best_objective_value:
-                    best_job_schedule = cur_best_schedule
-                    best_objective_value = cur_best_obj
-                    has_improved = True
-                else:
-                    has_improved = False
-                if not has_improved:
-                    break
+        best_objective_value_no_merge = initial_best_objective_value
+        best_job_schedule_no_merge = initial_job_schedule
+        best_shared_job_order_no_merge = initial_shared_job_order
+        has_improved = False
+        while True:
+            # try swapping shared job order to see if we can get a better solution
+            cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule_no_merge, best_shared_job_order_no_merge, best_objective_value_no_merge)
+            if cur_best_obj < best_objective_value_no_merge:
+                # use best swapped order to generate a new schedule
+                best_shared_job_order_no_merge = cur_best_shared_job_order
+                best_job_schedule_no_merge = self._sort_schedule_with_shared_job_order(best_shared_job_order_no_merge, best_job_schedule_no_merge)
+                best_objective_value_no_merge = cur_best_obj
+            # try adjusting maintenance position to see if we can get a better solution
+            cur_best_schedule, cur_best_obj = self._decide_best_maintenance_position(best_job_schedule_no_merge, best_shared_job_order_no_merge, best_objective_value_no_merge)
+            if cur_best_obj < best_objective_value_no_merge:
+                best_job_schedule_no_merge = cur_best_schedule
+                best_objective_value_no_merge = cur_best_obj
+                has_improved = True
+            else:
+                has_improved = False
+            if not has_improved:
+                break
         print(f"Swap Order Objective Value: {best_objective_value}")
         print(f"Swap Order Shared Job Order: {best_shared_job_order}")
         print(f"Swap Order Schedule: {best_job_schedule}")
