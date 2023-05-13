@@ -85,7 +85,8 @@ class GreedyModel(SolutionModel):
         best_shared_job_order = initial_shared_job_order
         
         # run merge swap and maint first
-        best_shared_job_order, best_objective_value = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
+        for _ in range(self.parameters.Number_of_Jobs):
+            best_shared_job_order, best_objective_value = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
         
         # switch merge_swap to false to separately run two stages
         self.combine_maint_and_swap = False
@@ -93,7 +94,7 @@ class GreedyModel(SolutionModel):
         best_job_schedule_no_merge = initial_job_schedule
         best_shared_job_order_no_merge = initial_shared_job_order
         has_improved = False
-        while True:
+        for _ in range(self.parameters.Number_of_Jobs):
             # try swapping shared job order to see if we can get a better solution
             cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule_no_merge, best_shared_job_order_no_merge, best_objective_value_no_merge)
             if cur_best_obj < best_objective_value_no_merge:
@@ -328,39 +329,39 @@ class GreedyModel(SolutionModel):
         # calculate the number of machines with maintenance
         machines_with_maintenance_num = len(job_order_on_machines)
 
-        accumulated_no_improvement_count = 0
-        while True: # stopping crietria: no improvement for the number of machines with maintenance
-            is_best_schedule_found = False
-            for machine_index, job_order in enumerate(job_order_on_machines_copy):
-                # if the job order contains 'M', it means this machine has maintenance, so we need to find the best position for the maintenance
-                if 'M' in job_order:
-                    has_improved_on_this_machine = False
-                    # do a deep copy of the job order
-                    job_order_copy = copy.deepcopy(job_order)
-                    best_job_order_on_this_machine = copy.deepcopy(job_order)
-                    # first we get the job order list without 'M', and insert 'M' into every possible position to find the best position
-                    for i in range(len(job_order_copy)):
-                        job_order_copy.remove('M')
-                        job_order_copy.insert(i, 'M')
-                        # replace the job order on this machine with the new job order
-                        job_order_on_machines_copy[machine_index] = job_order_copy
-                        # calculate the objective value for this job order under the situation that other machines maintain the same job order
-                        cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
-                        if cur_objective_value < best_objective_value:
-                            best_job_order_on_this_machine = copy.deepcopy(job_order_copy)
-                            best_objective_value = cur_objective_value
-                            has_improved_on_this_machine = True
-                    if not has_improved_on_this_machine:
-                        accumulated_no_improvement_count += 1
-                    else:
-                        accumulated_no_improvement_count = 1
-                    # replace the job order on this machine with the best job order
-                    job_order_on_machines_copy[machine_index] = best_job_order_on_this_machine
-                    if accumulated_no_improvement_count >= machines_with_maintenance_num:
-                        is_best_schedule_found = True
-                        break
-            if is_best_schedule_found:
-                break
+        # accumulated_no_improvement_count = 0
+        # while True: # stopping crietria: no improvement for the number of machines with maintenance
+        #     is_best_schedule_found = False
+        for machine_index, job_order in enumerate(job_order_on_machines_copy):
+            # if the job order contains 'M', it means this machine has maintenance, so we need to find the best position for the maintenance
+            if 'M' in job_order:
+                has_improved_on_this_machine = False
+                # do a deep copy of the job order
+                job_order_copy = copy.deepcopy(job_order)
+                best_job_order_on_this_machine = copy.deepcopy(job_order)
+                # first we get the job order list without 'M', and insert 'M' into every possible position to find the best position
+                for i in range(len(job_order_copy)):
+                    job_order_copy.remove('M')
+                    job_order_copy.insert(i, 'M')
+                    # replace the job order on this machine with the new job order
+                    job_order_on_machines_copy[machine_index] = job_order_copy
+                    # calculate the objective value for this job order under the situation that other machines maintain the same job order
+                    cur_objective_value = generate_schedule(shared_job_order, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
+                    if cur_objective_value < best_objective_value:
+                        best_job_order_on_this_machine = copy.deepcopy(job_order_copy)
+                        best_objective_value = cur_objective_value
+                        has_improved_on_this_machine = True
+                if not has_improved_on_this_machine:
+                    accumulated_no_improvement_count += 1
+                else:
+                    accumulated_no_improvement_count = 1
+                # replace the job order on this machine with the best job order
+                job_order_on_machines_copy[machine_index] = best_job_order_on_this_machine
+                if accumulated_no_improvement_count >= machines_with_maintenance_num:
+                    is_best_schedule_found = True
+                    break
+            # if is_best_schedule_found:
+            #     break
         return job_order_on_machines_copy, best_objective_value
 
     def _try_swapping_shared_job_order(self, job_order_on_machines: list[list], shared_job_order: list[int], initial_best_obj: float) -> tuple[list[int], float]:
@@ -378,26 +379,25 @@ class GreedyModel(SolutionModel):
         shared_job_order_copy = copy.deepcopy(shared_job_order)
         best_objective_value = initial_best_obj
         accumulated_no_improvement_count = 0
-        for _ in rnage(self.parameters.Number_of_Jobs):
-            # use combinations to generate all possible pairs of jobs to swap
-            for i, j in combinations(range(len(shared_job_order_copy)), 2):
-                shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
-                # sort job order on machines according to the new shared job order
-                job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
-                # swap two jobs on the same stage for better performance
-                if self.merge_step3_to_step2:
-                    job_order_on_machines_copy, best_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
-                if self.combine_maint_and_swap:
-                    job_order_on_machines_copy, best_objective_value = self._decide_best_maintenance_position(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
-                # calculate the objective value for this job order under the situation that other machines maintain the same job order
-                cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
-                if cur_objective_value < best_objective_value:
-                    best_objective_value = cur_objective_value
-                    shared_job_order = copy.deepcopy(shared_job_order_copy)
-                    accumulated_no_improvement_count = 1
-                else:
-                    shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i] # swap back because this swap doesn't improve
-                    accumulated_no_improvement_count += 1
+        # use combinations to generate all possible pairs of jobs to swap
+        for i, j in combinations(range(len(shared_job_order_copy)), 2):
+            shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
+            # sort job order on machines according to the new shared job order
+            job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
+            # swap two jobs on the same stage for better performance
+            if self.merge_step3_to_step2:
+                job_order_on_machines_copy, best_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
+            if self.combine_maint_and_swap:
+                job_order_on_machines_copy, best_objective_value = self._decide_best_maintenance_position(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
+            # calculate the objective value for this job order under the situation that other machines maintain the same job order
+            cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
+            if cur_objective_value < best_objective_value:
+                best_objective_value = cur_objective_value
+                shared_job_order = copy.deepcopy(shared_job_order_copy)
+                accumulated_no_improvement_count = 1
+            else:
+                shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i] # swap back because this swap doesn't improve
+                accumulated_no_improvement_count += 1
             if accumulated_no_improvement_count >= len(shared_job_order_copy) * (len(shared_job_order_copy) - 1) / 2: # stopping criteria: no improvement for the number of possible swaps
                 break
         return shared_job_order, best_objective_value
