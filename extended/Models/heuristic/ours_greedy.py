@@ -108,7 +108,6 @@ class GreedyModel(SolutionModel):
                     has_improved = False
                 if not has_improved:
                     break
-        else:
         print(f"Swap Order Objective Value: {best_objective_value}")
         print(f"Swap Order Shared Job Order: {best_shared_job_order}")
         print(f"Swap Order Schedule: {best_job_schedule}")
@@ -376,7 +375,7 @@ class GreedyModel(SolutionModel):
         shared_job_order_copy = copy.deepcopy(shared_job_order)
         best_objective_value = initial_best_obj
         accumulated_no_improvement_count = 0
-       for _ in rnage(self.parameters.Number_of_Jobs):
+        for _ in rnage(self.parameters.Number_of_Jobs):
             # use combinations to generate all possible pairs of jobs to swap
             for i, j in combinations(range(len(shared_job_order_copy)), 2):
                 shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
