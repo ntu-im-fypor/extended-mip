@@ -83,6 +83,11 @@ class GreedyModel(SolutionModel):
         best_objective_value = initial_best_objective_value
         best_job_schedule = initial_job_schedule
         best_shared_job_order = initial_shared_job_order
+        
+        # run merge swap and maint first
+        best_shared_job_order, best_objective_value = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
+        # switch merge_swap to false to separately run two stages
+        self.combine_maint_and_swap = False
         if not self.combine_maint_and_swap:
             has_improved = False
             while True:
@@ -104,7 +109,6 @@ class GreedyModel(SolutionModel):
                 if not has_improved:
                     break
         else:
-            best_shared_job_order, best_objective_value = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
         print(f"Swap Order Objective Value: {best_objective_value}")
         print(f"Swap Order Shared Job Order: {best_shared_job_order}")
         print(f"Swap Order Schedule: {best_job_schedule}")
@@ -372,32 +376,29 @@ class GreedyModel(SolutionModel):
         shared_job_order_copy = copy.deepcopy(shared_job_order)
         best_objective_value = initial_best_obj
         accumulated_no_improvement_count = 0
-        # keep writing the shared job order and current best objective value into a file
-        with open('extended/swap-job-records/no_maint_inf_queue_time.txt', 'a') as f:
-            while True:
-                # use combinations to generate all possible pairs of jobs to swap
-                for i, j in combinations(range(len(shared_job_order_copy)), 2):
-                    shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
-                    # sort job order on machines according to the new shared job order
-                    job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
-                    # swap two jobs on the same stage for better performance
-                    if self.merge_step3_to_step2:
-                        job_order_on_machines_copy, best_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
-                    if self.combine_maint_and_swap:
-                        job_order_on_machines_copy, best_objective_value = self._decide_best_maintenance_position(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
-                    # calculate the objective value for this job order under the situation that other machines maintain the same job order
-                    cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
-                    if cur_objective_value < best_objective_value:
-                        f.write(f"best obj value: [{best_objective_value}] shared job order: " + str(shared_job_order_copy) + "; objective value: " + str(cur_objective_value) + "\n")
-                        best_objective_value = cur_objective_value
-                        shared_job_order = copy.deepcopy(shared_job_order_copy)
-                        accumulated_no_improvement_count = 1
-                    else:
-                        shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i] # swap back because this swap doesn't improve
-                        accumulated_no_improvement_count += 1
-                if accumulated_no_improvement_count >= len(shared_job_order_copy) * (len(shared_job_order_copy) - 1) / 2: # stopping criteria: no improvement for the number of possible swaps
-                    break
-            return shared_job_order, best_objective_value
+       for _ in rnage(self.parameters.Number_of_Jobs):
+            # use combinations to generate all possible pairs of jobs to swap
+            for i, j in combinations(range(len(shared_job_order_copy)), 2):
+                shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
+                # sort job order on machines according to the new shared job order
+                job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
+                # swap two jobs on the same stage for better performance
+                if self.merge_step3_to_step2:
+                    job_order_on_machines_copy, best_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
+                if self.combine_maint_and_swap:
+                    job_order_on_machines_copy, best_objective_value = self._decide_best_maintenance_position(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
+                # calculate the objective value for this job order under the situation that other machines maintain the same job order
+                cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
+                if cur_objective_value < best_objective_value:
+                    best_objective_value = cur_objective_value
+                    shared_job_order = copy.deepcopy(shared_job_order_copy)
+                    accumulated_no_improvement_count = 1
+                else:
+                    shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i] # swap back because this swap doesn't improve
+                    accumulated_no_improvement_count += 1
+            if accumulated_no_improvement_count >= len(shared_job_order_copy) * (len(shared_job_order_copy) - 1) / 2: # stopping criteria: no improvement for the number of possible swaps
+                break
+        return shared_job_order, best_objective_value
 
     def _try_swapping_two_jobs_on_same_stage(self, job_order_on_machines: list[list], shared_job_order: list[int], initial_best_obj: float) -> tuple[list[list], float]:
         """
