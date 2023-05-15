@@ -66,7 +66,7 @@ def test_heuristic_model(scenario):
         df.iloc[i]["time"] = run_time
         print("Run time: ", run_time)
         print("=====")
-    df.to_csv('extended/greedy-results/test_0425/single_machine_0502/' + scenario + '_5000_ga.csv')
+    df.to_csv('extended/greedy-results/test_0425/single_machine_0502/' + scenario + '_test.csv')
 
 # def run_initial_job_listing_for_GA_team():
 #     for i in range(1, 51):
