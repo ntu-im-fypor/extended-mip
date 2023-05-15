@@ -399,7 +399,7 @@ class GreedyModel(SolutionModel):
         # use combinations to generate all possible pairs of jobs to swap
         for i, j in combinations(range(len(shared_job_order_copy)), 2):
             has_improve = False
-            shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i]
+            shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order[j], shared_job_order[i]
             # sort job order on machines according to the new shared job order
             job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
             # swap two jobs on the same stage for better performance
