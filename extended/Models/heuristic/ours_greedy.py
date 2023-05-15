@@ -86,7 +86,12 @@ class GreedyModel(SolutionModel):
         
         # run merge swap and maint first
         for _ in range(self.parameters.Number_of_Jobs):
-            best_shared_job_order, best_objective_value = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
+            cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule, best_shared_job_order, best_objective_value)
+            if cur_best_obj < best_objective_value:
+                # use best swapped order to generate a new schedule
+                best_shared_job_order = cur_best_shared_job_order
+                best_job_schedule = self._sort_schedule_with_shared_job_order(best_shared_job_order, best_job_schedule)
+                best_objective_value = cur_best_obj
         
         print(f"Merge Verison Objective Value: {best_objective_value}")
         print(f"Merge Verison Shared Job Order: {best_shared_job_order}")
