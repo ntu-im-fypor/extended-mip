@@ -53,7 +53,7 @@ def test_heuristic_model(scenario):
         "time"])
     for i in range(30):
         print(scenario + "_" + str(i+1))
-        file_path = "extended/tests/single_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
+        file_path = "extended/tests/multiple_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         start_time = time.time()
@@ -67,7 +67,7 @@ def test_heuristic_model(scenario):
         df.iloc[i]["time"] = run_time
         print("Run time: ", run_time)
         print("=====")
-    df.to_csv('extended/greedy-results/test_0425/single_machine_0502/' + scenario + '_test.csv')
+    df.to_csv('extended/greedy-results/test_0425/multiple_machine_0516/' + scenario + '.csv')
 
 # def run_initial_job_listing_for_GA_team():
 #     for i in range(1, 51):
@@ -86,11 +86,11 @@ def test_heuristic_model(scenario):
 if __name__ == '__main__':
     # test_relaxation_result()
     test_heuristic_model(scenario = 'base')
-    # test_heuristic_model(scenario = 'bottleneck_H')
-    # test_heuristic_model(scenario = 'bottleneck_H_2')
-    # test_heuristic_model(scenario = 'bottleneck_L')
-    # test_heuristic_model(scenario = 'maint_len_H')
-    # test_heuristic_model(scenario = 'maint_len_L')
-    # test_heuristic_model(scenario = 'queue_time_H')
-    # test_heuristic_model(scenario = 'queue_time_L')
+    test_heuristic_model(scenario = 'bottleneck_H')
+    test_heuristic_model(scenario = 'bottleneck_H_2')
+    test_heuristic_model(scenario = 'bottleneck_L')
+    test_heuristic_model(scenario = 'maint_len_H')
+    test_heuristic_model(scenario = 'maint_len_L')
+    test_heuristic_model(scenario = 'queue_time_H')
+    test_heuristic_model(scenario = 'queue_time_L')
     # run_initial_job_listing_for_GA_team()
