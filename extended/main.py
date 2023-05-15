@@ -6,12 +6,12 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
-from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 
 def test_relaxation_result():
     result = []
     for i in range(1, 31):
-        file_path = "tests/multiple_machine/bottleneck_L/bottleneck_L_" + str(i) + ".txt"
+        file_path = "tests/multiple_machine/base/base_" + str(i) + ".txt"
         # result_path = "Gurobi_results/due_time_02_long_prod_0418/job_time_" + str(i) + ".csv"
         parameters = Parameters()
         parameters.read_parameters(file_path)
@@ -19,7 +19,7 @@ def test_relaxation_result():
         model = CompleteMIPModel(parameters)
         result.append(model.run_and_solve())
 
-    workbook = xlsxwriter.Workbook('Gurobi_results/0425_exp/multiple_machine/bottleneck_L_result.xlsx')
+    workbook = xlsxwriter.Workbook('Gurobi_results/0516_exp/multiple_machine/base_result.xlsx')
     worksheet = workbook.add_worksheet()
     for i in range(1, 31):
         # write operation perform
@@ -53,7 +53,7 @@ def test_heuristic_model(scenario):
         "time"])
     for i in range(30):
         print(scenario + "_" + str(i+1))
-        file_path = "extended/tests/single_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
+        file_path = "extended/tests/multiple_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         start_time = time.time()
@@ -67,7 +67,7 @@ def test_heuristic_model(scenario):
         df.iloc[i]["time"] = run_time
         print("Run time: ", run_time)
         print("=====")
-    df.to_csv('extended/greedy-results/test_0425/single_machine_0502/' + scenario + '_test.csv')
+    df.to_csv('extended/greedy-results/test_0425/multiple_machine_0516/' + scenario + '.csv')
 
 # def run_initial_job_listing_for_GA_team():
 #     for i in range(1, 51):
@@ -86,11 +86,11 @@ def test_heuristic_model(scenario):
 if __name__ == '__main__':
     # test_relaxation_result()
     test_heuristic_model(scenario = 'base')
-    # test_heuristic_model(scenario = 'bottleneck_H')
-    # test_heuristic_model(scenario = 'bottleneck_H_2')
-    # test_heuristic_model(scenario = 'bottleneck_L')
-    # test_heuristic_model(scenario = 'maint_len_H')
-    # test_heuristic_model(scenario = 'maint_len_L')
-    # test_heuristic_model(scenario = 'queue_time_H')
-    # test_heuristic_model(scenario = 'queue_time_L')
+    test_heuristic_model(scenario = 'bottleneck_H')
+    test_heuristic_model(scenario = 'bottleneck_H_2')
+    test_heuristic_model(scenario = 'bottleneck_L')
+    test_heuristic_model(scenario = 'maint_len_H')
+    test_heuristic_model(scenario = 'maint_len_L')
+    test_heuristic_model(scenario = 'queue_time_H')
+    test_heuristic_model(scenario = 'queue_time_L')
     # run_initial_job_listing_for_GA_team()

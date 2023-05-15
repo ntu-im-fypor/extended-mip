@@ -3,7 +3,7 @@ from gurobipy import *
 from Models import Parameters
 
 class CompleteMIPModel:
-    def __init__(self, parameters: Parameters, run_time_limit=1800, mip_gap=0.01) -> None:
+    def __init__(self, parameters: Parameters, run_time_limit=1000, mip_gap=0.01) -> None:
         self.gp_model = gp.Model("Complete_MIP")
         self.gp_model.Params.LogToConsole = 0
         self.parameters = parameters
