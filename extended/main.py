@@ -6,7 +6,7 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
-# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 
 def test_relaxation_result():
     result = []
