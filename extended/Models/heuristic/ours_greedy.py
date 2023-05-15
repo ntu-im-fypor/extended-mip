@@ -410,7 +410,7 @@ class GreedyModel(SolutionModel):
                     job_order_on_machines = copy.deepcopy(job_order_on_machines_copy)
                     accumulated_no_improvement_count = 1
             if self.combine_maint_and_swap:
-                job_order_on_machines_copy, cur_best_objective_value = self._decide_best_maintenance_position(job_order_on_machines_copy, shared_job_order, best_objective_value)
+                job_order_on_machines_copy, cur_best_objective_value = self._decide_best_maintenance_position(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
                 if cur_best_objective_value < best_objective_value:
                     best_objective_value = cur_objective_value
                     job_order_on_machines = copy.deepcopy(job_order_on_machines_copy)
