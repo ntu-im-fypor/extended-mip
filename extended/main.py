@@ -47,7 +47,8 @@ def test_heuristic_model(scenario):
     # use input to choose which model to use
     df = pd.DataFrame(index=range(1, 31), columns=[
         "initial objective value", "initial shared job order", "initial schedule",
-        "process objective value", "process shared job order", "process schedule", "greedy time",
+        "merge objective value", "merge shared job order", "merge schedule",
+        "no merge objective value", "no merge shared job order", "no merge schedule", "greedy time",
         "final objective value", "final shared job order", "final schedule",
         "time"])
     for i in range(30):
