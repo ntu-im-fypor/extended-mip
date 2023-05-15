@@ -95,13 +95,11 @@ class GreedyModel(SolutionModel):
         
         print(f"Merge Verison Objective Value: {best_objective_value}")
         print(f"Merge Verison Shared Job Order: {best_shared_job_order}")
-        # TODO: schedule need fix
         print(f"Merge Verison Schedule: {best_job_schedule}")
         print("=====")
 
         # store the results for final reference (merge version)
         self.merge_result = {
-            # TODO: schedule need fix
             "schedule": best_job_schedule,
             "objective_value": best_objective_value,
             "shared_job_order": best_shared_job_order
@@ -148,8 +146,8 @@ class GreedyModel(SolutionModel):
             "greedy_time": time.time() - start_time
         }
 
-        if not self.merge_step3_to_step2:
-            best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
+        # if not self.merge_step3_to_step2:
+        #     best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
 
         # run ga after heuristic, using WEDD job order, best job order by heuristic, and a randomly generated population
         if self.use_ga:
@@ -349,7 +347,7 @@ class GreedyModel(SolutionModel):
         # calculate the number of machines with maintenance
         machines_with_maintenance_num = len(job_order_on_machines)
 
-        # accumulated_no_improvement_count = 0
+        accumulated_no_improvement_count = 0
         # while True: # stopping crietria: no improvement for the number of machines with maintenance
         #     is_best_schedule_found = False
         for machine_index, job_order in enumerate(job_order_on_machines_copy):
