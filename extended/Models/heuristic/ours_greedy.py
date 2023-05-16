@@ -94,7 +94,7 @@ class GreedyModel(SolutionModel):
                 best_objective_value = cur_best_obj
         print(f"Merge Verison Objective Value: {best_objective_value}")
         print(f"Merge Verison Shared Job Order: {best_shared_job_order}")
-        print(f"Merge Verison Schedule: {best_job_schedule}")
+        print(f"Merge Verison Schedule: {best_  job_schedule}")
         print("=====")
 
         # store the results for final reference (merge version)
@@ -419,14 +419,13 @@ class GreedyModel(SolutionModel):
                     job_order_on_machines = copy.deepcopy(job_order_on_machines_copy)
                     accumulated_no_improvement_count = 1
             # calculate the objective value for this job order under the situation that other machines maintain the same job order
-            if not self.merge_step3_to_step2 and not self.combine_maint_and_swap:
-                cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
-                if cur_objective_value < best_objective_value:
-                    has_improve = True
-                    best_objective_value = cur_objective_value
-                    shared_job_order = copy.deepcopy(shared_job_order_copy)
-                    job_order_on_machines = copy.deepcopy(job_order_on_machines_copy)
-                    accumulated_no_improvement_count = 1
+            cur_objective_value = generate_schedule(shared_job_order_copy, job_order_on_machines_copy, instances, self.instance_num, best_objective_value)
+            if cur_objective_value < best_objective_value:
+                has_improve = True
+                best_objective_value = cur_objective_value
+                shared_job_order = copy.deepcopy(shared_job_order_copy)
+                job_order_on_machines = copy.deepcopy(job_order_on_machines_copy)
+                accumulated_no_improvement_count = 1
             if not has_improve:
                 shared_job_order_copy[i], shared_job_order_copy[j] = shared_job_order_copy[j], shared_job_order_copy[i] # swap back because this swap doesn't improve
                 accumulated_no_improvement_count += 1
