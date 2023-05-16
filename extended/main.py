@@ -48,7 +48,8 @@ def test_heuristic_model(scenario):
     df = pd.DataFrame(index=range(1, 31), columns=[
         "initial objective value", "initial shared job order", "initial schedule",
         "merge objective value", "merge shared job order", "merge schedule",
-        "no merge objective value", "no merge shared job order", "no merge schedule", "greedy time",
+        # "no merge objective value", "no merge shared job order", "no merge schedule",
+        "greedy time",
         "final objective value", "final shared job order", "final schedule",
         "time"])
     for i in range(30):
@@ -86,11 +87,11 @@ def test_heuristic_model(scenario):
 if __name__ == '__main__':
     # test_relaxation_result()
     test_heuristic_model(scenario = 'base')
-    # test_heuristic_model(scenario = 'bottleneck_H')
-    # test_heuristic_model(scenario = 'bottleneck_H_2')
-    # test_heuristic_model(scenario = 'bottleneck_L')
-    # test_heuristic_model(scenario = 'maint_len_H')
-    # test_heuristic_model(scenario = 'maint_len_L')
-    # test_heuristic_model(scenario = 'queue_time_H')
-    # test_heuristic_model(scenario = 'queue_time_L')
+    test_heuristic_model(scenario = 'bottleneck_H')
+    test_heuristic_model(scenario = 'bottleneck_H_2')
+    test_heuristic_model(scenario = 'bottleneck_L')
+    test_heuristic_model(scenario = 'maint_len_H')
+    test_heuristic_model(scenario = 'maint_len_L')
+    test_heuristic_model(scenario = 'queue_time_H')
+    test_heuristic_model(scenario = 'queue_time_L')
     # run_initial_job_listing_for_GA_team()

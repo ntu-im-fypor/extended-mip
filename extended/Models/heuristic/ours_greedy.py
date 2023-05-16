@@ -101,49 +101,50 @@ class GreedyModel(SolutionModel):
         self.merge_result = {
             "schedule": best_job_schedule,
             "objective_value": best_objective_value,
-            "shared_job_order": best_shared_job_order
+            "shared_job_order": best_shared_job_order,
+            "greedy_time": time.time() - start_time
         }
 
-        # switch merge_swap to false to separately run two stages
-        self.combine_maint_and_swap = False
-        best_objective_value_no_merge = initial_best_objective_value
-        best_job_schedule_no_merge = initial_job_schedule
-        best_shared_job_order_no_merge = initial_shared_job_order
-        has_improved = False
-        for _ in range(self.parameters.Number_of_Jobs):
-            # try swapping shared job order to see if we can get a better solution
-            cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule_no_merge, best_shared_job_order_no_merge, best_objective_value_no_merge)
-            if cur_best_obj < best_objective_value_no_merge:
-                # use best swapped order to generate a new schedule
-                best_shared_job_order_no_merge = cur_best_shared_job_order
-                best_job_schedule_no_merge = self._sort_schedule_with_shared_job_order(best_shared_job_order_no_merge, best_job_schedule_no_merge)
-                best_objective_value_no_merge = cur_best_obj
-            # try adjusting maintenance position to see if we can get a better solution
-            cur_best_schedule, cur_best_obj = self._decide_best_maintenance_position(best_job_schedule_no_merge, best_shared_job_order_no_merge, best_objective_value_no_merge)
-            if cur_best_obj < best_objective_value_no_merge:
-                best_job_schedule_no_merge = cur_best_schedule
-                best_objective_value_no_merge = cur_best_obj
-                has_improved = True
-            else:
-                has_improved = False
-            if not has_improved:
-                break
+        # # switch merge_swap to false to separately run two stages
+        # self.combine_maint_and_swap = False
+        # best_objective_value_no_merge = initial_best_objective_value
+        # best_job_schedule_no_merge = initial_job_schedule
+        # best_shared_job_order_no_merge = initial_shared_job_order
+        # has_improved = False
+        # for _ in range(self.parameters.Number_of_Jobs):
+        #     # try swapping shared job order to see if we can get a better solution
+        #     cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule_no_merge, best_shared_job_order_no_merge, best_objective_value_no_merge)
+        #     if cur_best_obj < best_objective_value_no_merge:
+        #         # use best swapped order to generate a new schedule
+        #         best_shared_job_order_no_merge = cur_best_shared_job_order
+        #         best_job_schedule_no_merge = self._sort_schedule_with_shared_job_order(best_shared_job_order_no_merge, best_job_schedule_no_merge)
+        #         best_objective_value_no_merge = cur_best_obj
+        #     # try adjusting maintenance position to see if we can get a better solution
+        #     cur_best_schedule, cur_best_obj = self._decide_best_maintenance_position(best_job_schedule_no_merge, best_shared_job_order_no_merge, best_objective_value_no_merge)
+        #     if cur_best_obj < best_objective_value_no_merge:
+        #         best_job_schedule_no_merge = cur_best_schedule
+        #         best_objective_value_no_merge = cur_best_obj
+        #         has_improved = True
+        #     else:
+        #         has_improved = False
+        #     if not has_improved:
+        #         break
 
-        print(f"No Merge Version Objective Value: {best_objective_value_no_merge}")
-        print(f"No Merge Version Shared Job Order: {best_shared_job_order_no_merge}")
-        print(f"No Merge Version Schedule: {best_job_schedule_no_merge}")
-        print("=====")
+        # print(f"No Merge Version Objective Value: {best_objective_value_no_merge}")
+        # print(f"No Merge Version Shared Job Order: {best_shared_job_order_no_merge}")
+        # print(f"No Merge Version Schedule: {best_job_schedule_no_merge}")
+        # print("=====")
 
         print("Time before GA:", time.time() - start_time)
         print("=====")
 
-        # store the results for final reference (no merge version)
-        self.no_merge_result = {
-            "schedule": best_job_schedule_no_merge,
-            "objective_value": best_objective_value_no_merge,
-            "shared_job_order": best_shared_job_order_no_merge,
-            "greedy_time": time.time() - start_time
-        }
+        # # store the results for final reference (no merge version)
+        # self.no_merge_result = {
+        #     "schedule": best_job_schedule_no_merge,
+        #     "objective_value": best_objective_value_no_merge,
+        #     "shared_job_order": best_shared_job_order_no_merge,
+        #     "greedy_time": time.time() - start_time
+        # }
 
         # if not self.merge_step3_to_step2:
         #     best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
@@ -153,7 +154,7 @@ class GreedyModel(SolutionModel):
             population_num = 30
             pick_pop_method = 2 # 1 if weight is [pop_num, pop_num - 1, ..., 1] and 2 if weight is the objective value
             # generate initial population
-            ga_int_pop = ga_order_gen_pop(self.parameters.Number_of_Jobs, self.initial_result['shared_job_order'], self.merge_result['shared_job_order'], self.no_merge_result['shared_job_order'], population_num)
+            ga_int_pop = ga_order_gen_pop(self.parameters.Number_of_Jobs, self.initial_result['shared_job_order'], self.merge_result['shared_job_order'], population_num)
             # list of dictionaries, with schedule, objective_value, shared_job_order
             ga_pop = []
             # calculate and record objective value of each order
@@ -543,10 +544,10 @@ class GreedyModel(SolutionModel):
         df.iloc[num]["merge objective value"] = self.merge_result['objective_value']
         df.iloc[num]["merge shared job order"] = self.merge_result['shared_job_order']
         df.iloc[num]["merge schedule"] = self.merge_result['schedule']
-        df.iloc[num]["no merge objective value"] = self.no_merge_result['objective_value']
-        df.iloc[num]["no merge shared job order"] = self.no_merge_result['shared_job_order']
-        df.iloc[num]["no merge schedule"] = self.no_merge_result['schedule']
-        df.iloc[num]["greedy time"] = self.no_merge_result['greedy_time']
+        # df.iloc[num]["no merge objective value"] = self.no_merge_result['objective_value']
+        # df.iloc[num]["no merge shared job order"] = self.no_merge_result['shared_job_order']
+        # df.iloc[num]["no merge schedule"] = self.no_merge_result['schedule']
+        df.iloc[num]["greedy time"] = self.merge_result['greedy_time']
         df.iloc[num]["final objective value"] = self.final_result['objective_value']
         df.iloc[num]["final shared job order"] = self.final_result['shared_job_order']
         df.iloc[num]["final schedule"] = self.final_result['schedule']
