@@ -94,7 +94,7 @@ class GreedyModel(SolutionModel):
                 best_objective_value = cur_best_obj
         print(f"Merge Verison Objective Value: {best_objective_value}")
         print(f"Merge Verison Shared Job Order: {best_shared_job_order}")
-        print(f"Merge Verison Schedule: {best_  job_schedule}")
+        print(f"Merge Verison Schedule: {best_job_schedule}")
         print("=====")
 
         # store the results for final reference (merge version)
