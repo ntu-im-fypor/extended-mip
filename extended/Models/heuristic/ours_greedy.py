@@ -68,7 +68,9 @@ class GreedyModel(SolutionModel):
             initial_job_listing = self.generate_initial_job_listing()
             initial_shared_job_order = utils.get_shared_job_order(self.job_weight_list)
         # start to consider the best maintenance position for each machine
-        initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order, np.inf)
+        initial_job_schedule, initial_best_objective_value = self._use_initial_job_listing_but_not_swap(initial_job_listing, initial_shared_job_order)
+        initial_job_schedule, initial_best_objective_value = self._try_swapping_two_jobs_on_same_stage(initial_job_schedule, initial_shared_job_order, initial_best_objective_value)
+        initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_schedule, initial_shared_job_order, np.inf)
         print(f"Initial Objective Value: {initial_best_objective_value}")
         print(f"Initial Shared Job Order: {initial_shared_job_order}")
         print(f"Initial Schedule: {initial_job_schedule}")
@@ -162,7 +164,9 @@ class GreedyModel(SolutionModel):
             # calculate and record objective value of each order
             for i in range(len(ga_int_pop)):
                 job_listing = self.generate_initial_job_listing(ga_int_pop[i])
-                job_schedule, objective_value = self._decide_best_maintenance_position(job_listing, ga_int_pop[i], np.inf)
+                job_schedule, objective_value= self._use_initial_job_listing_but_not_swap(job_listing, ga_int_pop[i])
+                job_schedule, objective_value = self._try_swapping_two_jobs_on_same_stage(job_schedule, ga_int_pop[i], objective_value)
+                job_schedule, objective_value = self._decide_best_maintenance_position(job_schedule, ga_int_pop[i], np.inf)
                 pop = {
                     "schedule": job_schedule,
                     "objective_value": objective_value,
@@ -189,7 +193,9 @@ class GreedyModel(SolutionModel):
                 child = ga_order_crossover(parent)
                 for j in range(len(child)):
                     tmp_job_listing = self.generate_initial_job_listing(child[j])
-                    tmp_job_schedule, tmp_objective_value = self._decide_best_maintenance_position(tmp_job_listing, child[j], np.inf)
+                    tmp_job_schedule, tmp_objective_value = self._use_initial_job_listing_but_not_swap(tmp_job_listing, child[j])
+                    tmp_job_schedule, tmp_objective_value = self._try_swapping_two_jobs_on_same_stage(tmp_job_schedule, child[j], tmp_objective_value)
+                    tmp_job_schedule, tmp_objective_value = self._decide_best_maintenance_position(tmp_job_schedule, child[j], np.inf)
                     pop = {
                         "schedule": tmp_job_schedule,
                         "objective_value": tmp_objective_value,
