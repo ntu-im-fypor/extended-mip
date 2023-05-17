@@ -101,7 +101,7 @@ def compute_tardiness(current_end_time, instance):
 
 
 # function for generating schedule and computing objective value
-def generate_schedule(shared_job_order, order_on_machines, instance, instance_num, best_objective_value) -> float:
+def generate_schedule(shared_job_order, order_on_machines, instance, instance_num, best_objective_value = 0) -> float:
 
     def sort_maintenance(maint_order): # TODO: sort maintenance order according to stage and machine length
         # print('maint_order', maint_order)

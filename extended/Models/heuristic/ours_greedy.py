@@ -23,7 +23,8 @@ class GreedyModel(SolutionModel):
             instance_num: int = 0, 
             job_weight_choice: str = "WEDD",
             merge_step3_to_step2: bool = True,
-            combine_maint_and_swap: bool = True
+            combine_maint_and_swap: bool = True,
+            use_initial_but_not_swap = True
         ):
         """
         Initialize the model with the parameters and the maintenance choice percentage
@@ -46,6 +47,7 @@ class GreedyModel(SolutionModel):
         self.job_weight_choice = job_weight_choice
         self.merge_step3_to_step2 = merge_step3_to_step2
         self.combine_maint_and_swap = combine_maint_and_swap
+        self.use_initial_but_not_swap = use_initial_but_not_swap
 
     def run_and_solve(self):
         """
@@ -405,7 +407,11 @@ class GreedyModel(SolutionModel):
             job_order_on_machines_copy = self._sort_schedule_with_shared_job_order(shared_job_order_copy, job_order_on_machines_copy)
             # swap two jobs on the same stage for better performance
             if self.merge_step3_to_step2:
-                job_order_on_machines_copy, cur_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
+                cur_objective_value = np.inf
+                if self.use_initial_but_not_swap:
+                    job_order_on_machines_copy, cur_objective_value = self._use_initial_job_listing_but_not_swap(job_order_on_machines_copy, shared_job_order_copy)
+                else:
+                    job_order_on_machines_copy, cur_objective_value = self._try_swapping_two_jobs_on_same_stage(job_order_on_machines_copy, shared_job_order_copy, best_objective_value)
                 if cur_objective_value < best_objective_value:
                     has_improve = True
                     best_objective_value = cur_objective_value
@@ -563,3 +569,11 @@ class GreedyModel(SolutionModel):
         initial_job_listing = self.generate_initial_job_listing()
         df = pd.DataFrame({'output': initial_job_listing})
         df.to_csv(file_path, index=False)
+
+    def _use_initial_job_listing_but_not_swap(self, job_order_on_machines: list[list], shared_job_order: list[int]) -> tuple[list[list], float]:
+        new_schedule = self.generate_initial_job_listing(shared_job_order)
+        instances = cast_parameters_to_instance(self.parameters)
+        objective_value = generate_schedule(shared_job_order, new_schedule, instances, self.instance_num)
+        return new_schedule, objective_value
+
+
