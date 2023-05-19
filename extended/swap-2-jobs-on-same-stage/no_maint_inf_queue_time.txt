@@ -1,168 +1,168 @@
-Stage 1, Machine 1 and Machine 2, Swap 11 and 3, Objective Value 1108.437790785928 | improved!
-Stage 1, Machine 1 and Machine 2, Swap 6 and 11, Objective Value 1221.5664609390703 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 7 and 11, Objective Value 1433.2953673780848 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 4 and 11, Objective Value 1411.399337965971 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 12 and 11, Objective Value 1272.0458530965898 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 14 and 11, Objective Value 1315.1541700275748 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 15 and 11, Objective Value 1270.9156528856663 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 8 and 11, Objective Value 1301.3893125720695 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 3 and 2, Objective Value 1269.0222251502653 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 6 and 2, Objective Value 1064.424777544048 | improved!
-Stage 1, Machine 1 and Machine 2, Swap 7 and 6, Objective Value 1256.517483617924 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 4 and 6, Objective Value 1234.6214542058096 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 12 and 6, Objective Value 1095.2679693364285 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 14 and 6, Objective Value 1138.3762862674137 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 15 and 6, Objective Value 1094.1377691255052 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 8 and 6, Objective Value 1124.6114288119084 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 3 and 5, Objective Value 1354.4789665027952 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 2 and 5, Objective Value 1193.894532138458 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 7 and 5, Objective Value 1080.6021096502095 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 4 and 5, Objective Value 1195.5664201218433 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 12 and 5, Objective Value 1193.894532138458 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 14 and 5, Objective Value 1193.894532138458 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 15 and 5, Objective Value 1179.5945104780353 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 8 and 5, Objective Value 1210.0681701644385 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 3 and 10, Objective Value 1227.1328495212028 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 2 and 10, Objective Value 1061.8525290757939 | improved!
-Stage 1, Machine 1 and Machine 2, Swap 7 and 2, Objective Value 1215.3847046900523 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 4 and 2, Objective Value 1051.195617789869 | improved!
-Stage 1, Machine 1 and Machine 2, Swap 12 and 4, Objective Value 1066.548415156865 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 14 and 4, Objective Value 1068.5834613936947 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 15 and 4, Objective Value 1052.2483934964423 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 8 and 4, Objective Value 1082.7220531828452 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 3 and 1, Objective Value 1239.8686966113464 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 10 and 1, Objective Value 1176.1117350209324 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 7 and 1, Objective Value 1219.12952681969 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 2 and 1, Objective Value 1074.5883761659377 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 12 and 1, Objective Value 1049.035310983066 | improved!
-Stage 1, Machine 1 and Machine 2, Swap 14 and 12, Objective Value 1011.4384941221256 | improved!
-Stage 1, Machine 1 and Machine 2, Swap 15 and 14, Objective Value 1064.9842405865859 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 8 and 14, Objective Value 1095.457900272989 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 3 and 13, Objective Value 1174.7696349207304 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 10 and 13, Objective Value 1176.1117350209324 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 7 and 13, Objective Value 1215.3847046900523 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 2 and 13, Objective Value 1009.4893144753216 | improved!
-Stage 1, Machine 1 and Machine 2, Swap 1 and 2, Objective Value 1064.132171549081 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 12 and 2, Objective Value 1058.9975411845376 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 15 and 2, Objective Value 999.0169485795241 | improved!
-Stage 1, Machine 1 and Machine 2, Swap 8 and 15, Objective Value 1027.612132148106 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 3 and 9, Objective Value 1184.393856929816 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 10 and 9, Objective Value 1188.482663464285 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 7 and 9, Objective Value 1227.755633133405 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 13 and 9, Objective Value 1023.8094225654781 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 1 and 9, Objective Value 1076.5030999924336 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 12 and 9, Objective Value 1071.3684696278901 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 2 and 9, Objective Value 1019.1135364844072 | not improved!
-Stage 1, Machine 1 and Machine 2, Swap 8 and 9, Objective Value 1015.2412037047534 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 11 and 3, Objective Value 888.4212250810144 | improved!
-Stage 2, Machine 1 and Machine 2, Swap 2 and 11, Objective Value 935.2971339744864 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 6 and 11, Objective Value 1116.3892402708468 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 5 and 11, Objective Value 1314.005295886001 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 10 and 11, Objective Value 1188.5459122626492 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 1 and 11, Objective Value 1196.6319674482536 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 12 and 11, Objective Value 1283.6626159011535 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 8 and 11, Objective Value 1216.8871035466716 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 3 and 7, Objective Value 1181.59750521971 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 2 and 7, Objective Value 1326.8524529895376 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 6 and 7, Objective Value 1084.0646652977239 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 5 and 7, Objective Value 962.9868181868728 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 10 and 7, Objective Value 1226.60703717066 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 1 and 7, Objective Value 1177.4145635595478 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 12 and 7, Objective Value 1222.0370178918001 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 8 and 7, Objective Value 1187.4896485822724 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 3 and 4, Objective Value 1045.788142937199 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 2 and 4, Objective Value 1193.7930081369175 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 6 and 4, Objective Value 1071.0850598827953 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 5 and 4, Objective Value 1048.6132246494462 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 10 and 4, Objective Value 856.2244983843989 | improved!
-Stage 2, Machine 1 and Machine 2, Swap 1 and 10, Objective Value 1036.4707937662206 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 12 and 10, Objective Value 1129.4932673360665 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 8 and 10, Objective Value 1041.5182892766134 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 3 and 14, Objective Value 965.7388545234289 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 2 and 14, Objective Value 1121.4506419940067 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 6 and 14, Objective Value 1061.4869324412894 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 5 and 14, Objective Value 1039.0150972079407 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 4 and 14, Objective Value 929.0199192846244 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 1 and 14, Objective Value 905.0189706258464 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 12 and 14, Objective Value 880.6125114324506 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 8 and 14, Objective Value 967.2604524520063 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 3 and 13, Objective Value 894.5352430943309 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 2 and 13, Objective Value 1056.1003618423085 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 6 and 13, Objective Value 996.136652289591 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 5 and 13, Objective Value 973.6648170562421 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 4 and 13, Objective Value 899.1867520146824 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 1 and 13, Objective Value 852.68082285565 | improved!
-Stage 2, Machine 1 and Machine 2, Swap 12 and 1, Objective Value 906.7341544726247 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 8 and 1, Objective Value 858.4398427640169 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 3 and 15, Objective Value 909.9581158441317 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 2 and 15, Objective Value 1067.9107964539132 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 6 and 15, Objective Value 1007.9470869011959 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 5 and 15, Objective Value 985.475251667847 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 4 and 15, Objective Value 934.78247863783 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 13 and 15, Objective Value 856.8492659171771 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 12 and 15, Objective Value 891.3326838381774 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 8 and 15, Objective Value 889.1499954312764 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 3 and 9, Objective Value 915.9348466263702 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 2 and 9, Objective Value 1079.6022766295478 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 6 and 9, Objective Value 1019.6385670768307 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 5 and 9, Objective Value 997.1667318434817 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 4 and 9, Objective Value 953.1664869002745 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 13 and 9, Objective Value 898.6982732575997 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 12 and 9, Objective Value 909.7166921006221 | not improved!
-Stage 2, Machine 1 and Machine 2, Swap 8 and 9, Objective Value 854.937092075504 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 3 and 2, Objective Value 966.9125088549642 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 11 and 2, Objective Value 854.7967364846389 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 7 and 2, Objective Value 1267.1512076845731 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 4 and 2, Objective Value 1123.6334291087628 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 1 and 2, Objective Value 1151.8620036436912 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 12 and 2, Objective Value 1168.38730146329 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 13 and 2, Objective Value 1191.9087679685767 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 8 and 2, Objective Value 1162.4946352508775 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 3 and 6, Objective Value 838.6225268698416 | improved!
-Stage 3, Machine 1 and Machine 2, Swap 11 and 3, Objective Value 1136.2828865096599 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 7 and 3, Objective Value 962.1887757670663 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 4 and 3, Objective Value 863.4756026174059 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 1 and 3, Objective Value 864.5343156481931 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 12 and 3, Objective Value 881.059613467792 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 13 and 3, Objective Value 904.5810799730784 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 8 and 3, Objective Value 875.1669472553796 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 6 and 5, Objective Value 998.2026446740026 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 11 and 5, Objective Value 1112.3934615917685 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 7 and 5, Objective Value 808.3143721266641 | improved!
-Stage 3, Machine 1 and Machine 2, Swap 4 and 7, Objective Value 980.0243874678583 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 1 and 7, Objective Value 980.0680054306184 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 12 and 7, Objective Value 1013.3108066892578 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 13 and 7, Objective Value 1041.7088660847414 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 8 and 7, Objective Value 1011.1955557376174 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 6 and 10, Objective Value 889.83103967215 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 11 and 10, Objective Value 990.6316931046906 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 5 and 10, Objective Value 993.5894448049523 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 4 and 10, Objective Value 835.5907398646401 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 1 and 10, Objective Value 811.1866360871034 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 12 and 10, Objective Value 890.861556317167 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 13 and 10, Objective Value 919.2596157126507 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 8 and 10, Objective Value 888.7463053655268 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 6 and 14, Objective Value 864.0703031519415 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 11 and 14, Objective Value 951.5515136560667 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 5 and 14, Objective Value 959.3698396826801 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 4 and 14, Objective Value 824.3021126719672 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 1 and 14, Objective Value 824.1561638208615 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 12 and 14, Objective Value 809.7206521542992 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 13 and 14, Objective Value 839.7571772356173 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 8 and 14, Objective Value 832.6989498251457 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 6 and 15, Objective Value 882.6282432933209 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 11 and 15, Objective Value 970.1094537974461 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 5 and 15, Objective Value 975.4635739904263 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 4 and 15, Objective Value 834.4314001512702 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 1 and 15, Objective Value 834.2854513001645 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 12 and 15, Objective Value 860.2284969631036 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 13 and 15, Objective Value 804.165791527976 | improved!
-Stage 3, Machine 1 and Machine 2, Swap 8 and 13, Objective Value 863.7022415767691 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 6 and 9, Objective Value 835.7074593390223 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 11 and 9, Objective Value 923.1886698431476 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 5 and 9, Objective Value 955.9803449465162 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 4 and 9, Objective Value 767.7240215829522 | improved!
-Stage 3, Machine 1 and Machine 2, Swap 1 and 4, Objective Value 767.5780727318465 | improved!
-Stage 3, Machine 1 and Machine 2, Swap 12 and 1, Objective Value 824.0115664217806 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 15 and 1, Objective Value 878.8325268568132 | not improved!
-Stage 3, Machine 1 and Machine 2, Swap 8 and 1, Objective Value 802.2576174797249 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 15 and 3, Objective Value 1804.4816867646964 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 11 and 3, Objective Value 1589.1225656583472 | improved!
+Stage 1, Machine 1 and Machine 2, Swap 6 and 11, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 12 and 11, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 7 and 11, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 14 and 11, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 8 and 11, Objective Value 1626.41002207655 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 4 and 11, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 15 and 10, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 3 and 10, Objective Value 1945.544119819593 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 6 and 10, Objective Value 1746.2931464800783 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 12 and 10, Objective Value 1746.2931464800783 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 7 and 10, Objective Value 1746.2931464800783 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 14 and 10, Objective Value 1746.2931464800783 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 8 and 10, Objective Value 1783.580602898281 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 4 and 10, Objective Value 1746.2931464800783 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 15 and 2, Objective Value 1804.4816867646964 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 3 and 2, Objective Value 1734.4909432652519 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 6 and 2, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 12 and 2, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 7 and 2, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 14 and 2, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 8 and 2, Objective Value 1626.41002207655 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 4 and 2, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 15 and 5, Objective Value 1804.4816867646964 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 3 and 5, Objective Value 1734.4909432652519 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 6 and 5, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 12 and 5, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 7 and 5, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 14 and 5, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 8 and 5, Objective Value 1626.41002207655 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 4 and 5, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 15 and 13, Objective Value 1804.4816867646964 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 3 and 13, Objective Value 1734.4909432652519 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 6 and 13, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 12 and 13, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 7 and 13, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 14 and 13, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 8 and 13, Objective Value 1626.41002207655 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 4 and 13, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 15 and 1, Objective Value 1831.8025768094267 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 3 and 1, Objective Value 1761.8118333099821 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 6 and 1, Objective Value 1616.4434557030777 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 12 and 1, Objective Value 1616.4434557030777 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 7 and 1, Objective Value 1616.4434557030777 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 14 and 1, Objective Value 1614.4660020488602 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 8 and 1, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 4 and 1, Objective Value 1616.4434557030777 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 15 and 9, Objective Value 1804.4816867646964 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 3 and 9, Objective Value 1734.4909432652519 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 6 and 9, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 12 and 9, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 7 and 9, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 14 and 9, Objective Value 1589.1225656583472 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 8 and 9, Objective Value 1626.41002207655 | not improved!
+Stage 1, Machine 1 and Machine 2, Swap 4 and 9, Objective Value 1589.1225656583472 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 10 and 3, Objective Value 1483.9658242383775 | improved!
+Stage 2, Machine 1 and Machine 2, Swap 11 and 10, Objective Value 1274.1530136301433 | improved!
+Stage 2, Machine 1 and Machine 2, Swap 2 and 11, Objective Value 1279.2122746545097 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 5 and 11, Objective Value 1326.115399080428 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 6 and 11, Objective Value 1325.1676905048946 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 12 and 11, Objective Value 1436.8326643322328 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 1 and 11, Objective Value 1474.0167876033113 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 8 and 11, Objective Value 1510.2858135659094 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 3 and 15, Objective Value 1417.289261685087 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 10 and 15, Objective Value 1319.065462201056 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 2 and 15, Objective Value 1345.9600976255267 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 5 and 15, Objective Value 1204.5384477271105 | improved!
+Stage 2, Machine 1 and Machine 2, Swap 6 and 5, Objective Value 1203.5907391515768 | improved!
+Stage 2, Machine 1 and Machine 2, Swap 12 and 6, Objective Value 1315.2557129789147 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 1 and 6, Objective Value 1352.4398362499935 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 8 and 6, Objective Value 1388.7088622125916 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 3 and 7, Objective Value 1318.9446027328272 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 10 and 7, Objective Value 1220.7208032487965 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 2 and 7, Objective Value 1251.8855501235485 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 15 and 7, Objective Value 1175.8083546778837 | improved!
+Stage 2, Machine 1 and Machine 2, Swap 5 and 15, Objective Value 1226.8327835285033 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 12 and 15, Objective Value 1222.831504593168 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 1 and 15, Objective Value 1254.095177297734 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 8 and 15, Objective Value 1290.3642032603323 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 3 and 13, Objective Value 1242.5873594650473 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 10 and 13, Objective Value 1330.6089840622863 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 2 and 13, Objective Value 1132.4369909014292 | improved!
+Stage 2, Machine 1 and Machine 2, Swap 7 and 2, Objective Value 1088.7315107179018 | improved!
+Stage 2, Machine 1 and Machine 2, Swap 5 and 7, Objective Value 1100.2191876407803 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 12 and 7, Objective Value 1100.7526448756394 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 1 and 7, Objective Value 1116.067351985264 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 8 and 7, Objective Value 1119.7953425455019 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 3 and 14, Objective Value 1230.8530149191797 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 10 and 14, Objective Value 1318.874639516419 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 13 and 14, Objective Value 1082.14262440586 | improved!
+Stage 2, Machine 1 and Machine 2, Swap 2 and 13, Objective Value 1161.835519560677 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 5 and 13, Objective Value 1147.9468507612376 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 12 and 13, Objective Value 1214.2903529982668 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 1 and 13, Objective Value 1119.7844612616666 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 8 and 13, Objective Value 1104.3393878004115 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 3 and 4, Objective Value 1163.028388154908 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 10 and 4, Objective Value 1251.050012752147 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 14 and 4, Objective Value 1091.0839022257383 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 2 and 4, Objective Value 1090.0543395170384 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 5 and 4, Objective Value 1076.1656707175991 | improved!
+Stage 2, Machine 1 and Machine 2, Swap 12 and 5, Objective Value 1142.509172954628 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 1 and 5, Objective Value 1040.3345904870882 | improved!
+Stage 2, Machine 1 and Machine 2, Swap 8 and 1, Objective Value 1041.4347420781007 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 3 and 9, Objective Value 1158.212202769447 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 10 and 9, Objective Value 1246.2338273666862 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 14 and 9, Objective Value 1107.1055144044567 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 2 and 9, Objective Value 1085.2381541315776 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 4 and 9, Objective Value 1042.060896415122 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 12 and 9, Objective Value 1137.6929875691671 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 5 and 9, Objective Value 1071.349485332138 | not improved!
+Stage 2, Machine 1 and Machine 2, Swap 8 and 9, Objective Value 1080.8542784747708 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 3 and 15, Objective Value 967.4896203078272 | improved!
+Stage 3, Machine 1 and Machine 2, Swap 11 and 3, Objective Value 1066.292387068932 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 12 and 3, Objective Value 965.3188399103606 | improved!
+Stage 3, Machine 1 and Machine 2, Swap 7 and 12, Objective Value 933.8107790609602 | improved!
+Stage 3, Machine 1 and Machine 2, Swap 13 and 7, Objective Value 960.7481621258066 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 1 and 7, Objective Value 946.5016798498426 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 8 and 7, Objective Value 955.71143604139 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 4 and 7, Objective Value 981.8259294133894 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 15 and 10, Objective Value 933.3383161708961 | improved!
+Stage 3, Machine 1 and Machine 2, Swap 11 and 15, Objective Value 1054.7788832397298 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 3 and 15, Objective Value 969.4885832897004 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 12 and 15, Objective Value 1039.0516340548231 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 13 and 15, Objective Value 1081.1863685892602 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 1 and 15, Objective Value 1042.958477865562 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 8 and 15, Objective Value 1035.5672833664203 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 4 and 15, Objective Value 1041.0753832116766 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 10 and 2, Objective Value 1056.0581463683268 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 11 and 2, Objective Value 932.5799909087294 | improved!
+Stage 3, Machine 1 and Machine 2, Swap 3 and 11, Objective Value 999.4027444506766 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 12 and 11, Objective Value 1046.6921412771924 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 13 and 11, Objective Value 1088.8268758116294 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 1 and 11, Objective Value 1050.5989850879312 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 8 and 11, Objective Value 1043.2077905887895 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 4 and 11, Objective Value 1048.7158904340458 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 10 and 5, Objective Value 978.087875002606 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 2 and 5, Objective Value 995.4550509364655 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 3 and 5, Objective Value 889.7570848388618 | improved!
+Stage 3, Machine 1 and Machine 2, Swap 12 and 3, Objective Value 915.7580518607543 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 13 and 3, Objective Value 951.9439480895819 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 1 and 3, Objective Value 913.7160573658837 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 8 and 3, Objective Value 906.324862866742 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 4 and 3, Objective Value 911.8329627119983 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 10 and 6, Objective Value 947.9190307946426 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 2 and 6, Objective Value 969.3966562877227 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 5 and 6, Objective Value 895.7300672649995 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 12 and 6, Objective Value 929.8579005778074 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 13 and 6, Objective Value 976.4067675612932 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 1 and 6, Objective Value 938.1788768375949 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 8 and 6, Objective Value 930.7876823384534 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 4 and 6, Objective Value 936.2957821837097 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 10 and 14, Objective Value 1004.6791318423994 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 2 and 14, Objective Value 1026.7342775077213 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 5 and 14, Objective Value 1012.9417819991431 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 12 and 14, Objective Value 984.7071637007792 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 13 and 14, Objective Value 890.6020133399744 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 1 and 14, Objective Value 913.6691685338116 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 8 and 14, Objective Value 970.852962535819 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 4 and 14, Objective Value 984.4551850348377 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 10 and 9, Objective Value 918.5764461938425 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 2 and 9, Objective Value 940.6315918591642 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 5 and 9, Objective Value 926.839096350586 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 12 and 9, Objective Value 907.7758962752199 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 13 and 9, Objective Value 952.9527717354737 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 1 and 9, Objective Value 899.232191652369 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 8 and 9, Objective Value 895.8857438355624 | not improved!
+Stage 3, Machine 1 and Machine 2, Swap 4 and 9, Objective Value 890.1282847410911 | not improved!
