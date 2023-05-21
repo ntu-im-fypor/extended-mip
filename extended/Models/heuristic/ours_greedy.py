@@ -24,7 +24,7 @@ class GreedyModel(SolutionModel):
             job_weight_choice: str = "WEDD",
             merge_step3_to_step2: bool = True,
             combine_maint_and_swap: bool = True,
-            use_initial_but_not_swap = False
+            use_initial_but_not_swap = True
         ):
         """
         Initialize the model with the parameters and the maintenance choice percentage
@@ -68,9 +68,9 @@ class GreedyModel(SolutionModel):
             initial_job_listing = self.generate_initial_job_listing()
             initial_shared_job_order = utils.get_shared_job_order(self.job_weight_list)
         # start to consider the best maintenance position for each machine
-        initial_job_schedule, initial_best_objective_value = self._use_initial_job_listing_but_not_swap(initial_job_listing, initial_shared_job_order)
-        initial_job_schedule, initial_best_objective_value = self._try_swapping_two_jobs_on_same_stage(initial_job_schedule, initial_shared_job_order, initial_best_objective_value)
-        initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_schedule, initial_shared_job_order, np.inf)
+        # initial_job_schedule, initial_best_objective_value = self._use_initial_job_listing_but_not_swap(initial_job_listing, initial_shared_job_order)
+        # initial_job_schedule, initial_best_objective_value = self._try_swapping_two_jobs_on_same_stage(initial_job_schedule, initial_shared_job_order, initial_best_objective_value)
+        initial_job_schedule, initial_best_objective_value = self._decide_best_maintenance_position(initial_job_listing, initial_shared_job_order, np.inf)
         print(f"Initial Objective Value: {initial_best_objective_value}")
         print(f"Initial Shared Job Order: {initial_shared_job_order}")
         print(f"Initial Schedule: {initial_job_schedule}")
@@ -175,7 +175,7 @@ class GreedyModel(SolutionModel):
                 ga_pop.append(pop)
             ga_pop = sorted(ga_pop, key=lambda d: d['objective_value'])
             # run ga for 300 iterations
-            for i in range(300):
+            for i in range(1000):
                 if ga_pop[0]['objective_value'] == 0:
                     break
                 # random choose two in the population to be parents for crossover

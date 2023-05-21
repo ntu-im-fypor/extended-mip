@@ -182,4 +182,4 @@ def main(instance_num=10, start_instance_num=1):
     # create_cls.scenario('queue_time', level='H')
     # create_cls.run(instance_num=instance_num, start_instance_num=start_instance_num)
 
-main(instance_num=30)
+main(instance_num=20, start_instance_num=31)
