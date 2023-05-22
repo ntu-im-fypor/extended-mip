@@ -6,11 +6,11 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
-from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 
 def test_relaxation_result():
     result = []
-    for i in range(1, 31):
+    for i in range(31, 46):
         file_path = "tests/multiple_machine/base/base_" + str(i) + ".txt"
         # result_path = "Gurobi_results/due_time_02_long_prod_0418/job_time_" + str(i) + ".csv"
         parameters = Parameters()
@@ -21,7 +21,7 @@ def test_relaxation_result():
 
     workbook = xlsxwriter.Workbook('Gurobi_results/0516_exp/multiple_machine/base_result.xlsx')
     worksheet = workbook.add_worksheet()
-    for i in range(1, 31):
+    for i in range(1, 16):
         # write operation perform
         worksheet.write(i, 0, result[i-1][0])
         worksheet.write(i, 1, result[i-1][1])
@@ -85,13 +85,13 @@ def test_heuristic_model(scenario):
 #         heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/benchmark_1203/benchmark_{i}.csv")
 
 if __name__ == '__main__':
-    # test_relaxation_result()
+    test_relaxation_result()
     # test_heuristic_model(scenario = 'base')
     # test_heuristic_model(scenario = 'bottleneck_H')
     # test_heuristic_model(scenario = 'bottleneck_H_2')
     # test_heuristic_model(scenario = 'bottleneck_L')
     # test_heuristic_model(scenario = 'maint_len_H')
     # test_heuristic_model(scenario = 'maint_len_L')
-    test_heuristic_model(scenario = 'queue_time_H')
-    test_heuristic_model(scenario = 'queue_time_L')
+    # test_heuristic_model(scenario = 'queue_time_H')
+    # test_heuristic_model(scenario = 'queue_time_L')
     # run_initial_job_listing_for_GA_team()
