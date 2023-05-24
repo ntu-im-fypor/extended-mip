@@ -6,7 +6,7 @@ from tokenize import String
 from unittest import result
 from Models import Parameters
 from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
-# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
 
 def test_relaxation_result():
     result = []
@@ -45,16 +45,16 @@ def test_heuristic_model(scenario):
     # parameters.read_parameters(file_path)
 
     # use input to choose which model to use
-    df = pd.DataFrame(index=range(1, 51), columns=[
+    df = pd.DataFrame(index=range(1, 31), columns=[
         "initial objective value", "initial shared job order", "initial schedule",
         "merge objective value", "merge shared job order", "merge schedule",
         # "no merge objective value", "no merge shared job order", "no merge schedule",
         "greedy time",
         "final objective value", "final shared job order", "final schedule",
         "time"])
-    for i in range(50):
+    for i in range(30):
         print(scenario + "_" + str(i+1))
-        file_path = "extended/tests/multiple_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
+        file_path = "extended/tests/single_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         start_time = time.time()
@@ -68,7 +68,7 @@ def test_heuristic_model(scenario):
         df.iloc[i]["time"] = run_time
         print("Run time: ", run_time)
         print("=====")
-    df.to_csv('extended/greedy-results/test_0425/multiple_machine_ga_swap_1000_0523/' + scenario + '.csv')
+    df.to_csv('extended/greedy-results/test_0425/single_machine_0530_final' + scenario + '.csv')
 
 # def run_initial_job_listing_for_GA_team():
 #     for i in range(1, 51):
@@ -85,13 +85,13 @@ def test_heuristic_model(scenario):
 #         heuristic_model.run_initial_and_save_result(f"initial-job-listing-results/benchmark_1203/benchmark_{i}.csv")
 
 if __name__ == '__main__':
-    test_relaxation_result()
-    # test_heuristic_model(scenario = 'base')
-    # test_heuristic_model(scenario = 'bottleneck_H')
-    # test_heuristic_model(scenario = 'bottleneck_H_2')
-    # test_heuristic_model(scenario = 'bottleneck_L')
-    # test_heuristic_model(scenario = 'maint_len_H')
-    # test_heuristic_model(scenario = 'maint_len_L')
-    # test_heuristic_model(scenario = 'queue_time_H')
-    # test_heuristic_model(scenario = 'queue_time_L')
+    # test_relaxation_result()
+    test_heuristic_model(scenario = 'base')
+    test_heuristic_model(scenario = 'bottleneck_H')
+    test_heuristic_model(scenario = 'bottleneck_H_2')
+    test_heuristic_model(scenario = 'bottleneck_L')
+    test_heuristic_model(scenario = 'maint_len_H')
+    test_heuristic_model(scenario = 'maint_len_L')
+    test_heuristic_model(scenario = 'queue_time_H')
+    test_heuristic_model(scenario = 'queue_time_L')
     # run_initial_job_listing_for_GA_team()

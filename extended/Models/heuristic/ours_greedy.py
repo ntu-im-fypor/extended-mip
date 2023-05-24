@@ -24,7 +24,7 @@ class GreedyModel(SolutionModel):
             job_weight_choice: str = "WEDD",
             merge_step3_to_step2: bool = True,
             combine_maint_and_swap: bool = True,
-            use_initial_but_not_swap = True
+            use_initial_but_not_swap = False
         ):
         """
         Initialize the model with the parameters and the maintenance choice percentage
@@ -175,7 +175,7 @@ class GreedyModel(SolutionModel):
                 ga_pop.append(pop)
             ga_pop = sorted(ga_pop, key=lambda d: d['objective_value'])
             # run ga for 300 iterations
-            for i in range(1000):
+            for i in range(300):
                 if ga_pop[0]['objective_value'] == 0:
                     break
                 # random choose two in the population to be parents for crossover
