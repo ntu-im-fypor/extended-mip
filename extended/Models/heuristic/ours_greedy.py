@@ -24,7 +24,7 @@ class GreedyModel(SolutionModel):
             job_weight_choice: str = "WEDD",
             merge_step3_to_step2: bool = True,
             combine_maint_and_swap: bool = True,
-            use_initial_but_not_swap = False
+            use_initial_but_not_swap = True
         ):
         """
         Initialize the model with the parameters and the maintenance choice percentage
