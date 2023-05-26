@@ -307,16 +307,20 @@ class GreedyModel(SolutionModel):
                 job_order_list[i][j].sort(key=lambda x: x[1])
         # now we have the initial job listing, we need to flatten the list
         job_order_list_flatten = []
+        machine_cnt = 0
         for i in range(self.parameters.Number_of_Stages):
             for j in range(self.parameters.Number_of_Machines[i]):
                 # if machine j has maintenance, we need to add a 'M' to the head of the job order list for this machine
                 job_order_for_this_machine = []
                 machine_maintained = False
+                machine_cnt += 1
+                job_cnt = 0
                 if job_order_on_machines is None and self.maintenance_choice[i, j] == 1:
                     job_order_for_this_machine.append('M')
                     machine_maintained = True
                 for job_index, _ in job_order_list[i][j]:
-                    if (not job_order_on_machines is None) and job_order_on_machines[i][j] == 'M':
+                    job_cnt += 1
+                    if (not job_order_on_machines is None) and job_order_on_machines[machine_cnt - 1][job_cnt - 1] == 'M':
                         job_order_for_this_machine.append('M')
                         machine_maintained = True
                     job_order_for_this_machine.append(job_index + 1)                        
