@@ -273,13 +273,14 @@ class GreedyModel(SolutionModel):
         # for each stage, we calculate the largest production time difference for each job on different machines
         # larger production time difference means we should schedule the job first
         for i in range(self.parameters.Number_of_Stages):
-            production_difference_list = [] # store production time difference for each job, every element is a tuple (job index, production time difference)
+            # production_difference_list = [] # store production time difference for each job, every element is a tuple (job index, production time difference)
             machine_num = self.parameters.Number_of_Machines[i]
-            for k in range(self.parameters.Number_of_Jobs):
-                production_difference_list.append((k, max(self.real_production_time_matrix[i, :machine_num, k]) - min(self.real_production_time_matrix[i, :machine_num, k])))
-            production_difference_list.sort(key=lambda x: x[1], reverse=True) # sort the list by production time difference, descending order
+            # for k in range(self.parameters.Number_of_Jobs):
+            #     production_difference_list.append((k, max(self.real_production_time_matrix[i, :machine_num, k]) - min(self.real_production_time_matrix[i, :machine_num, k])))
+            # production_difference_list.sort(key=lambda x: x[1], reverse=True) # sort the list by production time difference, descending order
             # start to schedule the job onto the machine
-            for job_index, _ in production_difference_list: # here the job index starts from 0, after computing we need to add 1 to the final job listing
+            for job_index_with_1_index in shared_job_order: # here the job index starts from 0, after computing we need to add 1 to the final job listing
+                job_index = job_index_with_1_index - 1
                 # first find the machine with smallest production time for this job
                 best_machine_idx = np.argmin(self.real_production_time_matrix[i, :machine_num, job_index])
                 # if schedule the job onto this machine will make current machine time exceed average machine time on this stage, then we need to schedule the job onto another machine
