@@ -65,7 +65,7 @@ class GreedyModel(SolutionModel):
             initial_job_listing = self.generate_initial_job_listing(initial_shared_job_order)
             initial_job_listing = self._sort_schedule_with_shared_job_order(initial_shared_job_order, initial_job_listing)
         else:
-            initial_shared_job_order = utils.get_shared_job_order(self.job_weight_list)
+            initial_shared_job_order = utils.get_shared_job_order(utils.get_WEDD_list(self.parameters))
             initial_job_listing = self.generate_initial_job_listing(initial_shared_job_order)
         # start to consider the best maintenance position for each machine
         # initial_job_schedule, initial_best_objective_value = self._use_initial_job_listing_but_not_swap(initial_job_listing, initial_shared_job_order)
