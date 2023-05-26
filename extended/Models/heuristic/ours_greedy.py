@@ -192,7 +192,8 @@ class GreedyModel(SolutionModel):
                 parent = [ga_pop[r1[0]]["shared_job_order"], ga_pop[r2[0]]["shared_job_order"]]
                 child = ga_order_crossover(parent)
                 for j in range(len(child)):
-                    tmp_job_listing = self.generate_initial_job_listing(child[j])
+                    r = r1 if j == 0 else r2
+                    tmp_job_listing = self.generate_initial_job_listing(child[j], ga_pop[r[0]][tmp_job_schedule])
                     tmp_job_schedule, tmp_objective_value = self._use_initial_job_listing_but_not_swap(tmp_job_listing, child[j])
                     tmp_job_schedule, tmp_objective_value = self._try_swapping_two_jobs_on_same_stage(tmp_job_schedule, child[j], tmp_objective_value)
                     tmp_job_schedule, tmp_objective_value = self._decide_best_maintenance_position(tmp_job_schedule, child[j], np.inf)
@@ -240,7 +241,7 @@ class GreedyModel(SolutionModel):
             self.job_weight_list = utils.get_SPT_list(self.parameters, self.real_production_time_matrix)
         # self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix, 0, 1)
         self.average_machine_time_for_each_stage = np.zeros(self.parameters.Number_of_Stages)
-    def generate_initial_job_listing(self, shared_job_order: list[int] = None) -> list[list]:
+    def generate_initial_job_listing(self, shared_job_order: list[int] = None, job_order_on_machines: list[list] = None) -> list[list]:
         """
         Run the initial job listing part\n
         it will return the initial job listing schedule indicating the job order\n
@@ -310,11 +311,16 @@ class GreedyModel(SolutionModel):
             for j in range(self.parameters.Number_of_Machines[i]):
                 # if machine j has maintenance, we need to add a 'M' to the head of the job order list for this machine
                 job_order_for_this_machine = []
-                if self.maintenance_choice[i, j] == 1:
+                machine_maintained = False
+                if job_order_on_machines is None and self.maintenance_choice[i, j] == 1:
                     job_order_for_this_machine.append('M')
+                    machine_maintained = True
                 for job_index, _ in job_order_list[i][j]:
-                    job_order_for_this_machine.append(job_index + 1)
-                if self.maintenance_choice[i, j] == 0:
+                    if (not job_order_on_machines is None) and job_order_on_machines[i][j] == 'M':
+                        job_order_for_this_machine.append('M')
+                        machine_maintained = True
+                    job_order_for_this_machine.append(job_index + 1)                        
+                if not machine_maintained:
                     job_order_for_this_machine.append('M')
                 job_order_list_flatten.append(job_order_for_this_machine)
         # complete the initial job listing
@@ -578,7 +584,7 @@ class GreedyModel(SolutionModel):
         df.to_csv(file_path, index=False)
 
     def _use_initial_job_listing_but_not_swap(self, job_order_on_machines: list[list], shared_job_order: list[int]) -> tuple[list[list], float]:
-        new_schedule = self.generate_initial_job_listing(shared_job_order)
+        new_schedule = self.generate_initial_job_listing(shared_job_order, job_order_on_machines)
         instances = cast_parameters_to_instance(self.parameters)
         objective_value = generate_schedule(shared_job_order, new_schedule, instances, self.instance_num)
         return new_schedule, objective_value
