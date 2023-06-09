@@ -109,49 +109,8 @@ class GreedyModel(SolutionModel):
             "greedy_time": time.time() - start_time
         }
 
-        # # switch merge_swap to false to separately run two stages
-        # self.combine_maint_and_swap = False
-        # best_objective_value_no_merge = initial_best_objective_value
-        # best_job_schedule_no_merge = initial_job_schedule
-        # best_shared_job_order_no_merge = initial_shared_job_order
-        # has_improved = False
-        # for _ in range(self.parameters.Number_of_Jobs):
-        #     # try swapping shared job order to see if we can get a better solution
-        #     cur_best_shared_job_order, cur_best_obj = self._try_swapping_shared_job_order(best_job_schedule_no_merge, best_shared_job_order_no_merge, best_objective_value_no_merge)
-        #     if cur_best_obj < best_objective_value_no_merge:
-        #         # use best swapped order to generate a new schedule
-        #         best_shared_job_order_no_merge = cur_best_shared_job_order
-        #         best_job_schedule_no_merge = self._sort_schedule_with_shared_job_order(best_shared_job_order_no_merge, best_job_schedule_no_merge)
-        #         best_objective_value_no_merge = cur_best_obj
-        #     # try adjusting maintenance position to see if we can get a better solution
-        #     cur_best_schedule, cur_best_obj = self._decide_best_maintenance_position(best_job_schedule_no_merge, best_shared_job_order_no_merge, best_objective_value_no_merge)
-        #     if cur_best_obj < best_objective_value_no_merge:
-        #         best_job_schedule_no_merge = cur_best_schedule
-        #         best_objective_value_no_merge = cur_best_obj
-        #         has_improved = True
-        #     else:
-        #         has_improved = False
-        #     if not has_improved:
-        #         break
-
-        # print(f"No Merge Version Objective Value: {best_objective_value_no_merge}")
-        # print(f"No Merge Version Shared Job Order: {best_shared_job_order_no_merge}")
-        # print(f"No Merge Version Schedule: {best_job_schedule_no_merge}")
-        # print("=====")
-
         print("Time before GA:", time.time() - start_time)
         print("=====")
-
-        # # store the results for final reference (no merge version)
-        # self.no_merge_result = {
-        #     "schedule": best_job_schedule_no_merge,
-        #     "objective_value": best_objective_value_no_merge,
-        #     "shared_job_order": best_shared_job_order_no_merge,
-        #     "greedy_time": time.time() - start_time
-        # }
-
-        # if not self.merge_step3_to_step2:
-        #     best_job_schedule, best_objective_value = self._try_swapping_two_jobs_on_same_stage(best_job_schedule, best_shared_job_order, best_objective_value)
 
         # run ga after heuristic, using WEDD job order, best job order by heuristic, and a randomly generated population
         if self.use_ga:
