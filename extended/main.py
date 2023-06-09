@@ -5,8 +5,9 @@ import pandas as pd
 from tokenize import String
 from unittest import result
 from Models import Parameters
-from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
-from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+# from Models.Gurobi import CompleteMIPModel, CompleteMIPModel_original, RelaxedMIPModel, SharedRelaxedMIPModel
+# from Models.heuristic import MetaPSOModel, MetaGAModel, GreedyModel
+from Models.heuristic import GreedyModel
 
 def test_relaxation_result():
     result = []
@@ -54,7 +55,8 @@ def test_heuristic_model(scenario):
         "time"])
     for i in range(30):
         print(scenario + "_" + str(i+1))
-        file_path = "extended/tests/single_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
+        # TODO: change parameters in Models/heuristic/ours_greedy.py, line 27-29, for single machine/multiple machine differences
+        file_path = "extended/tests/multiple_machine/" + scenario + "/" + scenario + "_" + str(i+1) + ".txt"
         parameters = Parameters()
         parameters.read_parameters(file_path)
         start_time = time.time()
@@ -68,7 +70,7 @@ def test_heuristic_model(scenario):
         df.iloc[i]["time"] = run_time
         print("Run time: ", run_time)
         print("=====")
-    df.to_csv('extended/greedy-results/test_0425/single_machine_0530_final' + scenario + '.csv')
+    df.to_csv('extended/greedy-results/final_test_0530/multiple_machine/' + scenario + '.csv')
 
 # def run_initial_job_listing_for_GA_team():
 #     for i in range(1, 51):

@@ -24,6 +24,8 @@ class GreedyModel(SolutionModel):
             job_weight_choice: str = "WEDD",
             merge_step3_to_step2: bool = True,
             combine_maint_and_swap: bool = True,
+            # Multiple machines on each stage: use_initial_but_not_swap = True
+            # Only one machine on each stage: use_initial_but_not_swap = False
             use_initial_but_not_swap = True
         ):
         """
@@ -429,7 +431,7 @@ class GreedyModel(SolutionModel):
                 all_stages_machines_job_order[i].append(job_order_on_machines_copy[machine_index])
                 machine_index += 1
         # then we try swapping two jobs between two machines on the same stage
-        with open("extended/swap-2-jobs-on-same-stage/no_maint_inf_queue_time.txt", 'w') as f:
+        with open("extended/greedy-results/process_file.txt", 'w') as f:
             completed_machines_count = 0
             for cur_stage_index, machines_on_this_stage in enumerate(all_stages_machines_job_order):
                 # if there is only one machine on this stage, we don't need to swap
