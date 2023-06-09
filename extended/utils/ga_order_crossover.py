@@ -26,9 +26,3 @@ def ga_order_crossover(job_order_lists) -> list:
 
   # print(new_job_order)
   return new_job_orders
-
-# test
-# job_order_list1 = [2, 1, 4, 7, 5, 8, 6, 3, 9, 10]
-# job_order_list2 = [3, 7, 9, 2, 1, 5, 10, 8, 6, 4]
-
-# ga_order_crossover([job_order_list1, job_order_list2])
