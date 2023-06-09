@@ -1,91 +1,6 @@
 import math
 import pandas as pd
 from operator import itemgetter
-# from Models import Parameters
-
-# Instance:
-# JOBS_NUM: number of jobs, ex: 3
-# STAGES_NUMBER: number of stages, ex: 2
-# MACHINES_NUM: list of number of machines for each stage, ex: [2, 1]
-# DISCOUNT: list of discount for each machine, ex: [0.8, 0.7, 0.9]
-# MAINT_LEN: list of maintenance length for each machine, ex: [5, 4, 6]
-# REMAIN: list of unfinished production on each machine, ex: [3, 6, 0]
-# INIT_PROD_TIME: MACHINES_NUM * JOBS_NUM array of the initial production time per job per machine, ex: [[10, 15, 13],[12, 17, 15],[8, 15, 12]]
-# DUE_TIME: list of due times of each job, ex: [30, 40, 30]
-# WEIGHT: list of penalty of each job, ex: [100, 200, 100]
-# QUEUE_LIMIT: list of queue time limit of each job, assumeing the value doesn't change across different stages, ex: [10, 10, 0]
-
-
-# Order On Machines:
-# Order of jobs and maintenance on a Machine, ex:
-# ex: [[3,1], [4,2,5], [M,4,2,3,5,1], [M,4,2,3,5,1]]
-
-# Shared Job Order
-# ex: [4,2,3,5,1]
-
-# Initializa an instance and solution
-class Instance:
-    JOBS_NUM = 8
-    STAGES_NUMBER = 3
-    MACHINES_NUM = [1, 1, 1]
-    DISCOUNT = [0.8976129930150941, 0.8810900058491944, 0.8070112615378183]
-    MAINT_LEN = [26.886434421662717, 24.605185592139204, 27.026819567803]
-    REMAIN = [2, 14, 0]
-    INIT_PROD_TIME = [[18, 5, 29, 26, 8, 14, 12, 22], [21, 23, 10, 18, 29, 18, 5, 13], [15, 18, 29, 17, 8, 12, 21, 25]]
-    DUE_TIME = [149.07383907299263, 101.29023952518345, 80.29088167978276, 73.63473424011333, 119.91225978166554, 128.19439549338392, 125.35327253440184, 121.49742279836815]
-    WEIGHT = [1.0894125775069705, 0.9436711936056963, 0.9396820198071156, 0.9097654816906069, 1.176964048797249, 0.9840779030753487, 1.1502149340402437, 0.9577260790261988]
-    QUEUE_LIMIT = [[1, 12, 15, 4, 8, 1, 8, 1], [13, 1, 14, 16, 11, 17, 9, 1]]
-
-
-# def transform_parameters_to_instance(parameters: Parameters) -> Instance:
-#     instance = Instance()
-#     instance.JOBS_NUM = parameters.Number_of_Jobs
-#     instance.STAGES_NUMBER = parameters.Number_of_Stages
-#     instance.MACHINES_NUM = parameters.Number_of_Machines
-#     instance.DISCOUNT = []
-#     for i in range(parameters.Number_of_Stages):
-#         for m in range(parameters.Number_of_Machines[i]):
-#             instance.DISCOUNT.append(parameters.Production_Time_Discount[i][m])
-
-#     instance.MAINT_LEN = []
-#     for i in range(parameters.Number_of_Stages):
-#         for m in range(parameters.Number_of_Machines[i]):
-#             instance.MAINT_LEN.append(parameters.Maintenance_Length[i][m])
-
-#     instance.REMAIN = []
-#     for i in range(parameters.Number_of_Stages):
-#         for m in range(parameters.Number_of_Machines[i]):
-#             instance.REMAIN.append(parameters.Unfinished_Production_Time[i][m])
-        
-#     instance.INIT_PROD_TIME = []
-#     for i in range(parameters.Number_of_Stages):
-#         for m in range(parameters.Number_of_Machines[i]):
-#             machine_prod_list = []
-#             for j in range(parameters.Number_of_Jobs):
-#                 machine_prod_list.append(parameters.Initial_Production_Time[i][m][j])
-#             instance.INIT_PROD_TIME.append(machine_prod_list)
-#     instance.DUE_TIME = parameters.Due_Time.tolist()
-#     instance.WEIGHT = parameters.Tardiness_Penalty.tolist()
-#     instance.QUEUE_LIMIT = []
-#     for i in range(1, parameters.Number_of_Stages):
-#         instance.QUEUE_LIMIT.append(parameters.Queue_Time_Limit[i].tolist())
-#     return instance
-
-# def print_instance(instance):
-#     print("JOBS_NUM: ", instance.JOBS_NUM)
-#     print("STAGES_NUMBER: ", instance.STAGES_NUMBER)
-#     print("MACHINES_NUM: ", instance.MACHINES_NUM)
-#     print("DISCOUNT: ", instance.DISCOUNT)
-#     print("MAINT_LEN: ", instance.MAINT_LEN)
-#     print("REMAIN: ", instance.REMAIN)
-#     print("INIT_PROD_TIME: ", instance.INIT_PROD_TIME)
-#     print("DUE_TIME: ", instance.DUE_TIME)
-#     print("WEIGHT: ", instance.WEIGHT)
-#     print("QUEUE_LIMIT: ", instance.QUEUE_LIMIT)
-
-instance = Instance()
-order_on_machines = [[2, 4, 3, 5, 7, 6, 1, 8], [2, 4, 3, 5, 7, 6, 1, 8], ['M', 2, 4, 3, 5, 7, 6, 1, 8]]
-shared_job_order = [2, 4, 3, 5, 7, 6, 1, 8]
 
 
 def compute_tardiness(current_end_time, instance):
@@ -186,21 +101,9 @@ def generate_schedule(shared_job_order, order_on_machines, instance, instance_nu
                     current_job_time[k-1][1] += shift
                 else:
                     break
-            # job_df[column_list[3*j+1]][shared_job_order[i]] = current_job_time[j][0]
-            # job_df[column_list[3*j+2]][shared_job_order[i]] = current_job_time[j][1]
-
-        # job_df['stage1_machine'][shared_job_order[i]] = current_job_machines[0]+1 # 0 -> 1, 1 -> 2
-        # job_df['stage2_machine'][shared_job_order[i]] = current_job_machines[1]-1 # 2 -> 1, 3 -> 2 
-        # job_df['stage3_machine'][shared_job_order[i]] = current_job_machines[2]-3 # 4 -> 1, 5 -> 2 
-
         for j in range(instance.STAGES_NUMBER): # update current machine time
             current_machine_time[current_job_machines[j]] = current_job_time[j][1]
         current_end_time[shared_job_order[i]-1] = current_job_time[instance.STAGES_NUMBER-1][1]
     obj = compute_tardiness(current_end_time, instance)
-    # if obj < best_objective_value:
-    #     job_df.to_csv('extended/greedy-results/no_maint_inf_queue_schedule/job_time_' + str(instance_num) + '.csv')
     return obj
-
-
-# print(generate_schedule(shared_job_order, order_on_machines, instance))
     
