@@ -26,6 +26,3 @@ def ga_order_gen_pop(job_count, WEDD_job_order, heuristic_job_order_merge, popul
             return_value.append(random_order.tolist())
 
     return return_value
-
-# test
-# print(ga_order_gen_pop(10, 30)[0])
