@@ -197,7 +197,6 @@ class GreedyModel(SolutionModel):
             self.job_weight_list = utils.get_EDD_list(self.parameters)
         elif self.job_weight_choice == "SPT":
             self.job_weight_list = utils.get_SPT_list(self.parameters, self.real_production_time_matrix)
-        # self.average_machine_time_for_each_stage = utils.get_average_machine_time_for_each_stage(self.parameters, self.real_production_time_matrix, 0, 1)
         self.average_machine_time_for_each_stage = np.zeros(self.parameters.Number_of_Stages)
     def generate_initial_job_listing(self, shared_job_order: list[int] = None) -> list[list]:
         """

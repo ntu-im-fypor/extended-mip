@@ -96,59 +96,6 @@ def get_SPT_list(parameters: Parameters, production_time_matrix: np.ndarray):
     for k in range(parameters.Number_of_Jobs):
         SPT_list[k] = np.min(production_time_matrix[0][:, k])
     return SPT_list
-def get_average_machine_time_for_each_stage(parameters: Parameters, production_time_matrix: np.ndarray, method_choice: int, sensitive_denominator: float) -> np.ndarray:
-    """
-    Get the average machine time for each stage\n
-    method_choice:
-    0: origin method, choose by time difference for each job on different machines,
-       if schedule the job onto this machine will make current machine time exceed average machine time on this stage,
-       we try to find another machine that have smallest current machine time
-    1: very large average_machine_time, for each job, just choose the smallest production time on different machines
-    2: very small average_machine_time, for each job, choose the machine that can make the smallest current machine time
-    3: half of average_machine_time
-    4: average = all values' Q2 value * number of jobs
-    """
-    average_machine_time = np.zeros(parameters.Number_of_Stages)
-    if method_choice == 0:
-        for i in range(parameters.Number_of_Stages):
-            for j in range(parameters.Number_of_Machines[i]):
-                # need to add unfinished production time for that machine
-                average_machine_time[i] += parameters.Unfinished_Production_Time[i][j]
-                for k in range(parameters.Number_of_Jobs):
-                    average_machine_time[i] += production_time_matrix[i][j][k]
-            average_machine_time[i] /= parameters.Number_of_Machines[i] # divide by the square of the number of machines
-    elif method_choice == 1:
-        for i in range(parameters.Number_of_Stages):
-            for j in range(parameters.Number_of_Machines[i]):
-                average_machine_time[i] += parameters.Unfinished_Production_Time[i][j]
-                for k in range(parameters.Number_of_Jobs):
-                    average_machine_time[i] += production_time_matrix[i][j][k]
-    elif method_choice == 2:
-        for i in range(parameters.Number_of_Stages):
-            average_machine_time[i] = -1 
-    elif method_choice == 3:
-        for i in range(parameters.Number_of_Stages):
-            for j in range(parameters.Number_of_Machines[i]):
-                # need to add unfinished production time for that machine
-                average_machine_time[i] += parameters.Unfinished_Production_Time[i][j]
-                for k in range(parameters.Number_of_Jobs):
-                    average_machine_time[i] += production_time_matrix[i][j][k]
-            average_machine_time[i] /= (parameters.Number_of_Machines[i]*sensitive_denominator) # divide by the square of the number of machines
-    else:
-        for i in range(parameters.Number_of_Stages):
-            values = []
-            for j in range(parameters.Number_of_Machines[i]):
-                for k in range(parameters.Number_of_Jobs):
-                    values.append(production_time_matrix[i][j][k])
-            q2_value = np.quantile(values, .50)
-
-            for j in range(parameters.Number_of_Machines[i]):
-                average_machine_time[i] += parameters.Unfinished_Production_Time[i][j]
-                for k in range(parameters.Number_of_Jobs):
-                    average_machine_time[i] += q2_value
-            average_machine_time[i] /= parameters.Number_of_Machines[i] # divide by the square of the number of machines
-
-    return average_machine_time
 
 def get_shared_job_order(weight_list):
     """
@@ -211,32 +158,3 @@ def get_Gurobi_order_dict() -> dict:
 
     # Create the dictionary with 1-indexed keys
     return {i+1: lst for i, lst in enumerate(lists_of_ints)}
-
-def transform_our_param_to_before(params: Parameters, folder_to_save: str, scenario_name: str, instance_id):
-    """
-    Transform our parameters to the parameters used before
-    params: our parameters
-    folder_to_save: the folder to save the parameters
-    scenario_name: the name of the scenario
-    instance_id: the id of the instance
-    """
-    # create the folder
-    if not os.path.exists(folder_to_save):
-        os.makedirs(folder_to_save)
-
-    # create the file
-    file_name = f"{folder_to_save}/{scenario_name}_{instance_id}.txt"
-    with open(file_name, "w") as f:
-        # sum params.Number_of_Machines, which is a list
-        f.write(f"{sum(params.Number_of_Machines)} {params.Number_of_Jobs}\n")
-        for stage in range(params.Number_of_Stages):
-            for machine in range(params.Number_of_Machines[stage]):
-                discount = params.Production_Time_Discount[stage][machine]
-                maint_len = params.Maintenance_Length[stage][machine]
-                unfinished_prod_time = params.Unfinished_Production_Time[stage][machine]
-                f.write(f"{discount} {maint_len} {unfinished_prod_time} ")
-                for job in range(params.Number_of_Jobs):
-                    f.write(f"{params.Initial_Production_Time[stage][machine][job]} ")
-                f.write("\n")
-        for j in range(params.Number_of_Jobs):
-            f.write(f"{params.Due_Time[j]} {params.Tardiness_Penalty[j]}\n")
